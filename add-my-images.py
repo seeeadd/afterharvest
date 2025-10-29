@@ -104,10 +104,12 @@ def main():
 
     # Find all signature files
     signature_files = [
+        'sean-signature-final.html',
+        'sean-signature-kinfolk-warm.html',
+        'sean-signature-studio.html',
         'sean-signature-bold.html',
         'sean-signature-kinfolk.html',
         'sean-signature-brutalist.html',
-        'sean-signature-final.html',
         'sean-signature-asymmetric-v2.html',
         'sean-signature-photo-left.html'
     ]
