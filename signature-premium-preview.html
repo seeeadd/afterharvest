@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Email Signature Designs - Afterharvest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2C2C2C;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        .header .subtitle {
+            font-size: 18px;
+            color: #7B6B9E;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .header .description {
+            font-size: 14px;
+            color: #6B6B6B;
+            margin-top: 16px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+        .designs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        .design-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .design-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .design-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2C2C2C;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+        .design-description {
+            font-size: 13px;
+            color: #6B6B6B;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .design-features {
+            font-size: 12px;
+            color: #7B6B9E;
+            margin-bottom: 24px;
+            padding: 12px;
+            background: rgba(123,107,158,0.04);
+            border-radius: 6px;
+            border-left: 3px solid #7B6B9E;
+        }
+        .design-features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .design-features li {
+            padding: 4px 0;
+        }
+        .design-features li:before {
+            content: "✦";
+            color: #7B6B9E;
+            margin-right: 8px;
+            font-size: 10px;
+        }
+        .signature-preview {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .email-context {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        .email-text {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .best-for {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: #856404;
+            margin-top: 16px;
+            border-radius: 4px;
+        }
+        .instructions {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .instructions h2 {
+            font-size: 24px;
+            color: #2C2C2C;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            font-size: 16px;
+            color: #7B6B9E;
+            margin: 24px 0 12px 0;
+            font-weight: 600;
+        }
+        .instructions code {
+            background: #f1f3f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            color: #7B6B9E;
+        }
+        .instructions ol {
+            padding-left: 24px;
+        }
+        .instructions li {
+            margin: 12px 0;
+            line-height: 1.7;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning-box strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .pro-tip {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .pro-tip strong {
+            color: #0d47a1;
+            display: block;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Premium Email Signature Designs</h1>
+            <div class="subtitle">$10,000 Designer Aesthetic for Afterharvest</div>
+            <div class="description">
+                Three sophisticated, high-end signature layouts featuring editorial typography, asymmetric balance, and luxury details. Each design is email-client tested and optimized for cold outreach.
+            </div>
+        </div>
+
+        <div class="designs-grid">
+            <!-- Design 1: Editorial Vertical Rule -->
+            <div class="design-card">
+                <div class="design-title">1. Editorial Vertical Rule</div>
+                <div class="design-description">
+                    Classic editorial aesthetic with vertical hairline divider. Soft rounded-square photo with premium shadow. Sophisticated gradient rule and subtle background tint.
+                </div>
+                <div class="design-features">
+                    <ul>
+                        <li>Rounded square photo (10px radius) with border + shadow</li>
+                        <li>Vertical gradient divider for editorial feel</li>
+                        <li>ALL CAPS title with generous letter-spacing</li>
+                        <li>Horizontal micro-rule accent</li>
+                        <li>Subtle background tint (rgba opacity)</li>
+                    </ul>
+                </div>
+                <div class="signature-preview">
+                    <div class="email-context">
+                        <div class="email-text">Hi Sarah,</div>
+                        <div class="email-text">I noticed you're building an engaged community. I'd love to share how we help community builders improve retention.</div>
+                        <div class="email-text">Open to a quick call next week?</div>
+                        <div class="email-text">Best,</div>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e0e0e0;">
+                        <!-- Signature Preview with Placeholder -->
+                        <table cellpadding="0" cellspacing="0" border="0" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; color: #2C2C2C; max-width: 500px; background: rgba(123,107,158,0.02); padding: 20px 24px; border-radius: 3px;">
+                            <tr>
+                                <td style="vertical-align: top; padding-right: 0;">
+                                    <div style="width: 72px; height: 72px; border-radius: 10px; background: linear-gradient(135deg, #7B6B9E, #9B8BB8); border: 2px solid #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;">YN</div>
+                                </td>
+                                <td style="vertical-align: top; padding: 0 20px;">
+                                    <div style="width: 1px; height: 100%; background: linear-gradient(to bottom, rgba(123,107,158,0.15) 0%, rgba(123,107,158,0.4) 50%, rgba(123,107,158,0.15) 100%); min-height: 72px;"></div>
+                                </td>
+                                <td style="vertical-align: top; padding-left: 4px;">
+                                    <div style="font-size: 18px; font-weight: 600; color: #2C2C2C; margin: 0 0 4px 0; line-height: 1.2; letter-spacing: 0.5px;">Your Name</div>
+                                    <div style="font-size: 11px; font-weight: 500; color: #6B6B6B; margin: 0 0 10px 0; line-height: 1.3; letter-spacing: 1.2px; text-transform: uppercase;">YOUR TITLE</div>
+                                    <div style="width: 40px; height: 1px; background: rgba(123,107,158,0.25); margin: 0 0 10px 0;"></div>
+                                    <div style="font-size: 14px; font-weight: 600; color: #7B6B9E; margin: 0 0 4px 0; line-height: 1.3; letter-spacing: 0.3px;">Afterharvest</div>
+                                    <div style="font-size: 12px; color: #6B6B6B; margin: 0 0 12px 0; line-height: 1.5; max-width: 280px; letter-spacing: 0.1px;">Customer retention for community builders</div>
+                                    <div style="margin-top: 8px; opacity: 0.75; width: 85px; height: 22px; background: #7B6B9E; border-radius: 2px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 600; letter-spacing: 0.5px;">LOGO</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="best-for">
+                    <strong>Best for:</strong> Thoughtful, relationship-focused outreach. Perfect for content creators, consultants, and premium services.
+                </div>
+            </div>
+
+            <!-- Design 2: Asymmetric Luxury -->
+            <div class="design-card">
+                <div class="design-title">2. Asymmetric Luxury</div>
+                <div class="design-description">
+                    High-end studio aesthetic with asymmetric layout. Circular photo with accent dot, vertical color bar, and logo positioned inline with name. Sophisticated left-border quotation style.
+                </div>
+                <div class="design-features">
+                    <ul>
+                        <li>Circular photo with premium border + shadow</li>
+                        <li>Brand-colored accent dot (overlaid)</li>
+                        <li>Vertical gradient bar (2px thick)</li>
+                        <li>Logo inline with name for balance</li>
+                        <li>Left-border micro-accent on company section</li>
+                    </ul>
+                </div>
+                <div class="signature-preview">
+                    <div class="email-context">
+                        <div class="email-text">Hi Marcus,</div>
+                        <div class="email-text">Your community engagement numbers are impressive. We specialize in turning that engagement into lasting retention.</div>
+                        <div class="email-text">Worth a conversation?</div>
+                        <div class="email-text">Cheers,</div>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e0e0e0;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; color: #2C2C2C; max-width: 480px;">
+                            <tr>
+                                <td style="vertical-align: top; position: relative;">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="padding-right: 13px;">
+                                                <div style="position: relative; width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, #7B6B9E, #9B8BB8); border: 2.5px solid rgba(123,107,158,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; font-weight: 600;">YN</div>
+                                                <div style="position: absolute; bottom: 2px; right: 13px; width: 10px; height: 10px; background: #7B6B9E; border-radius: 50%; border: 2px solid #FFFFFF;"></div>
+                                            </td>
+                                            <td style="vertical-align: middle;">
+                                                <div style="width: 2px; height: 48px; background: linear-gradient(to bottom, #7B6B9E, rgba(123,107,158,0.3)); border-radius: 1px;"></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="vertical-align: top; padding-left: 21px; padding-top: 2px;">
+                                    <table cellpadding="0" cellspacing="0" border="0" style="width: 100%; margin-bottom: 5px;">
+                                        <tr>
+                                            <td style="vertical-align: middle;">
+                                                <div style="font-size: 18px; font-weight: 600; color: #2C2C2C; line-height: 1.2; letter-spacing: 0.6px;">Your Name</div>
+                                            </td>
+                                            <td style="vertical-align: middle; text-align: right; padding-left: 13px;">
+                                                <div style="width: 75px; height: 20px; background: #7B6B9E; opacity: 0.65; border-radius: 2px; display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-weight: 600; letter-spacing: 0.5px;">LOGO</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div style="font-size: 11px; font-weight: 500; color: #7B6B9E; margin: 0 0 13px 0; line-height: 1.3; letter-spacing: 1.5px; text-transform: uppercase;">YOUR TITLE</div>
+                                    <div style="border-left: 2px solid rgba(123,107,158,0.3); padding-left: 13px; margin-bottom: 8px;">
+                                        <div style="font-size: 15px; font-weight: 600; color: #2C2C2C; margin: 0 0 3px 0; line-height: 1.3; letter-spacing: 0.2px;">Afterharvest</div>
+                                        <div style="font-size: 12px; color: #6B6B6B; margin: 0; line-height: 1.6; max-width: 260px; letter-spacing: 0.15px; font-style: italic;">Customer retention for community builders</div>
+                                    </div>
+                                    <div style="width: 100%; height: 1px; background: linear-gradient(to right, rgba(123,107,158,0.2), transparent); margin-top: 8px;"></div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="best-for">
+                    <strong>Best for:</strong> Bold, confident outreach. Ideal for founders, agency principals, and design-forward brands.
+                </div>
+            </div>
+
+            <!-- Design 3: Minimal Luxury -->
+            <div class="design-card">
+                <div class="design-title">3. Minimal Luxury</div>
+                <div class="design-description">
+                    Ultimate sophistication with "expensive simplicity." Rounded square photo with corner accent, inline title/company with dot divider, and geometric micro-element. Subtle top border for polish.
+                </div>
+                <div class="design-features">
+                    <ul>
+                        <li>Rounded square (8px) with layered shadows</li>
+                        <li>Corner accent shape for visual interest</li>
+                        <li>Inline title/company separated by styled dot</li>
+                        <li>Generous whitespace with golden ratio spacing</li>
+                        <li>Minimal geometric accent with logo</li>
+                    </ul>
+                </div>
+                <div class="signature-preview">
+                    <div class="email-context">
+                        <div class="email-text">Hi Jennifer,</div>
+                        <div class="email-text">Community building is one thing—retention is another. We'd love to show you how we help brands like yours reduce churn by 40%.</div>
+                        <div class="email-text">Interested in learning more?</div>
+                        <div class="email-text">Warmly,</div>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e0e0e0;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; color: #2C2C2C; max-width: 520px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 18px;">
+                            <tr>
+                                <td style="vertical-align: top; padding-right: 24px;">
+                                    <div style="position: relative; display: inline-block;">
+                                        <div style="width: 76px; height: 76px; border-radius: 8px; background: linear-gradient(135deg, #7B6B9E, #9B8BB8); box-shadow: 0 3px 10px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; color: white; font-size: 26px; font-weight: 600;">YN</div>
+                                        <div style="position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; background: #7B6B9E; border-radius: 0 8px 0 8px; opacity: 0.85;"></div>
+                                    </div>
+                                </td>
+                                <td style="vertical-align: top; padding-left: 0; padding-top: 4px;">
+                                    <div style="font-size: 19px; font-weight: 600; color: #2C2C2C; margin: 0 0 3px 0; line-height: 1.2; letter-spacing: 0.8px;">Your Name</div>
+                                    <div style="margin: 0 0 13px 0; line-height: 1.4;">
+                                        <span style="font-size: 12px; font-weight: 500; color: #6B6B6B; letter-spacing: 1.2px; text-transform: uppercase;">YOUR TITLE</span>
+                                        <span style="font-size: 12px; color: rgba(123,107,158,0.4); padding: 0 8px;">·</span>
+                                        <span style="font-size: 13px; font-weight: 600; color: #7B6B9E; letter-spacing: 0.3px;">Afterharvest</span>
+                                    </div>
+                                    <div style="font-size: 13px; color: #6B6B6B; margin: 0 0 16px 0; line-height: 1.65; max-width: 300px; letter-spacing: 0.1px;">Customer retention for community builders</div>
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="vertical-align: middle; padding-right: 13px;">
+                                                <div style="width: 88px; height: 22px; background: #7B6B9E; opacity: 0.7; border-radius: 2px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 600; letter-spacing: 0.5px;">LOGO</div>
+                                            </td>
+                                            <td style="vertical-align: middle;">
+                                                <div style="width: 4px; height: 4px; background: #7B6B9E; border-radius: 1px; opacity: 0.5;"></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="best-for">
+                    <strong>Best for:</strong> Luxury brands, high-ticket services, and sophisticated B2B outreach. Maximum impact with minimal elements.
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Section -->
+        <div class="instructions">
+            <h2>🎨 Setup Instructions</h2>
+
+            <div class="warning-box">
+                <strong>⚠️ Image Issues Detected</strong>
+                Your profile photo URL (blob:) and Imgur logo link both failed to load. Follow the instructions below to add your images properly.
+            </div>
+
+            <h3>Step 1: Prepare Your Images</h3>
+            <ol>
+                <li><strong>Profile Photo:</strong> Save your image locally (JPG or PNG, 256x256px recommended, under 50KB)</li>
+                <li><strong>Afterharvest Logo:</strong> Download from Imgur or use your local file (PNG preferred, ~200px wide, under 30KB)</li>
+            </ol>
+
+            <div class="pro-tip">
+                <strong>💡 Pro Tip: Compress First</strong>
+                Use TinyPNG (tinypng.com) or Squoosh (squoosh.app) to compress your images before converting. Smaller files = faster loading = better deliverability.
+            </div>
+
+            <h3>Step 2: Convert to Base64</h3>
+            <p>Use the included Python script for easiest conversion:</p>
+            <code>python3 convert-images.py your-photo.jpg afterharvest-logo.png</code>
+
+            <p style="margin-top: 16px;">This creates two files:</p>
+            <ul>
+                <li><code>profile-base64.txt</code> - Your photo as base64</li>
+                <li><code>logo-base64.txt</code> - Your logo as base64</li>
+            </ul>
+
+            <h3>Step 3: Edit Your Chosen Signature</h3>
+            <p>Open one of the three signature HTML files:</p>
+            <ul>
+                <li><code>signature-premium-editorial.html</code></li>
+                <li><code>signature-premium-asymmetric.html</code></li>
+                <li><code>signature-premium-minimal-luxury.html</code></li>
+            </ul>
+
+            <p style="margin-top: 16px;">Replace these placeholders:</p>
+            <ol>
+                <li>Find <code>YOUR_PROFILE_PHOTO_BASE64_HERE</code> and paste your profile base64</li>
+                <li>Find <code>YOUR_LOGO_BASE64_HERE</code> and paste your logo base64</li>
+                <li>Replace <code>Your Name</code> with your actual name</li>
+                <li>Replace <code>Your Title</code> with your actual title</li>
+                <li>Adjust the description if needed</li>
+            </ol>
+
+            <h3>Step 4: Test in Browser</h3>
+            <p>Open your edited HTML file in Chrome or Safari to see how it looks with real images.</p>
+
+            <h3>Step 5: Add to Gmail</h3>
+            <p><strong>Method A (Recommended):</strong></p>
+            <ol>
+                <li>Open your signature HTML in a browser</li>
+                <li>Select all (Cmd/Ctrl + A) and copy</li>
+                <li>Go to Gmail Settings → Signature</li>
+                <li>Create new signature and paste</li>
+                <li>Save</li>
+            </ol>
+
+            <p style="margin-top: 16px;"><strong>Method B (Direct HTML):</strong></p>
+            <ol>
+                <li>Gmail Settings → Signature → Create new</li>
+                <li>Click ⋮ (three dots) → Insert HTML</li>
+                <li>Paste your complete HTML code</li>
+                <li>Save</li>
+            </ol>
+
+            <div class="pro-tip">
+                <strong>💡 Pro Tip: Test Thoroughly</strong>
+                Send test emails to yourself and check on:
+                <ul style="margin-top: 8px;">
+                    <li>Gmail (web and mobile)</li>
+                    <li>Outlook (if you have business contacts)</li>
+                    <li>Apple Mail (if relevant)</li>
+                </ul>
+            </div>
+
+            <h3>Customization Tips</h3>
+            <p><strong>Adjust Colors:</strong></p>
+            <ul>
+                <li><code>#2C2C2C</code> - Primary text (rich black)</li>
+                <li><code>#6B6B6B</code> - Secondary text (sophisticated gray)</li>
+                <li><code>#7B6B9E</code> - Brand accent (lavender)</li>
+            </ul>
+
+            <p style="margin-top: 16px;"><strong>Resize Elements:</strong></p>
+            <ul>
+                <li>Profile photo: Change <code>width</code> and <code>height</code> values (keep equal for circles)</li>
+                <li>Logo: Change <code>width</code> value (height auto-adjusts)</li>
+                <li>Spacing: Modify <code>padding</code> and <code>margin</code> values</li>
+            </ul>
+
+            <h3>Design Philosophy</h3>
+            <p>These signatures follow these premium principles:</p>
+            <ul>
+                <li><strong>Asymmetric Balance:</strong> Not centered—visually interesting</li>
+                <li><strong>Editorial Typography:</strong> Strategic letter-spacing and weights</li>
+                <li><strong>Sophisticated Whitespace:</strong> Generous padding with golden ratio inspiration</li>
+                <li><strong>Micro-Details:</strong> Hairline rules, gradients, geometric accents</li>
+                <li><strong>Intentional Color:</strong> Brand color used sparingly for maximum impact</li>
+            </ul>
+
+            <div class="warning-box" style="margin-top: 30px;">
+                <strong>📧 Deliverability Note</strong>
+                All three signatures use only inline CSS and base64 images—no external resources. This ensures maximum compatibility and deliverability across email clients. The sophisticated styling is achieved purely through email-safe CSS properties.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
