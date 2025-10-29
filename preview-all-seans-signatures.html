@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sean's Afterharvest Signatures - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+        }
+        .header .subtitle {
+            font-size: 16px;
+            color: #7B6B9E;
+            font-weight: 500;
+        }
+        .header .note {
+            margin-top: 20px;
+            padding: 16px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            text-align: left;
+            font-size: 13px;
+            color: #856404;
+        }
+        .designs {
+            display: grid;
+            gap: 30px;
+        }
+        .design-block {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .design-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .design-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+        .design-label {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #7B6B9E;
+            color: white;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .design-description {
+            font-size: 13px;
+            color: #6B6B6B;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        .design-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .feature-tag {
+            padding: 4px 10px;
+            background: rgba(123,107,158,0.08);
+            color: #7B6B9E;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .signature-preview {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .email-mock {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+        }
+        .best-for {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #0d47a1;
+        }
+        .recommended {
+            background: linear-gradient(135deg, #7B6B9E 0%, #D4A5A5 100%);
+        }
+        .instructions {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-top: 40px;
+        }
+        .instructions h2 {
+            font-size: 22px;
+            color: #1A1A1A;
+            margin-bottom: 16px;
+        }
+        .instructions ol {
+            padding-left: 24px;
+            line-height: 2;
+        }
+        .instructions code {
+            background: #f1f3f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', monospace;
+            font-size: 13px;
+            color: #7B6B9E;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Sean's Afterharvest Email Signatures</h1>
+            <div class="subtitle">4 Unique Premium Designs for Cold Outreach</div>
+            <div class="note">
+                <strong>⚠️ Note:</strong> These previews use placeholder graphics. Run <code>add-my-images.py</code> to add your real photo and logo to all signatures!
+            </div>
+        </div>
+
+        <div class="designs">
+            <!-- Design 1: Final (Recommended) -->
+            <div class="design-block">
+                <div class="design-header">
+                    <div class="design-title">1. The Final One</div>
+                    <div class="design-label recommended">⭐️ Recommended</div>
+                </div>
+                <div class="design-description">
+                    Sophisticated editorial with lavender/pink gradients. Vertical accent bar, refined typography, inline logo, corner gradient accent on photo. Perfect balance of premium and approachable.
+                </div>
+                <div class="design-features">
+                    <span class="feature-tag">Gradient accent bar</span>
+                    <span class="feature-tag">21px bold name</span>
+                    <span class="feature-tag">Inline logo</span>
+                    <span class="feature-tag">Corner gradient</span>
+                    <span class="feature-tag">Micro geometric</span>
+                </div>
+                <div class="signature-preview">
+                    <div class="email-mock">
+                        <div style="margin-bottom: 12px;">Hi Sarah,</div>
+                        <div style="margin-bottom: 12px;">I noticed you've scaled your community to 10K+ members. We help community builders turn that engagement into retention—worth a quick call?</div>
+                        <div style="margin-bottom: 16px;">Best,</div>
+                        <div style="padding-top: 12px; border-top: 1px solid #e0e0e0;">
+                            <!-- SIGNATURE PREVIEW -->
+                            <table cellpadding="0" cellspacing="0" border="0" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; max-width: 460px; margin: 0; border-spacing: 0;">
+                                <tr>
+                                    <td style="vertical-align: top; padding-right: 18px;">
+                                        <div style="width: 2px; height: 90px; background: linear-gradient(180deg, #7B6B9E 0%, #D4A5A5 60%, rgba(212,165,165,0.3) 100%); border-radius: 1px;"></div>
+                                    </td>
+                                    <td style="vertical-align: top; padding-top: 4px;">
+                                        <table cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td style="vertical-align: middle; padding-right: 26px;">
+                                                    <div style="font-size: 21px; font-weight: 700; color: #1A1A1A; letter-spacing: -0.2px; line-height: 1.1; margin-bottom: 5px;">Sean Canela</div>
+                                                    <div style="margin: 7px 0;">
+                                                        <table cellpadding="0" cellspacing="0" border="0">
+                                                            <tr>
+                                                                <td style="width: 24px; height: 1px; background: #7B6B9E; opacity: 0.4;"></td>
+                                                                <td style="width: 3px;"></td>
+                                                                <td style="width: 6px; height: 1px; background: #D4A5A5; opacity: 0.4;"></td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <div style="margin-top: 8px;">
+                                                        <table cellpadding="0" cellspacing="0" border="0">
+                                                            <tr>
+                                                                <td style="vertical-align: middle; padding-right: 7px;">
+                                                                    <span style="font-size: 11px; font-weight: 500; color: #6B6B6B; letter-spacing: 0.8px;">FOUNDER</span>
+                                                                </td>
+                                                                <td style="vertical-align: middle; padding: 0 6px;">
+                                                                    <span style="font-size: 10px; color: rgba(123,107,158,0.3);">·</span>
+                                                                </td>
+                                                                <td style="vertical-align: middle;">
+                                                                    <div style="height: 13px; width: 80px; background: #7B6B9E; opacity: 0.6; border-radius: 2px; font-size: 9px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; letter-spacing: 0.5px;">LOGO</div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <div style="margin-top: 12px;">
+                                                        <div style="width: 5px; height: 5px; background: #7B6B9E; border-radius: 1px; opacity: 0.4; transform: rotate(45deg);"></div>
+                                                    </div>
+                                                </td>
+                                                <td style="vertical-align: middle;">
+                                                    <div style="position: relative; display: inline-block;">
+                                                        <div style="width: 76px; height: 76px; border-radius: 10px; background: linear-gradient(135deg, #7B6B9E 0%, #D4A5A5 100%); box-shadow: 0 4px 16px rgba(123,107,158,0.25); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;">SC</div>
+                                                        <div style="position: absolute; top: -2px; right: -2px; width: 22px; height: 22px; background: linear-gradient(135deg, #D4A5A5 0%, #7B6B9E 100%); border-radius: 0 10px 0 8px; opacity: 0.65;"></div>
+                                                        <div style="position: absolute; bottom: 6px; left: -3px; width: 8px; height: 8px; background: #FFFFFF; border: 1.5px solid #7B6B9E; border-radius: 50%;"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="best-for">
+                    <strong>Best for:</strong> Premium but approachable outreach. Perfect for most cold emails. Sophisticated without being intimidating.
+                </div>
+            </div>
+
+            <!-- Design 2: Bold -->
+            <div class="design-block">
+                <div class="design-header">
+                    <div class="design-title">2. Bold Asymmetric</div>
+                </div>
+                <div class="design-description">
+                    Power move with photo on the right (unconventional). Gradient bar, large 22px name, inline logo integration. Multiple geometric accents for visual interest.
+                </div>
+                <div class="design-features">
+                    <span class="feature-tag">Photo on right</span>
+                    <span class="feature-tag">22px name</span>
+                    <span class="feature-tag">Gradient bar</span>
+                    <span class="feature-tag">Corner + dot accents</span>
+                </div>
+                <div class="signature-preview">
+                    <div style="background: white; padding: 20px; border-radius: 6px; border-top: 1px solid #e0e0e0; margin-top: 16px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; max-width: 480px;">
+                            <tr>
+                                <td style="vertical-align: top;">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="padding-right: 13px;">
+                                                <div style="width: 3px; height: 85px; background: linear-gradient(180deg, #7B6B9E 0%, #D4A5A5 100%); border-radius: 2px; opacity: 0.85;"></div>
+                                            </td>
+                                            <td style="vertical-align: middle;">
+                                                <div style="font-size: 22px; font-weight: 700; color: #1A1A1A; letter-spacing: -0.3px; margin-bottom: 8px;">Sean Canela</div>
+                                                <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 10px;">
+                                                    <tr>
+                                                        <td style="vertical-align: middle; padding-right: 8px;">
+                                                            <div style="font-size: 12px; font-weight: 500; color: #7B6B9E; letter-spacing: 0.5px;">Founder of</div>
+                                                        </td>
+                                                        <td style="vertical-align: middle;">
+                                                            <div style="height: 16px; width: 75px; background: #7B6B9E; opacity: 0.7; border-radius: 2px; font-size: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">LOGO</div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <div style="width: 28px; height: 2px; background: linear-gradient(90deg, #7B6B9E 0%, transparent 100%); border-radius: 1px;"></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="vertical-align: middle; padding-left: 24px;">
+                                    <div style="position: relative; display: inline-block;">
+                                        <div style="width: 80px; height: 80px; border-radius: 12px; background: linear-gradient(135deg, #7B6B9E 0%, #D4A5A5 100%); box-shadow: 0 4px 14px rgba(123,107,158,0.2); display: flex; align-items: center; justify-content: center; color: white; font-size: 26px; font-weight: 600;">SC</div>
+                                        <div style="position: absolute; top: -3px; right: -3px; width: 20px; height: 20px; background: linear-gradient(135deg, #D4A5A5 0%, #7B6B9E 100%); border-radius: 0 12px 0 6px; opacity: 0.75;"></div>
+                                        <div style="position: absolute; bottom: -2px; left: -2px; width: 6px; height: 6px; background: #7B6B9E; border-radius: 50%; border: 1px solid #FFFFFF;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="best-for">
+                    <strong>Best for:</strong> Making a bold first impression. Great for founders, agencies, design-forward brands.
+                </div>
+            </div>
+
+            <!-- Design 3: Kinfolk -->
+            <div class="design-block">
+                <div class="design-header">
+                    <div class="design-title">3. Kinfolk Editorial</div>
+                </div>
+                <div class="design-description">
+                    Magazine aesthetic with subtle gradient background. Artistic photo border with floating accent dot. Minimal hairline divider, all-caps title, sophisticated spacing.
+                </div>
+                <div class="design-features">
+                    <span class="feature-tag">Gradient background</span>
+                    <span class="feature-tag">Floating accent</span>
+                    <span class="feature-tag">Hairline divider</span>
+                    <span class="feature-tag">ALL CAPS title</span>
+                </div>
+                <div class="signature-preview">
+                    <div style="background: white; padding: 20px; border-radius: 6px; border-top: 1px solid #e0e0e0; margin-top: 16px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; max-width: 440px; background: linear-gradient(135deg, rgba(123,107,158,0.02) 0%, rgba(212,165,165,0.02) 100%); padding: 18px 20px; border-radius: 4px;">
+                            <tr>
+                                <td style="vertical-align: top; padding-right: 20px;">
+                                    <div style="position: relative; display: inline-block;">
+                                        <div style="width: 74px; height: 74px; border-radius: 6px; background: linear-gradient(135deg, #7B6B9E 0%, #D4A5A5 100%); border: 2px solid rgba(255,255,255,0.9); box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;">SC</div>
+                                        <div style="position: absolute; bottom: -4px; right: -4px; width: 14px; height: 14px; background: #D4A5A5; border-radius: 50%; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.15);"></div>
+                                    </div>
+                                </td>
+                                <td style="vertical-align: middle; padding-left: 6px;">
+                                    <div style="font-size: 20px; font-weight: 600; color: #2C2C2C; letter-spacing: 0.2px; margin-bottom: 6px;">Sean Canela</div>
+                                    <div style="width: 35px; height: 1px; background: linear-gradient(90deg, rgba(123,107,158,0.4) 0%, rgba(123,107,158,0.1) 100%); margin-bottom: 7px;"></div>
+                                    <div style="margin-bottom: 4px;">
+                                        <span style="font-size: 11px; font-weight: 500; color: #7B6B9E; letter-spacing: 1px; text-transform: uppercase;">Founder of</span>
+                                    </div>
+                                    <div>
+                                        <div style="height: 15px; width: 80px; background: #7B6B9E; opacity: 0.65; border-radius: 2px; margin-top: 4px; font-size: 9px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">LOGO</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="best-for">
+                    <strong>Best for:</strong> Creative, design-forward prospects. Sophisticated editorial vibe.
+                </div>
+            </div>
+
+            <!-- Design 4: Brutalist -->
+            <div class="design-block">
+                <div class="design-header">
+                    <div class="design-title">4. Brutalist Minimal</div>
+                </div>
+                <div class="design-description">
+                    Bold statement with split-color name (Sean = dark, Canela = lavender). Large 24px type, vertical divider between title and logo. Circular photo with offset geometric shape.
+                </div>
+                <div class="design-features">
+                    <span class="feature-tag">Split-color name</span>
+                    <span class="feature-tag">24px type</span>
+                    <span class="feature-tag">Vertical divider</span>
+                    <span class="feature-tag">Offset shape</span>
+                </div>
+                <div class="signature-preview">
+                    <div style="background: white; padding: 20px; border-radius: 6px; border-top: 1px solid #e0e0e0; margin-top: 16px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif; max-width: 500px;">
+                            <tr>
+                                <td style="vertical-align: top;">
+                                    <div style="margin-bottom: 3px;">
+                                        <span style="font-size: 24px; font-weight: 700; color: #1A1A1A; letter-spacing: -0.5px;">Sean</span>
+                                        <span style="font-size: 24px; font-weight: 300; color: #7B6B9E; letter-spacing: -0.5px; margin-left: 6px;">Canela</span>
+                                    </div>
+                                    <table cellpadding="0" cellspacing="0" border="0" style="margin-top: 8px;">
+                                        <tr>
+                                            <td style="vertical-align: middle; padding-right: 10px; border-right: 2px solid rgba(123,107,158,0.3);">
+                                                <div style="font-size: 10px; font-weight: 600; color: #7B6B9E; letter-spacing: 1.5px; text-transform: uppercase; padding-right: 10px;">FOUNDER</div>
+                                            </td>
+                                            <td style="vertical-align: middle; padding-left: 10px;">
+                                                <div style="height: 14px; width: 75px; background: #7B6B9E; opacity: 0.7; border-radius: 2px; font-size: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">LOGO</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td style="vertical-align: middle; padding-left: 32px;">
+                                    <div style="position: relative;">
+                                        <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #7B6B9E 0%, #D4A5A5 100%); border: 3px solid rgba(123,107,158,0.2); box-shadow: 0 6px 16px rgba(123,107,158,0.18); display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; font-weight: 600;">SC</div>
+                                        <div style="position: absolute; top: -4px; left: -4px; width: 16px; height: 16px; background: #D4A5A5; border-radius: 2px; transform: rotate(45deg); opacity: 0.7;"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="best-for">
+                    <strong>Best for:</strong> Standing out in crowded inboxes. Bold, memorable, modern.
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h2>⚡️ How to Use (30 seconds)</h2>
+            <ol>
+                <li><strong>Save your images:</strong> Download your headshot and the Afterharvest logo to your computer</li>
+                <li><strong>Run the magic script:</strong> <code>python3 add-my-images.py your-photo.jpg logo.png</code></li>
+                <li><strong>Pick your favorite:</strong> Open each HTML file in Chrome/Safari to see them with YOUR images</li>
+                <li><strong>Copy to Gmail:</strong> Select All (Cmd/Ctrl+A), Copy, paste into Gmail signature settings</li>
+                <li><strong>Done!</strong> Start sending premium cold emails</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
