@@ -107,7 +107,9 @@ def main():
         'sean-signature-bold.html',
         'sean-signature-kinfolk.html',
         'sean-signature-brutalist.html',
-        'sean-signature-final.html'
+        'sean-signature-final.html',
+        'sean-signature-asymmetric-v2.html',
+        'sean-signature-photo-left.html'
     ]
 
     print("\n📝 Updating signature files...")
