@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>After Harvest — get my plan</title>
+<meta name="description" content="After Harvest plans, builds, and runs quarterly three-day virtual launch events for course creators with a warm audience.">
+<link rel="icon" href="assets/asset-4.svg">
+<!-- shared design tokens + @font-face (same file the full site uses → identical rendering) -->
+<style>/* ============================================================
+   AFTER HARVEST — WEBFONTS  (v1.6)
+   Display: FANWOOD (League of Movable Type) — a quiet Fournier
+   revival with crisp triangular serifs. No bold; hierarchy comes
+   from optical size (Fanwood large / Fanwood Text small), italic,
+   and scale. Body: Literata (has real weights). Mono: IBM Plex
+   Mono. Three faces only.
+   ============================================================ */
+
+/* ---- Display — Fanwood (large sizes, ~28px+) ---- */
+@font-face {
+  font-family: 'Olivera';
+  src: url("assets/asset-7.ttf") format('truetype');
+  font-weight: 400 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Olivera';
+  src: url("assets/asset-8.ttf") format('truetype');
+  font-weight: 400 700; font-style: italic; font-display: swap;
+}
+
+
+/* ---- Body — Literata (text face only, never above 24px) ---- */
+@font-face {
+  font-family: 'Literata';
+  src: url("assets/asset-9.ttf") format('truetype-variations');
+  font-weight: 200 900; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Literata';
+  src: url("assets/asset-10.ttf") format('truetype-variations');
+  font-weight: 200 900; font-style: italic; font-display: swap;
+}
+
+/* ---- Mono — IBM Plex Mono (labels + micro-UI) ---- */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url("assets/asset-11.ttf") format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url("assets/asset-12.ttf") format('truetype');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url("assets/asset-13.ttf") format('truetype');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+
+/* ============================================================
+   AFTER HARVEST — COLOR TOKENS  (v1.4)
+   Whiter, less-yellow canvas so accents + embroidery read clean.
+   Adds a painterly flower palette (illustration-only) pulled from
+   the cross-stitch + oil-painting references.
+   No pure white. No pure black. Ratio: ~70% Eggshell, gold ≤3%.
+   ============================================================ */
+
+:root {
+  /* ---- Canvas & ink ---- */
+  --eggshell: #FBFAF6; /* warm paper-white, de-yellowed. Primary background */
+  --card:     #FEFDFA; /* raised surfaces — always with a hairline border */
+  --field:    #F1ECE1; /* deep sections / tonal shifts */
+  --ink:      #262119; /* all primary text, primary buttons. warm near-black */
+  --umber:    #6E6554; /* secondary text, captions, metadata */
+  --hairline: #E4DDCC; /* 1px borders, dividers, table rules */
+
+  /* ---- Accents (UI — rationed; unchanged) ---- */
+  --yolk:  #E8A100; /* THE accent. ≤3% of any screen */
+  --wheat: #C89B4B; /* stitch mid-tone, subdued gold */
+  --rust:  #B06A4A; /* link hover, small warm highlights */
+  --dusk:  #B6AFC4; /* illustration shadows + pattern accents ONLY */
+  --olive: #5C5340; /* illustration dark — stems, depth */
+
+  /* ---- Painterly flower palette — ILLUSTRATION / embroidery ONLY ---- */
+  --rose:      #C77E82;
+  --rose-dk:   #9E5563;
+  --rose-lt:   #E3B3B0;
+  --poppy:     #B0503C;
+  --poppy-dk:  #7E3B2F;
+  --sage:      #8A9068;
+  --sage-lt:   #A7AE86;
+  --plum:      #6E6079;
+  --sand:      #E8E0CF; /* the old canvas, now a light embroidery tone */
+
+  /* ---- Functional states (muted, on-palette) ---- */
+  --success: #6F7A50;
+  --error:   #A6503C;
+  --warning: #E8A100;
+  --focus-ring: #E8A100;
+
+  /* ---- Semantic aliases ---- */
+  --bg:             var(--eggshell);
+  --surface-card:   var(--card);
+  --surface-field:  var(--field);
+  --text-primary:   var(--ink);
+  --text-secondary: var(--umber);
+  --border:         var(--hairline);
+  --accent:         var(--yolk);
+
+  --link:           var(--ink);
+  --link-hover:     var(--rust);
+
+  --btn-primary-bg:       var(--ink);
+  --btn-primary-bg-hover: #3A3226;
+  --btn-primary-fg:       var(--eggshell);
+
+  --yolk-tint-12: rgba(232, 161, 0, 0.12);
+  --yolk-tint-22: rgba(232, 161, 0, 0.22);
+  --field-tint-45: rgba(241, 236, 225, 0.55);
+
+  /* Glass (frosted panels / floating nav) */
+  --glass:        rgba(254, 253, 250, 0.66);
+  --glass-strong: rgba(254, 253, 250, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================
+   AFTER HARVEST — TYPOGRAPHY TOKENS  (v1.6)
+   Display: FANWOOD — a quiet Fournier revival, crisp triangular
+   serifs. Sentence case. NO BOLD: display hierarchy = optical size
+   (Fanwood / Fanwood Text) + italic + scale. Body: Literata (this
+   is where real weights live). Mono: IBM Plex Mono. Three faces only.
+   ============================================================ */
+
+:root {
+  /* ---- Faces ---- */
+  --font-display:     'Olivera', Georgia, 'Times New Roman', serif;  /* headings — Olivera */
+  --font-display-sm:  'Olivera', Georgia, serif;                      /* subheads / small display */
+  --font-display-alt: 'Olivera', Georgia, serif;                      /* italic accents */
+  --font-serif:       'Literata', 'Source Serif 4', Georgia, serif;      /* body + small ONLY */
+  --font-mono:        'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-sans:        'Literata', 'Source Serif 4', Georgia, serif;  /* alias — forms use the body face */
+
+  /* ---- Scale (size / line-height / weight / tracking) ----
+     Olivera has one weight (400) — hierarchy is size + italic + scale. */
+  --text-display: 72px;   --leading-display: 1.03; --weight-display: 400; --tracking-display: -0.01em;
+  --text-display-sm: 56px;
+  --text-h1: 50px;        --leading-h1: 1.06;      --weight-h1: 400;      --tracking-h1: -0.01em;
+  --text-h2: 34px;        --leading-h2: 1.12;      --weight-h2: 400;      --tracking-h2: -0.005em;
+  --text-h3: 24px;        --leading-h3: 1.2;       --weight-h3: 400;      --tracking-h3: 0em;
+  /* Body + small: Literata 400 */
+  --text-body: 17px;      --leading-body: 1.65;    --weight-body: 400;
+  --text-small: 14px;     --leading-small: 1.5;
+  /* Labels + buttons: IBM Plex Mono 500, uppercase */
+  --text-label: 11.5px;   --leading-label: 1.4;    --weight-label: 500; --tracking-label: 0.08em;
+  --text-button: 13px;                             --weight-button: 500; --tracking-button: 0.06em;
+
+  --measure: 68ch;
+}
+
+/* ============================================================
+   AFTER HARVEST — SPACING, RADIUS, ELEVATION, MOTION  (v1.5)
+   Sharper corners than v1 — the brand reads crisp, not soft.
+   Whitespace is a feature. One shadow, never stacked.
+   ============================================================ */
+
+:root {
+  /* ---- Spacing scale ---- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+
+  --section-pad: var(--s-9);
+  --section-pad-mobile: 56px;
+  --card-pad: 32px;
+
+  /* ---- Corner radius: SHARP. Crisp, not pill-soft ---- */
+  --r-input: 3px;
+  --r-button: 4px;
+  --r-card: 6px;
+  --r-panel: 8px;   /* larger frosted panels / nav bar */
+  --r-stitch: 2px;  /* the pixel-stitch cell */
+
+  /* ---- Elevation: hairline first, one shadow max ---- */
+  --shadow-1: 0 8px 24px rgba(38, 33, 25, 0.06);
+  --shadow-bloom: 0 12px 22px rgba(38, 33, 25, 0.10); /* soft cast under scattered embroidery */
+
+  /* ---- Motion: 200–300ms, ease-out, low travel ---- */
+  --dur-fast: 200ms;
+  --dur-slow: 300ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --travel: 12px;
+}
+
+/* ============================================================
+   AFTER HARVEST — BASE ELEMENT RULES  (v1.3)
+   Book-like defaults. Besley headings, Literata body.
+   Dashed-underline links (reads as stitching).
+   ============================================================ */
+
+body {
+  margin: 0;
+  background: var(--eggshell);
+  color: var(--ink);
+  font-family: var(--font-serif); /* Literata — body */
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Signature micro-detail: every inline link is stitched */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--wheat);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3.5px;
+  transition: color var(--dur-fast) var(--ease-out),
+              text-decoration-color var(--dur-fast) var(--ease-out);
+}
+a:hover {
+  color: var(--link-hover);
+  text-decoration-color: var(--link-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--yolk-tint-22);
+}
+
+/* Headings — Besley (display face), sentence case, tight tracking */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+p {
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--hairline);
+  margin: var(--s-6) 0;
+}
+
+</style>
+<style>
+  /* ===== copied verbatim from index.html so the hero renders identically standalone ===== */
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--eggshell);
+    background-image: url("assets/asset-14.svg"), url("assets/asset-15.svg");
+    background-size: 220px 220px, 30px 30px;
+    color: var(--ink); font-family: var(--font-serif); overflow-x: hidden;
+  }
+  ::selection { background: var(--yolk-tint-22); }
+  a { color: var(--ink); text-decoration-color: var(--wheat); text-underline-offset: 3px; }
+  a:hover { color: var(--rust); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
+
+  /* ---------- floating, irregular sticky header + stitched garland ---------- */
+  .nav-wrap { position: sticky; top: 18px; z-index: 40; display: flex; justify-content: center; padding: 18px 20px 0; }
+  .nav-shell { position: relative; width: min(1000px, 100%); }
+  .nav-garland { position: absolute; left: -60px; right: -60px; top: -34px; height: 132px; z-index: 1; pointer-events: none; overflow: visible; }
+  .nav-garland canvas { display: block; margin: 0 auto; filter: drop-shadow(0 4px 7px rgba(38,33,25,0.13)); }
+  .nav {
+    position: relative; z-index: 2; border-radius: 13px;
+    display: flex; align-items: center; gap: 22px; padding: 13px 14px 13px 22px;
+    background: rgba(254,253,250,0.88); -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
+    border: 1px solid var(--hairline); filter: drop-shadow(0 7px 16px rgba(38,33,25,0.1));
+  }
+  .nav .brand { display: flex; align-items: center; }
+  .nav .wm { height: 31px; display: block; width: auto; }
+  .nav .spacer { margin-left: auto; }
+  .nav .pill { padding: 10px 20px 13px; font-size: 10.5px; }
+  @media (max-width: 760px){ .nav .pill { padding: 10px 18px 13px; } .nav-garland { left: -20px; right: -20px; } }
+
+  /* ---------- crystal CTA button ---------- */
+  .cta-row { margin-top: 40px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .micro { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--umber); }
+  .pill {
+    position: relative; z-index: 0; color: var(--eggshell); text-decoration: none;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 17px 34px 22px; border: none; cursor: pointer;
+    clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
+    background: linear-gradient(180deg, #0e0a06, #040302);
+    filter: drop-shadow(0 13px 20px rgba(38,33,25,0.5)) drop-shadow(0 0 16px rgba(200,155,75,0.34));
+    transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out);
+  }
+  .pill::before {
+    content: ""; position: absolute; inset: 0 0 7px 0; z-index: -1;
+    clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
+    background: conic-gradient(from 202deg at 50% 4%, #4a3d2a 0deg 40deg, rgba(244,235,214,0.7) 40deg 41.5deg, #241d13 41.5deg 82deg, rgba(244,235,214,0.55) 82deg 83.5deg, #463829 83.5deg 124deg, rgba(244,235,214,0.7) 124deg 125.5deg, #1e1710 125.5deg 166deg, rgba(244,235,214,0.55) 166deg 167.5deg, #4a3d2a 167.5deg 208deg, rgba(244,235,214,0.7) 208deg 209.5deg, #241d13 209.5deg 250deg, rgba(244,235,214,0.55) 250deg 251.5deg, #463829 251.5deg 292deg, rgba(244,235,214,0.7) 292deg 293.5deg, #1e1710 293.5deg 334deg, rgba(244,235,214,0.55) 334deg 335.5deg, #4a3d2a 335.5deg 360deg);
+    box-shadow: inset 0 2px 0 rgba(242,233,212,0.34), inset 0 -3px 5px rgba(0,0,0,0.55);
+  }
+  .pill::after {
+    content: ""; position: absolute; inset: 0 0 7px 0; z-index: -1;
+    clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
+    background: linear-gradient(180deg, rgba(244,235,214,0.2), rgba(244,235,214,0) 32%), linear-gradient(180deg, transparent calc(56% - 1px), rgba(244,235,214,0.5) 56%, transparent calc(56% + 1px)), linear-gradient(180deg, transparent calc(76% - 1px), rgba(0,0,0,0.38) 76%, transparent calc(76% + 1px));
+  }
+  .pill b { font-weight: 800; color: var(--yolk); }
+  .pill::before, .pill::after { transition: filter 0.28s var(--ease-out, ease), opacity 0.28s var(--ease-out, ease); }
+  .pill { transition: transform var(--dur-fast) var(--ease-out), filter 0.28s var(--ease-out), color 0.28s var(--ease-out); }
+  .pill:hover { transform: translateY(-2px); color: #FFFDF6;
+    filter: drop-shadow(0 16px 26px rgba(38,33,25,0.45)) drop-shadow(0 0 30px rgba(232,161,0,0.8)) drop-shadow(0 0 14px rgba(255,251,240,0.75)); }
+  .pill:hover::before { filter: brightness(2.5) saturate(1.15); }            /* facets flare toward white-gold */
+  .pill:hover::after { opacity: 1; filter: brightness(1.7); }
+  .pill:hover .arrow { color: #FFFDF6; }
+  @media (prefers-reduced-motion: reduce){ .pill:hover { transform: none; } }
+  .pill:focus-visible { outline: 2px solid var(--yolk); outline-offset: 4px; }
+  .pill .arrow { color: var(--wheat); font-family: var(--font-serif); }
+  .pill .pill-ico { width: 17px; height: 17px; display: block; margin-bottom: 2px; flex: none; }
+
+  /* ---------- S1 hero ---------- */
+  .hero { position: relative; padding: 30px 0 40px; }
+  .hero-inner { position: relative; z-index: 10; text-align: center; max-width: 900px; margin: 0 auto; }
+  .icp { display: inline-flex; align-items: center; gap: 11px; font-family: var(--font-mono); font-size: 11.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); position: relative; z-index: 3; margin: 0; }
+  .icp i { width: 6px; height: 6px; border-radius: 2px; background: var(--yolk); display: inline-block; }
+  .icp .rule { width: 26px; height: 1px; background: var(--hairline); }
+  h1.headline { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 68px; line-height: 1.06; letter-spacing: 0.006em; margin: 22px 0 0; -webkit-text-stroke: 2px currentColor; }
+  h1.headline .hword { font-style: italic; position: relative; text-decoration: none; white-space: nowrap;
+    background: linear-gradient(100deg, #3E3629 0%, #3E3629 28%, #241C14 44%, #C89B4B 51%, #241C14 58%, #3E3629 72%, #3E3629 100%);
+    background-size: 260% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    -webkit-text-stroke: 0.6px #3A3226;
+    filter: drop-shadow(0 1px 8px rgba(200,155,75,0.28));
+    animation: hwordFlow 9s linear infinite; }
+  @keyframes hwordFlow { 0% { background-position: 0 0; } 100% { background-position: 260% 0; } }
+  h1.headline .hword::after { content: ""; position: absolute; left: -1%; right: -1%; bottom: -2px; height: 10px;
+    background: no-repeat center/100% 100%;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 10' preserveAspectRatio='none'><path d='M2,6 C60,2 110,9 150,5 C195,1 250,8 298,4' fill='none' stroke='%23b0563a' stroke-width='2.4' stroke-linecap='round'/></svg>"); }
+  .hero .sub { font-size: 18px; line-height: 1.62; color: var(--umber); max-width: 76ch; margin: 26px auto 0; }
+  .cats-wrap { position: relative; left: 50%; transform: translateX(-50%); width: min(90vw, 720px); margin: 6px 0 2px; padding: 15px 64px 17px; text-align: center;
+    clip-path: polygon(0% 46%, 2.4% 15%, 7% 5%, 34% 1%, 61% 5%, 95% 2%, 99% 22%, 100% 60%, 96.5% 91%, 88% 99%, 54% 100%, 29% 95%, 4.5% 93%, 1% 68%);
+    background: linear-gradient(180deg, rgba(255,253,248,0.2), rgba(245,240,231,0.1));
+    backdrop-filter: blur(9px) saturate(1.18); -webkit-backdrop-filter: blur(9px) saturate(1.18);
+    filter: drop-shadow(0 12px 16px rgba(45,35,22,0.34)) drop-shadow(0 30px 50px rgba(45,35,22,0.24)) drop-shadow(0 0 1px rgba(110,94,64,0.6)); isolation: isolate; }
+  .cats-wrap .cats-cv { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.92;
+    clip-path: polygon(0% 46%, 2.4% 15%, 7% 5%, 34% 1%, 61% 5%, 95% 2%, 99% 22%, 100% 60%, 96.5% 91%, 88% 99%, 54% 100%, 29% 95%, 4.5% 93%, 1% 68%); }
+  .cats-wrap::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    clip-path: polygon(0% 46%, 2.4% 15%, 7% 5%, 34% 1%, 61% 5%, 95% 2%, 99% 22%, 100% 60%, 96.5% 91%, 88% 99%, 54% 100%, 29% 95%, 4.5% 93%, 1% 68%);
+    background:
+      linear-gradient(180deg, rgba(255,253,248,0.26), rgba(255,253,248,0) 50%),
+      linear-gradient(112deg, rgba(255,254,250,0.3) 1%, rgba(255,254,250,0.04) 9%, transparent 16%),
+      linear-gradient(248deg, rgba(255,254,250,0.3) 1%, rgba(255,254,250,0.04) 9%, transparent 16%),
+      linear-gradient(118deg, transparent calc(28% - 1.2px), rgba(255,255,255,0.55) 28%, rgba(120,104,72,0.1) calc(28% + 1.2px), transparent calc(28% + 2.4px)),
+      linear-gradient(118deg, transparent calc(63% - 1.2px), rgba(255,255,255,0.42) 63%, rgba(120,104,72,0.08) calc(63% + 1.2px), transparent calc(63% + 2.4px)),
+      linear-gradient(62deg,  transparent calc(46% - 1.2px), rgba(255,255,255,0.4) 46%, rgba(120,104,72,0.07) calc(46% + 1.2px), transparent calc(46% + 2.4px)),
+      linear-gradient(62deg,  transparent calc(80% - 1px), rgba(255,255,255,0.32) 80%, rgba(120,104,72,0.06) calc(80% + 1px), transparent calc(80% + 2px));
+    background-repeat: no-repeat;
+    box-shadow: inset 0 1px 0 rgba(255,255,252,0.55), inset 0 -1px 2px rgba(120,104,72,0.05); }
+  .cats-wrap::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    clip-path: polygon(0% 46%, 2.4% 15%, 7% 5%, 34% 1%, 61% 5%, 95% 2%, 99% 22%, 100% 60%, 96.5% 91%, 88% 99%, 54% 100%, 29% 95%, 4.5% 93%, 1% 68%);
+    background: linear-gradient(104deg, transparent 38%, rgba(253,250,243,0.42) 48%, rgba(253,250,243,0.1) 53%, transparent 62%); background-size: 240% 100%; background-position: 185% 0; mix-blend-mode: screen; animation: catsSheen 7.4s ease-in-out infinite; }
+  @keyframes catsSheen { 0%,100% { background-position: 178% 0; } 52% { background-position: -72% 0; } }
+  .cats { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 21px; line-height: 1; margin: 5px 0 0; position: relative; z-index: 3; display: flex; flex-wrap: nowrap; white-space: nowrap; align-items: center; justify-content: center; gap: 7px;
+    background: linear-gradient(100deg, #4A4234 0%, #4A4234 28%, #262119 45%, #C89B4B 51%, #262119 57%, #4A4234 72%, #4A4234 100%);
+    background-size: 260% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+    -webkit-text-stroke: 0.7px #3A3226;
+    animation: catsFlow 9s linear infinite; }
+  @keyframes catsFlow { 0% { background-position: 0% 0; } 100% { background-position: 260% 0; } }
+  .cats em { font-style: normal; -webkit-text-fill-color: #bda05a; color: #bda05a; -webkit-text-stroke: 0; opacity: 0.9; font-size: 0.7em; }
+  .hero-tag { font-size: 14px; line-height: 1.4; color: var(--umber); margin: 4px auto 0; position: relative; z-index: 3; white-space: nowrap; }
+  .blooms { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+  .bloom { position: absolute; transform-origin: 50% 92%; will-change: transform, filter;
+           filter: drop-shadow(0 9px 15px rgba(38,33,25,0.09));
+           animation: bloomShimmer 6.4s ease-in-out infinite; }
+  .bloom canvas { display: block; }
+  @keyframes bloomShimmer {
+    0%   { transform: rotate(-1.1deg) translateY(0);    filter: drop-shadow(0 9px 15px rgba(38,33,25,0.09))  brightness(1)    saturate(1); }
+    30%  { transform: rotate(0.6deg)  translateY(-2.5px); filter: drop-shadow(0 12px 20px rgba(198,142,58,0.22)) brightness(1.16) saturate(1.2); }
+    55%  { transform: rotate(1.3deg)  translateY(-1px);  filter: drop-shadow(0 10px 16px rgba(38,33,25,0.11)) brightness(1.04) saturate(1.06); }
+    80%  { transform: rotate(-0.3deg) translateY(-1.6px); filter: drop-shadow(0 12px 20px rgba(214,168,96,0.24)) brightness(1.12) saturate(1.16); }
+    100% { transform: rotate(-1.1deg) translateY(0);    filter: drop-shadow(0 9px 15px rgba(38,33,25,0.09))  brightness(1)    saturate(1); }
+  }
+  .bloom:nth-of-type(2n) { animation-duration: 7.8s; animation-delay: -1.6s; }
+  .bloom:nth-of-type(3n) { animation-duration: 8.9s; animation-delay: -3.4s; }
+  .bloom:nth-of-type(4n) { animation-duration: 6.9s; animation-delay: -4.7s; }
+  .bloom:nth-of-type(5n) { animation-duration: 9.4s; animation-delay: -2.2s; }
+
+  .hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .hero-bg .crystal-cv { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero-bg .halo { position: absolute; inset: 0; background: radial-gradient(46% 38% at 50% 40%, rgba(255,255,255,0.34), rgba(255,255,255,0) 72%); }
+  .hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--eggshell), rgba(251,250,246,0) 16%, rgba(251,250,246,0) 84%, var(--eggshell)); }
+
+  /* VSL — 16:9 video slot */
+  .vsl { position: relative; z-index: 10; margin: 56px auto 0; max-width: 1040px; }
+  .vsl-frame { position: relative; aspect-ratio: 16 / 9; border-radius: var(--r-panel); overflow: hidden; background: #241d15; border: 1px solid var(--hairline); box-shadow: 0 30px 60px -18px rgba(38,33,25,0.4); }
+  .vsl-poster { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; cursor: pointer; background: radial-gradient(120% 120% at 50% 0%, #3a3122, #201a12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+  .vsl-poster:focus-visible { outline: 3px solid var(--yolk); outline-offset: -3px; }
+  .vsl-poster::after { content: ""; position: absolute; inset: 0; background: url("assets/asset-15.svg"); background-size: 30px 30px; opacity: 0.28; mix-blend-mode: overlay; }
+  .vsl-gem { position: relative; z-index: 2; width: 84px; height: 84px;
+    display: flex; align-items: center; justify-content: center;
+    filter: drop-shadow(0 9px 18px rgba(38,33,25,0.4)) drop-shadow(0 1px 3px rgba(38,33,25,0.24));
+    transition: transform var(--dur-fast) var(--ease-out); }
+  .vsl-gem .gem-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .vsl-poster:hover .vsl-gem, .vsl-poster:focus-visible .vsl-gem { transform: scale(1.06) rotate(-1deg); }
+  .vsl-title { position: relative; z-index: 2; font-family: var(--font-display); font-style: italic; font-size: 27px; color: var(--eggshell); margin-top: 6px; }
+  .vsl-cap { position: absolute; left: 18px; right: 18px; bottom: 14px; z-index: 2; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(244,239,228,0.82); }
+  .vsl video, .vsl iframe { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; border: 0; }
+  .vsl-note { text-align: center; margin-top: 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--umber); }
+  .hero .cta-row { flex-direction: column; justify-content: center; align-items: center; gap: 16px; margin-top: 44px; }
+
+  /* ---------- Fillout form slot ---------- */
+  .plan { position: relative; padding: 64px 0 88px; overflow: hidden; }
+  .plan .wrap { position: relative; z-index: 2; }
+  /* subtle palette-knife harbour painting behind the form */
+  /* soft painting halo anchored behind each side scarecrow */
+  .plan-art { position: absolute; bottom: 0; z-index: 0; pointer-events: none;
+    width: 360px; height: 470px;
+    background-image: url("assets/asset-16.png"); background-size: cover; background-position: center 35%;
+    opacity: 0.3;
+    -webkit-mask-image: radial-gradient(ellipse 60% 52% at 50% 58%, #000 0%, #000 36%, transparent 80%);
+            mask-image: radial-gradient(ellipse 60% 52% at 50% 58%, #000 0%, #000 36%, transparent 80%); }
+  .plan-art.left  { left:  max(0px, calc(50% - 744px)); }
+  .plan-art.right { right: max(0px, calc(50% - 744px)); transform: scaleX(-1); }
+  /* scarecrows standing at the sides of the form */
+  .plan-cast { position: absolute; bottom: 0; z-index: 1; pointer-events: none; user-select: none;
+    width: 168px; filter: drop-shadow(0 12px 20px rgba(38,33,25,0.14)); }
+  .plan-cast img { width: 100%; height: auto; display: block; }
+  .plan-cast.left  { left:  max(14px, calc(50% - 648px)); }
+  .plan-cast.right { right: max(14px, calc(50% - 648px)); transform: scaleX(-1); }
+  @media (max-width: 1180px) { .plan-cast, .plan-art { display: none; } }
+  .plan-slot { max-width: 720px; margin: 0 auto; }
+  /* placeholder frame — remove once the real Fillout embed is pasted in */
+  .fillout-placeholder { min-height: 460px; border: 1.5px dashed var(--hairline); border-radius: var(--r-panel, 14px); background: rgba(254,253,250,0.55);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 40px; }
+  .fillout-placeholder .lab { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--umber); }
+  .fillout-placeholder .hint { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; color: var(--umber); opacity: 0.7; max-width: 46ch; line-height: 1.7; }
+  .plan-head { text-align: center; margin: 0 auto 30px; max-width: 760px; }
+  .plan-head .icp { justify-content: center; margin-bottom: 16px; }
+  .plan-head h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 40px; line-height: 1.08; margin: 0; }
+  .plan-head h2 em { font-style: italic; }
+  .plan-head p { font-size: 16px; line-height: 1.6; color: var(--umber); margin: 14px auto 0; max-width: 64ch; }
+
+  /* ---------- refined closing footer ---------- */
+  footer.foot { position: relative; margin-top: 46px; border-top: 1px solid var(--hairline); background: linear-gradient(180deg, #FFFEFB, #FCFAF4); background-image: url("assets/asset-14.svg"), url("assets/asset-15.svg"); background-size: 200px 200px, 26px 26px; padding: 46px 0 40px; overflow: hidden; }
+  footer.foot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 130% at 88% 0%, rgba(232,161,0,0.06), transparent 62%); pointer-events: none; }
+  footer.foot::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5; mix-blend-mode: multiply;
+    background-image: repeating-linear-gradient(0deg, rgba(92,83,64,0.05) 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, rgba(92,83,64,0.05) 0 1px, transparent 1px 4px); }
+  .foot-mark { position: absolute; top: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 11px; height: 11px; background: linear-gradient(135deg, #FFFDF7, var(--wheat)); border: 1px solid var(--wheat); box-shadow: 0 0 0 5px #FFFEFB; z-index: 4; }
+  .foot-inner { position: relative; z-index: 3; display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
+  .foot-id { display: flex; align-items: flex-end; gap: 15px; }
+  .foot-sprig { position: relative; flex: none; align-self: flex-end; line-height: 0; filter: drop-shadow(0 3px 6px rgba(38,33,25,0.14)); }
+  .foot-id .wm2 { height: 27px; width: auto; display: block; }
+  .foot-id .tag { font-family: 'Olivera', var(--font-display); font-style: italic; font-size: 15px; color: var(--wheat); margin: 9px 0 0; }
+  .foot-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .foot-meta span, .foot-meta a { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--umber); text-decoration: none; }
+  .foot-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--wheat); flex: none; }
+  .foot-meta a:hover { color: var(--ink); }
+  .foot-top-link { display: inline-flex; align-items: center; gap: 7px; }
+  .foot-top-link span { color: var(--wheat); }
+  @media (max-width: 760px){ footer.foot { margin-top: 30px; padding: 38px 0 34px; } .foot-inner { align-items: flex-start; gap: 22px; } .foot-meta .dot { display: none; } }
+
+  @media (max-width: 760px){
+    h1.headline { font-size: 44px; }
+    .wrap { padding: 0 22px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    html { scroll-behavior: auto; }
+    .pill, .vsl-gem { transition: none; }
+    .cats, .cats-wrap::after, .bloom, h1.headline .hword { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  
+
+  <!-- ============ floating irregular sticky header ============ -->
+  <div class="nav-wrap">
+    <div class="nav-shell">
+      <div class="nav-garland" aria-hidden="true"></div>
+      <div class="nav">
+        <div class="brand"><a href="#top" aria-label="After Harvest — home"><img class="wm" src="assets/asset-1.svg" alt="afterharvest"></a></div>
+        <span class="spacer"></span>
+        <a class="pill" href="#plan-form">get my <b>free</b> event plan <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HERO — copied from index.html ============ -->
+  <section class="hero" id="top" data-screen-label="01 Hero">
+    <div class="hero-bg" aria-hidden="true"><canvas class="crystal-cv"></canvas><div class="halo"></div></div>
+    <div class="blooms" aria-hidden="true">
+      <div class="bloom" style="left:2.5%;  top:150px" data-kind="spray" data-seed="5" data-cols="24" data-rows="34" data-cell="2"></div>
+      <div class="bloom" style="left:9%;    top:440px" data-kind="poppy" data-seed="18" data-cols="17" data-rows="24" data-cell="2"></div>
+      <div class="bloom" style="left:0.5%;  top:560px" data-kind="daisy" data-seed="22" data-cols="18" data-rows="24" data-cell="2"></div>
+      <div class="bloom" style="left:14%;   top:70px" data-kind="rosebud" data-seed="33" data-cols="16" data-rows="24" data-cell="2"></div>
+      <div class="bloom" style="left:4.5%;  top:700px" data-kind="wheat" data-seed="41" data-cols="15" data-rows="28" data-cell="2"></div>
+      <div class="bloom" style="right:3%;   top:96px" data-kind="lavender" data-seed="7" data-cols="14" data-rows="28" data-cell="2" data-side="right"></div>
+      <div class="bloom" style="right:11%;  top:370px" data-kind="berry" data-seed="15" data-cols="16" data-rows="22" data-cell="2" data-side="right"></div>
+      <div class="bloom" style="right:0.5%; top:520px" data-kind="olive" data-seed="27" data-cols="16" data-rows="26" data-cell="2" data-side="right"></div>
+      <div class="bloom" style="right:16%;  top:200px" data-kind="seedpod" data-seed="36" data-cols="15" data-rows="24" data-cell="2" data-side="right"></div>
+      <div class="bloom" style="right:6.5%; top:700px" data-kind="stalk" data-seed="48" data-cols="14" data-rows="28" data-cell="2" data-side="right"></div>
+    </div>
+    <div class="wrap">
+      <div class="hero-inner">
+        <div class="cats-wrap">
+          <canvas class="cats-cv" aria-hidden="true"></canvas>
+          <div class="icp">For creators, experts, and educators</div>
+          <div class="cats">Courses <em>—</em> Cohorts <em>—</em> Memberships <em>—</em> Communities</div>
+        </div>
+        <h1 class="headline">Learn How Our Clients Got Their Biggest Revenue Months With<br><span class="hword">3-Day Virtual Events</span></h1>
+        <p class="sub">We build and run the entire event, you show up and teach, and we only get paid from what the launch collects. It’s $0 upfront, with a revenue floor we put in writing before we start. The exact plan, our entire offer, and our two guarantees are all in the video below.</p>
+      </div>
+
+      <!-- ============ 16:9 VIDEO EMBED SLOT ============
+           Replace the <button class="vsl-poster">…</button> below with your player embed, e.g.:
+             <iframe src="https://your-video-host/embed/ID" allow="autoplay; fullscreen" allowfullscreen></iframe>
+           (or keep the branded poster and set data-vsl-src on .vsl to a direct video file URL). -->
+      <div class="vsl" data-vsl-src="">
+        <div class="vsl-frame">
+          <!-- VIDEO PLAYER / EMBED IFRAME GOES HERE -->
+          <button class="vsl-poster" type="button" aria-label="Play the overview video">
+            <span class="vsl-gem" aria-hidden="true"><svg class="gem-svg" viewBox="0 0 116 116" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="gemTable" x1="0.15" y1="0" x2="0.55" y2="1"><stop offset="0" stop-color="#FDFCF9"></stop><stop offset="1" stop-color="#E4DCCB"></stop></linearGradient>
+                <radialGradient id="gemHot" cx="0.32" cy="0.24" r="0.5"><stop offset="0" stop-color="#ffffff" stop-opacity="0.72"></stop><stop offset="1" stop-color="#ffffff" stop-opacity="0"></stop></radialGradient>
+                <linearGradient id="gemDepth" x1="0.1" y1="0" x2="0.35" y2="1"><stop offset="0.5" stop-color="#2f2a1e" stop-opacity="0"></stop><stop offset="1" stop-color="#2f2a1e" stop-opacity="0.22"></stop></linearGradient>
+                <clipPath id="gemClip"><polygon points="54,2 92,22 112,58 86,100 44,114 10,78 16,34"></polygon></clipPath>
+              </defs>
+              <g stroke="rgba(110,100,78,0.18)" stroke-width="0.55" stroke-linejoin="round">
+                <polygon points="52,26 72,38 92,22" fill="#E4DCCB"></polygon>
+                <polygon points="52,26 92,22 54,2" fill="#F1ECE0"></polygon>
+                <polygon points="72,38 80,60 112,58" fill="#D7CDB8"></polygon>
+                <polygon points="72,38 112,58 92,22" fill="#E4DCCB"></polygon>
+                <polygon points="80,60 66,82 86,100" fill="#B7AB8E"></polygon>
+                <polygon points="80,60 86,100 112,58" fill="#C7BBA1"></polygon>
+                <polygon points="66,82 46,82 44,114" fill="#A89B7F"></polygon>
+                <polygon points="66,82 44,114 86,100" fill="#B7AB8E"></polygon>
+                <polygon points="46,82 30,62 10,78" fill="#D7CDB8"></polygon>
+                <polygon points="46,82 10,78 44,114" fill="#C7BBA1"></polygon>
+                <polygon points="30,62 34,40 16,34" fill="#F1ECE0"></polygon>
+                <polygon points="30,62 16,34 10,78" fill="#E4DCCB"></polygon>
+                <polygon points="34,40 52,26 54,2" fill="#F1ECE0"></polygon>
+                <polygon points="34,40 54,2 16,34" fill="#FCFBF7"></polygon>
+                <polygon points="52,26 72,38 80,60 66,82 46,82 30,62 34,40" fill="url(#gemTable)"></polygon>
+              </g>
+              <g clip-path="url(#gemClip)">
+                <rect x="0" y="0" width="116" height="116" fill="url(#gemHot)"></rect>
+                <rect x="0" y="0" width="116" height="116" fill="url(#gemDepth)"></rect>
+              </g>
+              <polyline points="16,34 54,2 92,22" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="0.9" stroke-linejoin="round"></polyline>
+              <polyline points="34,40 52,26 72,38" fill="none" stroke="rgba(255,255,255,0.42)" stroke-width="0.7"></polyline>
+              <polyline points="112,58 86,100 44,114" fill="none" stroke="rgba(70,62,44,0.28)" stroke-width="0.9" stroke-linejoin="round"></polyline>
+              <polygon points="54,2 92,22 112,58 86,100 44,114 10,78 16,34" fill="none" stroke="rgba(255,255,255,0.26)" stroke-width="0.7"></polygon>
+              <polygon points="47,44 47,68 69,56" fill="#262119"></polygon>
+            </svg></span>
+            <span class="vsl-title">How a season works</span>
+          </button>
+        </div>
+        <p class="vsl-note" aria-hidden="true"></p>
+      </div>
+
+      <!-- CTA — smooth-scrolls to the Fillout form section below -->
+      <div class="cta-row">
+        <a class="pill" href="#plan-form">
+          <svg class="pill-ico" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <rect x="3.5" y="2.5" width="13" height="15" rx="2" stroke="currentColor" stroke-width="1.4"></rect>
+            <rect x="7" y="1" width="6" height="3" rx="1" fill="var(--wheat)"></rect>
+            <path d="M6 8.5l1.3 1.3 2-2.4" stroke="var(--wheat)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M6 13l1.3 1.3 2-2.4" stroke="var(--wheat)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="11" y1="8.6" x2="14" y2="8.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></line>
+            <line x1="11" y1="13.1" x2="14" y2="13.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></line>
+          </svg>
+          get my <b>free</b> event plan <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FILLOUT INLINE FORM ============ -->
+  <section class="plan" id="plan-form">
+    <div class="plan-art left"></div>
+    <div class="plan-art right"></div>
+    <div class="plan-cast left"><img src="assets/asset-3.png" alt="" aria-hidden="true"></div>
+    <div class="plan-cast right"><img src="assets/asset-2.png" alt="" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="plan-slot">
+        <div class="plan-head">
+          <div class="icp"><span class="rule"></span> Application <span class="rule"></span></div>
+          <h2>Want a free 3-day live event <em>plan</em>?</h2>
+          <p>Interested if 3-day virtual events will work for you specifically? We’ll make you a mockup plan around your own offer, numbers, and audience. Answer the questions below. Takes ~5 minutes, and we’ll send you the plan in 24–48 hours.</p>
+        </div>
+        <!-- ===== FILLOUT INLINE FORM EMBED ===== -->
+        <div style="width:100%;height:500px;" data-fillout-id="7UzHxLiu4rus" data-fillout-embed-type="standard" data-fillout-inherit-parameters="" data-fillout-dynamic-resize=""></div>
+        <script src="assets/asset-5.js"></script>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ refined closing footer ============ -->
+  <footer class="foot" data-screen-label="03 Footer">
+    <span class="foot-mark" aria-hidden="true"></span>
+    <div class="wrap foot-inner">
+      <div class="foot-id">
+        <div class="foot-sprig" aria-hidden="true"></div>
+        <div class="txt">
+          <img class="wm2" src="assets/asset-1.svg" alt="afterharvest">
+          <p class="tag">Done-for-you 3-day virtual events.</p>
+        </div>
+      </div>
+      <div class="foot-meta">
+        <span>© 2026 AfterHarvest</span>
+        <span class="dot" aria-hidden="true"></span>
+        <a href="mailto:sean@theseancanela.com">sean@theseancanela.com</a>
+        <span class="dot" aria-hidden="true"></span>
+        <a class="foot-top-link" href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
+    </div>
+  </footer>
+
+<script src="assets/asset-6.js"></script>
+<script>
+  var REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function mountHero() {
+    if (!window.AHStitch) return;
+    var gc = document.querySelector('.nav-garland');
+    if (gc && !gc.querySelector('canvas')) {
+      var gcv = document.createElement('canvas'); gc.appendChild(gcv);
+      var gw = gc.clientWidth || 1000, gcell = 3.5;
+      AHStitch.mount(gcv, { kind: 'garland', cols: Math.min(300, Math.round(gw / gcell)), rows: 38, cell: gcell, seed: 21, animate: false });
+    }
+    var cc = document.querySelector('.hero-bg .crystal-cv');
+    if (cc) AHStitch.crystal(cc, { animate: !REDUCE });
+    var fs = document.querySelector('.foot-sprig');
+    if (fs && !fs.querySelector('canvas')) {
+      var fsv = document.createElement('canvas'); fs.appendChild(fsv);
+      AHStitch.mount(fsv, { kind: 'wheat', cols: 12, rows: 19, cell: 2, seed: 41, twinkle: false, animate: false });
+    }
+    var ccats = document.querySelector('.cats-wrap .cats-cv');
+    if (ccats) AHStitch.crystal(ccats, { animate: false });
+    document.querySelectorAll('.bloom').forEach(function (el) {
+      if (el.querySelector('canvas')) return;
+      var c = document.createElement('canvas'); el.appendChild(c);
+      AHStitch.mount(c, {
+        kind: el.getAttribute('data-kind'),
+        cols: +el.getAttribute('data-cols'), rows: +el.getAttribute('data-rows'),
+        cell: +el.getAttribute('data-cell') || 3, seed: +el.getAttribute('data-seed'),
+        side: el.getAttribute('data-side') || undefined, twinkle: false
+      });
+    });
+  }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(mountHero); } else { window.addEventListener('load', mountHero); }
+
+  // shape the floating nav into a soft, irregular organic bar
+  (function(){
+    function shapeNav(){
+      var nav = document.querySelector('.nav'); if(!nav) return;
+      var r = nav.getBoundingClientRect(), W = Math.round(r.width), H = Math.round(r.height);
+      if (W < 40 || H < 20) { nav.style.clipPath = 'none'; return; }
+      var cr = 13, ty = 2, by = H - 2, i, x;
+      function wave(v){ return Math.sin(v*0.017)*1.4; }
+      var steps = Math.max(10, Math.round(W / 48));
+      var d = 'M' + cr + ' ' + ty.toFixed(1);
+      for (i=1;i<=steps;i++){ x=cr+(W-2*cr)*(i/steps); d+=' L'+x.toFixed(1)+' '+(ty+wave(x)).toFixed(1); }
+      d += ' Q'+W+' '+ty+' '+W+' '+(ty+cr).toFixed(1) + ' L'+W+' '+(by-cr).toFixed(1);
+      d += ' Q'+W+' '+by+' '+(W-cr).toFixed(1)+' '+by;
+      for (i=1;i<=steps;i++){ x=(W-cr)-(W-2*cr)*(i/steps); d+=' L'+x.toFixed(1)+' '+(by-wave(x)).toFixed(1); }
+      d += ' Q0 '+by+' 0 '+(by-cr).toFixed(1) + ' L0 '+(ty+cr).toFixed(1);
+      d += ' Q0 '+ty+' '+cr+' '+ty.toFixed(1) + ' Z';
+      nav.style.webkitClipPath = "path('" + d + "')"; nav.style.clipPath = "path('" + d + "')";
+    }
+    function run(){ shapeNav(); }
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(run); } else { window.addEventListener('load', run); }
+    window.addEventListener('resize', function(){ clearTimeout(window.__navT); window.__navT = setTimeout(shapeNav, 150); });
+  })();
+
+  // VSL poster → plays data-vsl-src if provided, else hints to add an embed
+  (function(){
+    var vsl = document.querySelector('.vsl'); if(!vsl) return;
+    var poster = vsl.querySelector('.vsl-poster'); if(!poster) return;
+    poster.addEventListener('click', function(){
+      var src = vsl.getAttribute('data-vsl-src');
+      var frame = vsl.querySelector('.vsl-frame');
+      if (src) {
+        var v = document.createElement('video');
+        v.setAttribute('controls',''); v.setAttribute('playsinline','');
+        v.src = src; frame.innerHTML = ''; frame.appendChild(v);
+        var p = v.play(); if (p && p.catch) p.catch(function(){});
+      } else {
+        var note = vsl.querySelector('.vsl-note');
+        if (note) { note.textContent = 'Add your player embed inside .vsl-frame (or set data-vsl-src on .vsl).'; note.style.color = 'var(--rust)'; }
+      }
+    });
+  })();
+</script>
+
+
+</body></html>
