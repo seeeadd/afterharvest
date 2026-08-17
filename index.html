@@ -651,6 +651,16 @@ hr {
   .pf-next:hover { transform: translateY(-1px); background: #fff; }
   .pf-next:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
   .pf-err { margin-top: 13px; font-size: 15px; color: #E9A78E; min-height: 1em; }
+  .pf-reset { display: block; margin: 20px auto 0; padding: 7px 4px; background: none; border: 0;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(247,243,234,0.42); cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+  .pf-reset:hover { color: rgba(247,243,234,0.85); border-bottom-color: rgba(247,243,234,0.4); }
+  .pf-reset:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
+  .pf-reset[hidden] { display: none; }
+  .pf-back { border-radius: 7px; }
+  .pf-back:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
   .pf-note { margin-top: 22px; text-align: center; font-family: var(--font-mono); font-size: 10px;
     letter-spacing: 0.09em; text-transform: uppercase; color: rgba(247,243,234,0.34); }
   .pf-done { text-align: center; padding: 26px 0 14px; }
@@ -1330,9 +1340,30 @@ hr {
 
     var stepsEl = el('div','pf-steps');
     var backEl = el('button','pf-back','<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>');
-    backEl.type = 'button'; backEl.setAttribute('aria-label','Back');
+    backEl.type = 'button'; backEl.setAttribute('aria-label','Back to the previous question');
+    backEl.addEventListener('click', function(){
+      if (at <= 0) return;
+      at--; draw();
+      root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    var resetEl = el('button','pf-reset','Start over');
+    resetEl.type = 'button';
+    resetEl.addEventListener('click', function(){
+      if (!window.confirm('Clear your answers and go back to the first question?')) return;
+      // same rid on purpose: one person stays one row in the sheet rather than two
+      state.answers = {};
+      state.done = false;
+      state.started = new Date().toISOString();
+      at = 0;
+      lastSent = '';
+      saveSoon(false);
+      draw();
+      root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
     var bodyEl = el('div','pf-body');
     root.appendChild(backEl); root.appendChild(stepsEl); root.appendChild(bodyEl);
+    root.appendChild(resetEl);
 
     function drawSteps(){
       stepsEl.innerHTML = '';
@@ -1421,12 +1452,18 @@ hr {
       screen.appendChild(next);
       bodyEl.appendChild(screen);
       drawSteps();
+      var touched = false;
+      for (var k in state.answers) {
+        if (String(state.answers[k] || '').trim() !== '') { touched = true; break; }
+      }
+      resetEl.hidden = !touched;
     }
 
     function finish(){
       state.done = true;
       saveSoon(true);
       backEl.hidden = true;
+      resetEl.hidden = false;
       stepsEl.innerHTML = '';
       bodyEl.innerHTML = '';
       var d = el('div','pf-done');
