@@ -38,6 +38,7 @@ function sheet_() {
   if (sh.getLastRow() === 0) {
     sh.appendRow(COLS);
     sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, COLS.length).setFontWeight('bold');
   }
   return sh;
 }
@@ -56,7 +57,7 @@ function doPost(e) {
       return a[k] != null ? a[k] : '';
     });
 
-    // one row per visitor: update in place if we've seen this rid before
+    // find this visitor's existing row, if any
     const last = sh.getLastRow();
     let at = -1;
     if (last > 1) {
@@ -65,10 +66,13 @@ function doPost(e) {
         if (rids[i][0] === d.rid) { at = i + 2; break; }
       }
     }
-    if (at > 0) sh.getRange(at, 1, 1, COLS.length).setValues([row]);
-    else sh.appendRow(row);
 
-    return out_({ ok: true });
+    // whoever just did something goes to row 2, so the newest activity is always on top
+    if (at > 0) sh.deleteRow(at);
+    sh.insertRowBefore(2);
+    sh.getRange(2, 1, 1, COLS.length).setValues([row]);
+
+    return out_({ ok: true, row: 2, moved: at > 0 });
   } catch (err) {
     return out_({ ok: false, error: String(err) });
   } finally {
@@ -106,6 +110,7 @@ browser, but nothing is sent anywhere.
 | column | meaning |
 | --- | --- |
 | `rid` | stable id for one visitor, the key the row updates on |
+| row order | newest activity is always row 2; no sorting needed |
 | `started` / `updated` | first touch and most recent keystroke |
 | `step` / `of` | how far they got, e.g. `4` of `11` |
 | `complete` | `TRUE` only if they pressed **get my plan** |
