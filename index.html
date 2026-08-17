@@ -317,13 +317,34 @@ hr {
                            transform var(--dur-fast) var(--ease-out), filter 0.28s var(--ease-out),
                            color 0.28s var(--ease-out); }
   .nav-garland { transition: opacity 300ms var(--ease-out), transform 460ms var(--ease-out); }
-  .nav-wrap[data-compact="1"] { top: 10px; padding-top: 10px; }
-  .nav-wrap[data-compact="1"] .nav-shell { width: min(640px, 100%); }
-  .nav-wrap[data-compact="1"] .nav { padding: 8px 10px 8px 16px; gap: 14px;
-    background-color: rgba(254,253,250,0.95);
-    filter: drop-shadow(0 11px 24px rgba(38,33,25,0.17)); }
-  .nav-wrap[data-compact="1"] .nav .wm { height: 22px; }
-  .nav-wrap[data-compact="1"] .nav .pill { font-size: 9.5px; padding: 8px 15px 11px; letter-spacing: 0.07em; }
+  /* brand swaps wordmark for the stitched mark, and the box shrinks to fit it */
+  .nav .brand a { position: relative; display: block; width: 143px; height: 31px;
+    transition: width 460ms var(--ease-out), height 460ms var(--ease-out); }
+  .nav .wm, .nav .wm-mark { position: absolute; left: 0; top: 50%; height: 100%; width: auto;
+    transform: translateY(-50%); transition: opacity 280ms var(--ease-out); }
+  .nav .wm-mark { opacity: 0; height: 100%; }
+  .nav-progress { position: absolute; left: 0; right: 0; bottom: 3px; height: 2px; z-index: 3;
+    opacity: 0; pointer-events: none; transition: opacity 320ms var(--ease-out); }
+  .nav-progress i { display: block; height: 100%; width: 0;
+    background: repeating-linear-gradient(90deg, var(--wheat) 0 6px, transparent 6px 10px); }
+
+  .nav-wrap[data-compact="1"] { top: 9px; padding-top: 9px; }
+  .nav-wrap[data-compact="1"] .nav-shell { width: min(430px, 100%); }
+  .nav-wrap[data-compact="1"] .nav { padding: 7px 7px 7px 11px; gap: 10px; border-radius: 999px;
+    background-color: rgba(254,253,250,0.97);
+    filter: drop-shadow(0 12px 26px rgba(38,33,25,0.2)); }
+  /* wordmark out, mark in, and the brand box collapses to a square */
+  .nav-wrap[data-compact="1"] .nav .brand a { width: 27px; height: 27px; }
+  .nav-wrap[data-compact="1"] .nav .wm { opacity: 0; }
+  .nav-wrap[data-compact="1"] .nav .wm-mark { opacity: 1; }
+  /* the CTA drops its filler words rather than just shrinking: "free plan" */
+  .nav-wrap[data-compact="1"] .nav .pill .pw { max-width: 0; opacity: 0; margin: 0; }
+  .nav-wrap[data-compact="1"] .nav .pill { font-size: 9.5px; padding: 9px 16px 11px; letter-spacing: 0.08em; }
+  .nav .pill .pw { display: inline-block; max-width: 5em; overflow: hidden; white-space: pre;
+    vertical-align: bottom; opacity: 1;
+    transition: max-width 420ms var(--ease-out), opacity 260ms var(--ease-out); }
+  /* a stitched read-progress run appears only once compressed */
+  .nav-wrap[data-compact="1"] .nav-progress { opacity: 1; }
   /* the garland spills far wider than the compressed bar, so it retracts rather than clipping */
   .nav-wrap[data-compact="1"] .nav-garland { opacity: 0; transform: translateY(-12px) scale(0.96); }
 
@@ -733,9 +754,10 @@ hr {
     <div class="nav-shell">
       <div class="nav-garland" aria-hidden="true"></div>
       <div class="nav">
-        <div class="brand"><a href="#top" aria-label="After Harvest — home"><img class="wm" src="assets/asset-1.svg" alt="afterharvest"></a></div>
+        <div class="brand"><a href="#top" aria-label="After Harvest — home"><img class="wm" src="assets/asset-1.svg" alt="afterharvest"><img class="wm-mark" src="assets/ah-mark-nav.svg" alt="" aria-hidden="true"></a></div>
         <span class="spacer"></span>
-        <a class="pill" href="#plan-form">get my <b>free</b> event plan <span class="arrow">→</span></a>
+        <a class="pill" href="#plan-form"><span class="pw">get my </span><b>free</b><span class="pw"> event</span> plan <span class="arrow">→</span></a>
+        <div class="nav-progress" aria-hidden="true"><i></i></div>
       </div>
     </div>
   </div>
@@ -928,6 +950,8 @@ hr {
     (function(){
       var wrap = document.querySelector('.nav-wrap'); if (!wrap) return;
       var compact = false, queued = false, raf = null;
+      var nav = document.querySelector('.nav');
+      var bar = wrap.querySelector('.nav-progress i');
       function reshapeFor(ms){
         cancelAnimationFrame(raf);
         var end = (window.performance ? performance.now() : Date.now()) + ms;
@@ -940,10 +964,16 @@ hr {
       function check(){
         queued = false;
         var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        if (bar) {
+          var span = (document.documentElement.scrollHeight - window.innerHeight) || 1;
+          bar.style.width = Math.max(0, Math.min(100, (y / span) * 100)) + '%';
+        }
         if (!compact && y > 90) { compact = true; }
         else if (compact && y < 40) { compact = false; }   // hysteresis, so it cannot flutter
         else return;
         wrap.setAttribute('data-compact', compact ? '1' : '0');
+        // compact is a capsule, and the hand-drawn wavy clip would fight the pill radius
+        if (compact) { nav.style.clipPath = 'none'; nav.style.webkitClipPath = 'none'; return; }
         if (REDUCE) { shapeNav(); return; }
         reshapeFor(560);
       }
