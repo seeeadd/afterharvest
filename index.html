@@ -317,36 +317,23 @@ hr {
                            transform var(--dur-fast) var(--ease-out), filter 0.28s var(--ease-out),
                            color 0.28s var(--ease-out); }
   .nav-garland { transition: opacity 300ms var(--ease-out), transform 460ms var(--ease-out); }
-  .nav .brand a { position: relative; display: block; height: 31px;
-    transition: height 460ms var(--ease-out); }
+  .nav .brand .lockup { display: flex; align-items: center; gap: 0; }
   .nav .wm { transition: height 460ms var(--ease-out); }
-
-  /* read progress is the bar's own fill, not a rail under it, so there is nothing to align */
-  .nav::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; z-index: 0;
-    width: var(--read, 0%); opacity: 0; pointer-events: none; border-radius: inherit;
-    background: linear-gradient(90deg,
-      rgba(200,155,75,0.20) 0%, rgba(200,155,75,0.11) 62%, rgba(200,155,75,0.02) 100%);
-    transition: opacity 340ms var(--ease-out); }
-  .nav > * { position: relative; z-index: 1; }
-  .nav-wrap[data-compact="1"] .nav::before { opacity: 1; }
+  /* the stitched mark rides in only when the bar compresses */
+  .nav .wm-mark { height: 0; width: 0; opacity: 0; margin-right: 0; display: block;
+    transition: height 460ms var(--ease-out), width 460ms var(--ease-out),
+                margin-right 460ms var(--ease-out), opacity 300ms var(--ease-out); }
 
   .nav-wrap[data-compact="1"] { top: 9px; padding-top: 9px; }
-  .nav-wrap[data-compact="1"] .nav-shell { width: min(510px, 100%); }
-  /* frosted rather than solid: less opacity, more blur, so the page reads through it */
-  .nav-wrap[data-compact="1"] .nav { padding: 6px 6px 6px 15px; gap: 12px; border-radius: 999px;
-    background-color: rgba(254,253,250,0.62);
-    -webkit-backdrop-filter: blur(20px) saturate(175%); backdrop-filter: blur(20px) saturate(175%);
-    border-color: rgba(255,255,255,0.6);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(38,33,25,0.045);
-    filter: drop-shadow(0 10px 24px rgba(38,33,25,0.14)) drop-shadow(0 2px 5px rgba(38,33,25,0.07)); }
-  .nav-wrap[data-compact="1"] .nav .brand a { height: 22px; }
-  .nav-wrap[data-compact="1"] .nav .wm { height: 22px; }
-  /* the CTA drops its filler words rather than just shrinking: "free plan" */
-  .nav-wrap[data-compact="1"] .nav .pill .pw { max-width: 0; opacity: 0; margin: 0; }
-  .nav-wrap[data-compact="1"] .nav .pill { font-size: 9.5px; padding: 9px 17px 11px; letter-spacing: 0.085em; }
-  .nav .pill .pw { display: inline-block; max-width: 5em; overflow: hidden; white-space: pre;
-    vertical-align: bottom; opacity: 1;
-    transition: max-width 420ms var(--ease-out), opacity 260ms var(--ease-out); }
+  .nav-wrap[data-compact="1"] .nav-shell { width: min(580px, 100%); }
+  /* frosted, and still the hand-cut crystal edge: shapeNav keeps clipping it */
+  .nav-wrap[data-compact="1"] .nav { padding: 8px 9px 8px 15px; gap: 14px;
+    background-color: rgba(254,253,250,0.66);
+    -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+    filter: drop-shadow(0 10px 24px rgba(38,33,25,0.15)) drop-shadow(0 2px 5px rgba(38,33,25,0.07)); }
+  .nav-wrap[data-compact="1"] .nav .wm { height: 21px; }
+  .nav-wrap[data-compact="1"] .nav .wm-mark { height: 21px; width: 21px; opacity: 1; margin-right: 10px; }
+  .nav-wrap[data-compact="1"] .nav .pill { font-size: 9.5px; padding: 9px 17px 11px; letter-spacing: 0.075em; }
   /* the garland spills far wider than the compressed bar, so it retracts rather than clipping */
   .nav-wrap[data-compact="1"] .nav-garland { opacity: 0; transform: translateY(-12px) scale(0.96); }
 
@@ -766,7 +753,7 @@ hr {
     <div class="nav-shell">
       <div class="nav-garland" aria-hidden="true"></div>
       <div class="nav">
-        <div class="brand"><a href="#top" aria-label="After Harvest — home"><img class="wm" src="assets/asset-1.svg" alt="afterharvest"></a></div>
+        <div class="brand"><a class="lockup" href="#top" aria-label="After Harvest — home"><img class="wm-mark" src="assets/ah-mark-nav.svg" alt="" aria-hidden="true"><img class="wm" src="assets/asset-1.svg" alt="afterharvest"></a></div>
         <span class="spacer"></span>
         <a class="pill" href="#plan-form"><span class="pw">get my </span><b>free</b><span class="pw"> event</span> plan <span class="arrow">→</span></a>
       </div>
@@ -974,16 +961,12 @@ hr {
       function check(){
         queued = false;
         var y = window.pageYOffset || document.documentElement.scrollTop || 0;
-        var span = (document.documentElement.scrollHeight - window.innerHeight) || 1;
-        nav.style.setProperty('--read', Math.max(0, Math.min(100, (y / span) * 100)) + '%');
         if (!compact && y > 90) { compact = true; }
         else if (compact && y < 40) { compact = false; }   // hysteresis, so it cannot flutter
         else return;
         wrap.setAttribute('data-compact', compact ? '1' : '0');
-        // compact is a capsule, and the hand-drawn wavy clip would fight the pill radius
-        if (compact) { nav.style.clipPath = 'none'; nav.style.webkitClipPath = 'none'; return; }
         if (REDUCE) { shapeNav(); return; }
-        reshapeFor(560);
+        reshapeFor(620);
       }
       window.addEventListener('scroll', function(){
         if (queued) return; queued = true; requestAnimationFrame(check);
