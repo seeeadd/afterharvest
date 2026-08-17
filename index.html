@@ -1267,6 +1267,8 @@ hr {
       try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
     }
 
+    // ?reset=1 wipes first, so load() finds nothing and a fresh rid (= a new sheet row) is minted
+    if (/[?&]reset=1/.test(location.search)) { try { localStorage.removeItem(LS); } catch(e){} }
     var prev = load();
     state = (prev && prev.rid) ? prev : { rid: uid(), answers: {}, started: new Date().toISOString(), done: false };
 
@@ -1429,7 +1431,9 @@ hr {
         });
         if (bad) { bad.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
         if (sc.submit) { finish(); return; }
-        at++; saveSoon(false); draw();
+        at++;
+        persist(); clearTimeout(saveT); send(false, false);   // a completed screen posts immediately
+        draw();
         root.scrollIntoView({ behavior:'smooth', block:'start' });
       });
       screen.appendChild(next);
