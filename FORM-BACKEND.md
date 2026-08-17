@@ -4,21 +4,23 @@ The form on the landing page saves as people type, not only when they press
 **get my plan**. Every save carries the same `rid`, so a person is **one row**
 that keeps updating, and you can see exactly where someone stopped.
 
-## 1. Make the sheet
+## 1. The sheet
 
-New Google Sheet. Copy its ID from the URL:
+Already created, in your Drive:
 
-```
-https://docs.google.com/spreadsheets/d/<THIS_IS_THE_ID>/edit
-```
+**AfterHarvest Plan Form Responses**
+https://docs.google.com/spreadsheets/d/1ZKOzQZa7TbH8efFThTkGP39f9vzTvfvf_vkiwL6yQUs/edit
+
+It is empty on purpose. The script below creates the `Responses` tab and the
+header row by itself on the first save.
 
 ## 2. Add the script
 
-In the sheet: **Extensions → Apps Script**. Replace everything with this and
-paste your sheet ID into `SHEET_ID`.
+Open that sheet, then **Extensions → Apps Script**. Delete whatever is in the
+editor and paste this whole thing. The sheet ID is already filled in.
 
 ```js
-const SHEET_ID = 'PASTE_YOUR_SHEET_ID';
+const SHEET_ID = '1ZKOzQZa7TbH8efFThTkGP39f9vzTvfvf_vkiwL6yQUs';
 const TAB = 'Responses';
 
 const COLS = [
