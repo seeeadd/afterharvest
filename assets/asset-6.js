@@ -772,6 +772,97 @@
     berrySprig(G, Math.round(W*0.9), Math.round(H*0.92), H*0.16, rnd);
   }
 
+
+  /* ---------- chapter-seam blooms ----------------------------------------------
+     A distinct species per chapter knot. Deliberately NOT the hero set — the seam
+     should read as its own row of planting, not a reprise of the header. -------- */
+  function petalRing(G, cx,cy, R, petals, tone, rnd, notch, twist, thresh){
+    for(var r=-R-1;r<=R+1;r++)for(var c=-R-1;c<=R+1;c++){
+      var d=Math.hypot(c,r)/R; if(d>1.08) continue;
+      var ang=Math.atan2(r,c)+(twist||0);
+      var lobe=Math.abs(Math.cos(ang*petals/2));
+      var edge=notch? lobe*(0.93+0.11*Math.cos(ang*petals)) : lobe;
+      if(d<=0.30) continue;
+      if(edge<(thresh||0.34)) continue;
+      if(d>0.92 && rnd()<0.42) continue;
+      put(G,cx+c,cy+r, shade(mix(tone,P.creamSh,(d-0.30)/0.78*0.55),c,r,d));
+    }
+  }
+  function core(G,cx,cy,R,tone,edgeTone){
+    for(var r=-R;r<=R;r++)for(var c=-R;c<=R;c++){
+      var d=Math.hypot(c,r)/Math.max(0.6,R); if(d>1.05) continue;
+      put(G,cx+c,cy+r, d<0.5?tone:mix(tone,edgeTone,0.6));
+    }
+  }
+  function cupBloom(G,cx,cy,R,tone,lobes){
+    for(var r=-R;r<=R*1.25;r++)for(var c=-R;c<=R;c++){
+      var nx=c/R, ny=r/(R*1.25);
+      if(nx*nx+ny*ny>1.02) continue;
+      if(ny<-0.15){
+        var w=Math.abs(Math.cos(Math.atan2(r,c)*lobes/2));
+        if(w<0.30) continue;
+      }
+      put(G,cx+c,cy+r, shade(mix(tone,P.creamSh,(ny+1)/2*0.42),c,r,0.45));
+    }
+  }
+  function umbel(G,cx,cy,W,tone,rnd){
+    for(var i=0;i<26;i++){
+      var a=rnd()*Math.PI*2, rr=Math.sqrt(rnd())*W;
+      var x=cx+Math.cos(a)*rr, y=cy+Math.sin(a)*rr*0.42;
+      put(G,x,y, i%3? tone : lighten(tone,0.24));
+      if(rnd()<0.5) put(G,x, y-0.9, lighten(tone,0.3));
+    }
+  }
+  function chapterBloom(G, kind, W,H, rnd){
+    var cx=W*0.5, cy=H*0.5, R=Math.max(3,Math.round(Math.min(W,H)*0.44));
+    switch(kind){
+      case 'cosmos':
+        petalRing(G,cx,cy,R,8,P.rose,rnd,true,0.2,0.47);
+        core(G,cx,cy,Math.max(1,R*0.30),P.yolk,P.wheatDk); break;
+      case 'thistle':
+        for(var i=0;i<16;i++){
+          var a=-Math.PI/2+(i/15-0.5)*2.1, L=R*(0.95+rnd()*0.5);
+          put(G,cx+Math.cos(a)*L, cy-R*0.35+Math.sin(a)*L*0.8, i%2?P.dusk:mix(P.dusk,P.plum,0.5));
+        }
+        cupBloom(G,cx,cy+R*0.10,R*0.70,P.plum,5);
+        core(G,cx,cy-R*0.1,R*0.34,mix(P.dusk,P.plum,0.35),P.plum); break;
+      case 'clover':
+        core(G,cx-R*0.80,cy+R*0.30,R*0.50,P.sage,P.oliveDk);
+        core(G,cx+R*0.80,cy+R*0.30,R*0.50,P.sage,P.oliveDk);
+        core(G,cx,cy-R*0.72,R*0.50,P.sageLt,P.sage);
+        put(G,cx,cy+R*0.05,P.wheat); break;
+      case 'chamomile':
+        petalRing(G,cx,cy,R,16,P.creamLt,rnd,false,0,0.30);
+        core(G,cx,cy,Math.max(1,R*0.34),P.yolk,P.gold); break;
+      case 'tulip':
+        cupBloom(G,cx,cy-R*0.18,R*0.86,P.poppy,3); break;
+      case 'sunflower':
+        petalRing(G,cx,cy,R,13,P.yolk,rnd,true,0,0.38);
+        core(G,cx,cy,Math.max(1.4,R*0.42),P.oliveDk,P.umberDk); break;
+      case 'bluebell':
+        cupBloom(G,cx-R*0.46,cy+R*0.10,R*0.44,P.dusk,4);
+        cupBloom(G,cx+R*0.46,cy+R*0.22,R*0.40,mix(P.dusk,P.plum,0.35),4);
+        cupBloom(G,cx,cy-R*0.52,R*0.40,lighten(P.dusk,0.2),4); break;
+      case 'flax':
+        petalRing(G,cx,cy,R,5,mix(P.dusk,P.creamLt,0.25),rnd,false,0.35,0.60);
+        core(G,cx,cy,Math.max(1,R*0.28),P.creamLt,P.wheat); break;
+      case 'marigold':
+        petalRing(G,cx,cy,R,9,P.rust,rnd,true,0,0.26);
+        petalRing(G,cx,cy,R*0.72,11,mix(P.gold,P.rust,0.35),rnd,true,0.4,0.24);
+        core(G,cx,cy,Math.max(1,R*0.26),P.rustDk,P.umberDk); break;
+      case 'cornflower':
+        petalRing(G,cx,cy,R,7,P.dusk,rnd,true,0.15,0.52);
+        petalRing(G,cx,cy,R*0.55,6,P.plum,rnd,true,0.5,0.44);
+        core(G,cx,cy,Math.max(1,R*0.24),mix(P.plum,P.ink,0.3),P.plum); break;
+      case 'yarrow':
+        umbel(G,cx,cy+R*0.15,R*1.05,P.creamLt,rnd);
+        umbel(G,cx,cy-R*0.30,R*0.62,P.cream,rnd); break;
+      default:
+        petalRing(G,cx,cy,R,8,P.creamLt,rnd,false,0);
+        core(G,cx,cy,Math.max(1,R*0.3),P.yolk,P.gold);
+    }
+  }
+
   function buildMotif(kind, cols, rows, seed){
     var G=mkGrid(cols,rows), rnd=rngFrom(seed), W=cols, H=rows, cx=W*0.5, cy=H*0.5;
     switch(kind){
@@ -818,6 +909,10 @@
       case 'rosebud':
         stem(G,cx,H*0.98,cx,cy,cx+1,cy+H*0.3,P.olive,0.8); leaf(G,cx+2,cy+H*0.2,4,2,0.6,P.sage,rnd);
         rose(G,cx,cy-H*0.1,Math.round(W*0.28),{dk:P.roseDk,lt:P.roseLt},rnd); break;
+      case 'cosmos': case 'thistle': case 'clover': case 'chamomile': case 'tulip':
+      case 'sunflower': case 'bluebell': case 'flax': case 'marigold':
+      case 'cornflower': case 'yarrow':
+        chapterBloom(G, kind, W, H, rnd); break;
       default: wheatSheaf(G,cx,cy,H*0.78,rnd);
     }
     return collect(G, cols, rows, rnd, /^(ui-|launch)/.test(kind));

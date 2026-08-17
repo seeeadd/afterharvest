@@ -429,9 +429,99 @@ hr {
   .vsl-poster:hover .vsl-gem, .vsl-poster:focus-visible .vsl-gem { transform: scale(1.06) rotate(-1deg); }
   .vsl-title { position: relative; z-index: 2; font-family: var(--font-display); font-style: italic; font-size: 27px; color: var(--eggshell); margin-top: 6px; }
   .vsl-cap { position: absolute; left: 18px; right: 18px; bottom: 14px; z-index: 2; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(244,239,228,0.82); }
-  .vsl video, .vsl iframe { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; border: 0; }
+  .vsl video, .vsl iframe, .vsl wistia-player { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; border: 0; display: block; }
+  .vsl wistia-player:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/m3irf8jprp/swatch'); filter: blur(5px); }
   .vsl-note { text-align: center; margin-top: 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--umber); }
   .hero .cta-row { flex-direction: column; justify-content: center; align-items: center; gap: 16px; margin-top: 44px; }
+
+  /* ---------- VSL chapters — a stitched seam of the timeline, index one tap under it ----------
+     No time gate: a flower opens at every chapter the playhead reaches, and you don't hide a reward. */
+  .ch { position: relative; z-index: 10; max-width: 1040px; margin: 10px auto 0;
+    background: var(--card); border: 1px solid var(--hairline); border-radius: var(--r-panel);
+    padding: 4px 18px 0; box-shadow: 0 14px 30px -22px rgba(38,33,25,0.5); }
+  .ch[hidden] { display: none; }
+  .ch-reveal { animation: chIn 460ms var(--ease-out) both; }
+  @keyframes chIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+
+  .ch-seam { position: relative; height: 42px; margin: 0 6px; }
+  .ch-track { position: absolute; left: 0; right: 0; top: 14px; height: 2px;
+    background: repeating-linear-gradient(90deg, rgba(110,101,84,0.32) 0 3px, transparent 3px 9px); }
+  .ch-done { position: absolute; left: 0; top: 0; height: 2px; width: 0;
+    background: repeating-linear-gradient(90deg, var(--wheat) 0 7px, transparent 7px 12px);
+    transition: width 700ms linear; }
+  .ch-needle { position: absolute; top: 8px; left: 0; width: 2px; height: 14px; margin-left: -1px;
+    background: var(--ink); border-radius: 1px; transition: left 700ms linear; }
+  .ch-needle::after { content: ""; position: absolute; left: -2.5px; top: -4px; width: 7px; height: 7px;
+    background: var(--ink); border-radius: 50%; }
+  .ch-knot { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column;
+    align-items: center; padding: 0 11px; background: none; border: 0; cursor: default; }
+  .knot-bloom { position: absolute; top: 15px; left: 50%; width: 19px; height: 19px;
+    opacity: 0; pointer-events: none; transform-origin: 50% 50%;
+    transform: translate(-50%, -50%) scale(0.3);
+    transition: opacity 400ms var(--ease-out), transform 520ms var(--ease-out); }
+  .knot-bloom canvas { width: 100%; height: 100%; display: block; }
+  .knot-dot { width: 9px; height: 9px; margin-top: 11px; border-radius: 50%; display: block;
+    background: var(--card); border: 1.5px solid rgba(110,101,84,0.42);
+    transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
+  .knot-n { margin-top: 7px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
+    color: rgba(110,101,84,0.62); transition: color var(--dur-fast) var(--ease-out); }
+  .ch-knot[data-passed="true"] { z-index: 2; }
+  .ch-knot[data-passed="true"] .knot-bloom { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .ch-knot[data-passed="true"] .knot-dot { opacity: 0; transform: scale(0.3); }
+  .ch-knot[data-passed="true"] .knot-n { color: var(--wheat); }
+  .ch[data-progress="none"] .ch-seam { display: none; }
+  .ch[data-progress="none"] .ch-toggle { border-top: 0; }
+  .ch[data-state="unlocked"] .ch-knot { cursor: pointer; }
+  .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { transform: scale(1.45); border-color: var(--ink); }
+  .ch-knot:focus-visible { outline: 2px solid var(--yolk); outline-offset: 1px; border-radius: 3px; }
+
+  .ch-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%;
+    min-height: 48px; padding: 13px 6px; cursor: pointer; text-align: left;
+    background: transparent; border: 0; border-top: 1px solid var(--hairline);
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--umber); }
+  .ch-cap { color: var(--ink); letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ch-more { flex: none; display: inline-flex; align-items: center; gap: 8px; color: var(--rust);
+    font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+    border-bottom: 1px solid rgba(176,106,74,0.4); padding-bottom: 2px;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+  .ch-toggle:hover .ch-more { color: var(--ink); border-color: var(--ink); }
+  .ch-toggle:focus-visible { outline: 2px solid var(--yolk); outline-offset: -2px; }
+  .ch-chev { width: 12px; height: 12px; flex: none; transition: transform var(--dur-fast) var(--ease-out); }
+  .ch-toggle[aria-expanded="true"] .ch-chev { transform: rotate(180deg); }
+
+  .ch-list { list-style: none; margin: 0; padding: 0; max-height: 0; overflow: hidden;
+    display: grid; grid-auto-flow: column; grid-template-rows: repeat(6, auto);
+    grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px;
+    transition: max-height var(--dur-slow) var(--ease-out); }
+  .ch-list[data-open="true"] { max-height: 340px; }
+  .ch-item { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px;
+    padding: 10px 8px 10px 10px; cursor: pointer; text-align: left;
+    font-family: var(--font-mono); font-size: 11.5px; color: var(--umber);
+    background: transparent; border: 0; border-bottom: 1px solid var(--hairline);
+    border-left: 2px solid transparent;
+    transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
+                border-left-color var(--dur-fast) var(--ease-out); }
+  .ch-item:hover { color: var(--ink); background: rgba(254,253,250,0.72); }
+  .ch-item:focus-visible { outline: 2px solid var(--yolk); outline-offset: -2px; }
+  .ch-item[aria-current="true"] { color: var(--ink); border-left-color: var(--wheat);
+    background: rgba(232,161,0,0.055); }
+  .ch-item[aria-current="true"] .ch-n { color: var(--ink); }
+  /* the same bloom from the seam, so the list and the timeline read as one system */
+  .ch-flag { flex: none; width: 18px; height: 18px; position: relative; }
+  .ch-flag canvas { width: 100%; height: 100%; display: block;
+    opacity: 0; transform: scale(0.4); transform-origin: 50% 50%;
+    transition: opacity 380ms var(--ease-out), transform 460ms var(--ease-out); }
+  .ch-item[data-passed="true"] .ch-flag canvas { opacity: 1; transform: none; }
+  .ch-n { flex: none; color: var(--wheat); font-size: 10px; font-variant-numeric: tabular-nums; }
+  .ch-label { flex: 1; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* duration bar — how long this chapter actually runs, which the flat list threw away */
+  .ch-len { flex: none; width: 42px; height: 2px; background: var(--hairline); position: relative; }
+  .ch-len i { position: absolute; inset: 0 auto 0 0; background: var(--wheat); opacity: 0.55; }
+  .ch-time { flex: none; width: 38px; text-align: right; font-size: 10px; opacity: 0.66;
+    font-variant-numeric: tabular-nums; }
+  .ch-go { flex: none; width: 13px; height: 13px; color: var(--rust); opacity: 0.42;
+    transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
+  .ch-item:hover .ch-go, .ch-item:focus-visible .ch-go { opacity: 1; transform: translateX(2px); }
 
   /* ---------- Fillout form slot ---------- */
   .plan { position: relative; padding: 64px 0 88px; overflow: hidden; }
@@ -496,16 +586,33 @@ hr {
     .cta-row .pill { font-size: 11px; padding: 15px 24px 20px; }
     .plan { padding: 44px 0 64px; }
     .plan-head h2 { font-size: 31px; -webkit-text-stroke: 1px currentColor; }
+
+    /* knots sit too close to tap reliably at this width, so the index is the control */
+    .ch { margin-top: 26px; }
+    .ch-seam { margin: 0 12px; height: 38px; }
+    .ch-knot { padding: 0 7px; pointer-events: none; }
+    .knot-bloom { width: 16px; height: 16px; top: 13px; }
+    .ch-track, .ch-done { top: 12px; }
+    .ch-needle { top: 6px; }
+    .knot-dot { margin-top: 9px; }
+    .ch-toggle { min-height: 52px; padding: 14px 10px; font-size: 11px; }
+    .ch-more span { display: none; }
+    .ch-list { grid-auto-flow: row; grid-template-rows: none; grid-template-columns: 1fr; }
+    .ch-list[data-open="true"] { max-height: 640px; }
+    .ch-item { min-height: 52px; padding: 13px 8px; font-size: 12px; }
+    .ch-item:hover { background: transparent; }
+    .ch-len { display: none; }
   }
   @media (max-width: 400px){
     h1.headline { font-size: 34px; }
+    .knot-n { display: none; }
     .nav .pill { font-size: 8.5px; padding: 9px 12px 12px; }
     .cats { font-size: 12.5px; }
   }
   @media (prefers-reduced-motion: reduce){
     html { scroll-behavior: auto; }
-    .pill, .vsl-gem { transition: none; }
-    .cats, .cats-wrap::after, .bloom, h1.headline .hword { animation: none !important; }
+    .pill, .vsl-gem, .ch-item, .ch-chev, .ch-list, .knot-bloom { transition: none; }
+    .cats, .cats-wrap::after, .bloom, h1.headline .hword, .ch-reveal { animation: none !important; }
   }
 </style>
 </head>
@@ -557,10 +664,42 @@ hr {
            (or keep the branded poster and set data-vsl-src on .vsl to a direct video file URL). -->
       <div class="vsl" data-vsl-src="">
         <div class="vsl-frame">
-          <iframe src="https://www.loom.com/embed/2a6681d4f7414e28b4a290c012dcca04?hideEmbedTopBar=true" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="autoplay; fullscreen" title="How a season works"></iframe>
+          <script src="https://fast.wistia.com/player.js" async></script>
+          <script src="https://fast.wistia.com/embed/m3irf8jprp.js" async type="module"></script>
+          <wistia-player media-id="m3irf8jprp" aspect="1.7777777777777777"></wistia-player>
         </div>
         <p class="vsl-note" aria-hidden="true"></p>
       </div>
+
+      <!-- ============ VSL CHAPTERS ============
+           Visible from the moment the player is live. Each knot opens into its own
+           cross-stitch flower as the playhead passes it (chapterBloom in asset-6.js).
+           Titles/times mirror Wistia's chapterList and are re-read from it at runtime. -->
+      <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="1212" hidden>
+        <div class="ch-seam">
+          <div class="ch-track" aria-hidden="true"><div class="ch-done"></div></div>
+          <div class="ch-needle" aria-hidden="true"></div>
+        </div>
+        <button class="ch-toggle" type="button" aria-expanded="false" aria-controls="ch-list">
+          <span class="ch-cap">The Offer in 60 Seconds</span>
+          <span class="ch-more"><b class="ch-count">11</b> chapters<span> &middot; jump to any part</span>
+            <svg class="ch-chev" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </span>
+        </button>
+        <ul class="ch-list" id="ch-list" data-open="false">
+          <li><button class="ch-item" type="button" data-t="0"><span class="ch-n">01</span><span class="ch-label">The Offer in 60 Seconds</span><span class="ch-time">0:00</span></button></li>
+          <li><button class="ch-item" type="button" data-t="154"><span class="ch-n">02</span><span class="ch-label">Why we emailed YOU</span><span class="ch-time">2:34</span></button></li>
+          <li><button class="ch-item" type="button" data-t="184"><span class="ch-n">03</span><span class="ch-label">Why Your List Isn't Buying</span><span class="ch-time">3:04</span></button></li>
+          <li><button class="ch-item" type="button" data-t="281"><span class="ch-n">04</span><span class="ch-label">This won't work if...</span><span class="ch-time">4:41</span></button></li>
+          <li><button class="ch-item" type="button" data-t="454"><span class="ch-n">05</span><span class="ch-label">Running One Every 90 Days</span><span class="ch-time">7:34</span></button></li>
+          <li><button class="ch-item" type="button" data-t="554"><span class="ch-n">06</span><span class="ch-label">WHY specifically 3-DAY LIVE EVENTS</span><span class="ch-time">9:14</span></button></li>
+          <li><button class="ch-item" type="button" data-t="730"><span class="ch-n">07</span><span class="ch-label">WHY HAVEN’T YOU RAN ONE?</span><span class="ch-time">12:10</span></button></li>
+          <li><button class="ch-item" type="button" data-t="756"><span class="ch-n">08</span><span class="ch-label">What Happens After You Say Yes</span><span class="ch-time">12:36</span></button></li>
+          <li><button class="ch-item" type="button" data-t="830"><span class="ch-n">09</span><span class="ch-label">How Long This Actually Takes + Guarantees</span><span class="ch-time">13:50</span></button></li>
+          <li><button class="ch-item" type="button" data-t="970"><span class="ch-n">10</span><span class="ch-label">What You're Guaranteed To Make</span><span class="ch-time">16:10</span></button></li>
+          <li><button class="ch-item" type="button" data-t="1116"><span class="ch-n">11</span><span class="ch-label">Get Your Free (Non AI) 3-Day Event Plan</span><span class="ch-time">18:36</span></button></li>
+        </ul>
+      </nav>
 
       <!-- CTA — smooth-scrolls to the Fillout form section below -->
       <div class="cta-row">
@@ -693,6 +832,213 @@ hr {
         if (note) { note.textContent = 'Add your player embed inside .vsl-frame (or set data-vsl-src on .vsl).'; note.style.color = 'var(--rust)'; }
       }
     });
+  })();
+
+  // VSL chapters — stitched seam, a flower per chapter reached, index one tap under it
+  (function(){
+    var nav = document.getElementById('vsl-chapters');
+    var vsl = document.querySelector('.vsl');
+    if (!nav || !vsl) return;
+
+    var LS_KEY = 'ah_vsl_seen';
+    var seekTo = null;
+    var items = [].slice.call(nav.querySelectorAll('.ch-item'));
+    var seam = nav.querySelector('.ch-seam');
+    var done = nav.querySelector('.ch-done');
+    var needle = nav.querySelector('.ch-needle');
+    var cap = nav.querySelector('.ch-cap');
+    var toggle = nav.querySelector('.ch-toggle');
+    var list = nav.querySelector('.ch-list');
+    var duration = parseFloat(nav.getAttribute('data-duration')) || 1212;
+    var stops = items.map(function(b){
+      return { t: parseInt(b.getAttribute('data-t'), 10) || 0, label: b.querySelector('.ch-label').textContent };
+    });
+    var knots = [];
+
+    function clock(x){ var m=Math.floor(x/60), sec=Math.floor(x%60); return m+':'+(sec<10?'0':'')+sec; }
+    function pad(i){ return ('0'+i).slice(-2); }
+
+    // one array renders both the index rows and the seam knots, so they can never drift
+    function build(chapters){
+      stops = chapters;
+      list.innerHTML = '';
+      [].slice.call(seam.querySelectorAll('.ch-knot')).forEach(function(k){ k.remove(); });
+      knots = [];
+      chapters.forEach(function(sp, i){
+        var li = document.createElement('li');
+        var next = chapters[i+1] ? chapters[i+1].t : duration;
+        var span = Math.max(1, next - sp.t);
+        li.innerHTML = '<button class="ch-item" type="button" data-t="' + sp.t + '">' +
+          '<span class="ch-flag"></span>' +
+          '<span class="ch-n">' + pad(i+1) + '</span><span class="ch-label"></span>' +
+          '<span class="ch-len" title="' + clock(span) + ' long"><i style="width:' +
+            Math.max(6, Math.min(100, (span / (duration/chapters.length)) * 34)) + '%"></i></span>' +
+          '<span class="ch-time">' + clock(sp.t) + '</span>' +
+          '<svg class="ch-go" viewBox="0 0 13 13" fill="none" aria-hidden="true">' +
+          '<path d="M4.5 2.5L8.5 6.5l-4 4" stroke="currentColor" stroke-width="1.5" ' +
+          'stroke-linecap="round" stroke-linejoin="round"></path></svg></button>';
+        li.querySelector('.ch-label').textContent = sp.label;   // textContent — never trust a title as markup
+        list.appendChild(li);
+        var k = document.createElement('button');
+        k.type='button'; k.className='ch-knot'; k.setAttribute('data-t', sp.t);
+        k.setAttribute('aria-label', sp.label);
+        k.innerHTML = '<span class="knot-bloom"></span><span class="knot-dot"></span>' +
+                      '<span class="knot-n">' + pad(i+1) + '</span>';
+        seam.appendChild(k); knots.push(k);
+      });
+      items = [].slice.call(nav.querySelectorAll('.ch-item'));
+      var c = nav.querySelector('.ch-count'); if (c) c.textContent = chapters.length;
+      layout();
+    }
+
+    // Wistia keeps chapters on the media JSON. Read them there so Wistia stays the single
+    // source of truth — edit chapters there and this page follows. Deleted ones persist, so filter.
+    function fetchChapters(mediaId){
+      if (!window.fetch) return;
+      fetch('https://fast.wistia.com/embed/medias/' + mediaId + '.json')
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(j){
+          if (!j) return;
+          var m = j.media || j;
+          var raw = (((m.embed_options || {}).plugin || {}).chapters || {}).chapterList;
+          if (!raw || !raw.length) return;
+          var live = [];
+          for (var i = 0; i < raw.length; i++) {
+            var c = raw[i];
+            if (String(c.deleted) === 'true') continue;
+            var t = parseFloat(c.time);
+            if (isNaN(t) || !c.title) continue;
+            live.push({ t: Math.round(t), label: String(c.title) });
+          }
+          if (!live.length) return;
+          live.sort(function(a,b){ return a.t - b.t; });
+          build(live);
+          if (m.duration) { duration = parseFloat(m.duration); layout(); }
+        })
+        .catch(function(){});
+    }
+
+    build(stops);
+
+    // true positions for the dots; drop a number when it would collide with the last drawn
+    function layout(){
+      var last = -99;
+      knots.forEach(function(k){
+        var pct = Math.max(0, Math.min(100, (parseInt(k.getAttribute('data-t'),10)/duration)*100));
+        k.style.left = pct + '%';
+        var n = k.querySelector('.knot-n');
+        var room = pct - last >= (nav.offsetWidth < 620 ? 9 : 5.5);
+        if (n) n.style.visibility = room ? '' : 'hidden';
+        if (room) last = pct;
+      });
+    }
+    window.addEventListener('resize', function(){ clearTimeout(window.__chT); window.__chT = setTimeout(layout, 150); });
+
+    function setState(st){
+      if (nav.getAttribute('data-state') === 'unlocked' && st !== 'unlocked') return;
+      nav.setAttribute('data-state', st);
+      if (nav.hidden) { nav.hidden = false; nav.classList.add('ch-reveal'); }
+      if (st === 'unlocked') { try { localStorage.setItem(LS_KEY,'1'); } catch(e){} }
+    }
+
+    // one species per knot, in planting order — see chapterBloom() in assets/asset-6.js
+    var SPECIES = ['cosmos','thistle','clover','chamomile','tulip','sunflower',
+                   'bluebell','flax','marigold','cornflower','yarrow'];
+    function bloomInto(host, i, cell){
+      if (!host || host.__planted || !window.AHStitch) return;
+      host.__planted = true;
+      var cv = document.createElement('canvas'); host.appendChild(cv);
+      AHStitch.mount(cv, { kind: SPECIES[i % SPECIES.length],
+        cols: 13, rows: 13, cell: cell, seed: 7 + i * 13, twinkle: false, animate: false });
+    }
+    function plant(k, i){
+      var small = nav.offsetWidth < 620;
+      bloomInto(k.querySelector('.knot-bloom'), i, small ? 1.35 : 1.5);
+      if (items[i]) bloomInto(items[i].querySelector('.ch-flag'), i, 1.4);
+    }
+
+    var lastSec = -1;
+    function progress(sec){
+      if (Math.floor(sec) === lastSec) return;    // polled 4x/sec — only touch DOM on a real tick
+      lastSec = Math.floor(sec);
+      var pct = Math.max(0, Math.min(100, (sec/duration)*100));
+      done.style.width = pct + '%';
+      if (needle) needle.style.left = pct + '%';
+      var active = 0;
+      stops.forEach(function(sp, i){ if (sec >= sp.t) active = i; });
+      knots.forEach(function(k, i){
+        var passed = sec >= stops[i].t;
+        k.setAttribute('data-passed', passed ? 'true' : 'false');
+        if (passed) plant(k, i);
+      });
+      items.forEach(function(b, i){
+        b.setAttribute('aria-current', i === active ? 'true' : 'false');
+        b.setAttribute('data-passed', sec >= stops[i].t ? 'true' : 'false');
+      });
+      if (cap) cap.textContent = stops[active].label;
+    }
+
+    if (/[?&]reset=1/.test(location.search)) { try { localStorage.removeItem(LS_KEY); } catch(e){} }
+
+    if (toggle && list) {
+      toggle.addEventListener('click', function(){
+        var open = list.getAttribute('data-open') === 'true';
+        list.setAttribute('data-open', open ? 'false' : 'true');
+        toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+      });
+    }
+
+    nav.addEventListener('click', function(e){
+      var btn = e.target.closest ? e.target.closest('.ch-item, .ch-knot') : null;
+      if (!btn) return;
+      var t = parseInt(btn.getAttribute('data-t'), 10) || 0;
+      if (seekTo) seekTo(t);
+      progress(t);
+      vsl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    var frame = vsl.querySelector('.vsl-frame');
+    if (!frame) return;
+
+    // --- Wistia <wistia-player>: the element exposes a media-element API directly
+    //     (currentTime / duration / play). The legacy _wq + Wistia.api bridge does NOT
+    //     fire for this embed, so don't route through it.
+    var wEl = frame.querySelector('wistia-player');
+    if (wEl) {
+      var id = wEl.getAttribute('media-id') || '';
+      nav.setAttribute('data-progress', 'live');
+      if (id) fetchChapters(id);
+
+      // never leave the chapters unreachable — if the element stays dead, show a plain index
+      var live = false;
+      setTimeout(function(){
+        if (live) return;
+        nav.setAttribute('data-progress', 'none');
+        setState('unlocked');
+      }, 8000);
+
+      var attach = function(){
+        if (live) return;
+        live = true;
+        seekTo = function(t){
+          try { wEl.currentTime = t; var p = wEl.play(); if (p && p.catch) p.catch(function(){}); } catch(e){}
+        };
+        if (wEl.duration) { duration = wEl.duration; layout(); }
+        setState('unlocked');
+        // poll rather than guess event names — survives play, pause, seek and scrubbing alike
+        setInterval(function(){
+          var t = wEl.currentTime;
+          if (typeof t === 'number' && !isNaN(t)) progress(t);
+        }, 250);
+      };
+      if (typeof wEl.whenApiReady === 'function') {
+        try { var w = wEl.whenApiReady(); if (w && w.then) { w.then(attach); if (w.catch) w.catch(attach); } else attach(); }
+        catch(e){ attach(); }
+      } else if (window.customElements && customElements.whenDefined) {
+        customElements.whenDefined('wistia-player').then(attach);
+      } else attach();
+      setTimeout(attach, 3000);   // backstop if whenApiReady never settles
+    }
   })();
 </script>
 
