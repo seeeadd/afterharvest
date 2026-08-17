@@ -307,6 +307,26 @@ hr {
   .nav .pill { padding: 10px 20px 13px; font-size: 10.5px; }
   @media (max-width: 760px){ .nav .pill { padding: 10px 18px 13px; } .nav-garland { left: -20px; right: -20px; } }
 
+  /* compressed header — narrows and slims once you leave the top of the page */
+  .nav-wrap { transition: top 460ms var(--ease-out), padding-top 460ms var(--ease-out); }
+  .nav-shell { transition: width 460ms var(--ease-out); }
+  .nav { transition: padding 460ms var(--ease-out), gap 460ms var(--ease-out),
+                     background-color 460ms var(--ease-out), filter 460ms var(--ease-out); }
+  .nav .wm { transition: height 460ms var(--ease-out); }
+  .nav .pill { transition: font-size 460ms var(--ease-out), padding 460ms var(--ease-out),
+                           transform var(--dur-fast) var(--ease-out), filter 0.28s var(--ease-out),
+                           color 0.28s var(--ease-out); }
+  .nav-garland { transition: opacity 300ms var(--ease-out), transform 460ms var(--ease-out); }
+  .nav-wrap[data-compact="1"] { top: 10px; padding-top: 10px; }
+  .nav-wrap[data-compact="1"] .nav-shell { width: min(640px, 100%); }
+  .nav-wrap[data-compact="1"] .nav { padding: 8px 10px 8px 16px; gap: 14px;
+    background-color: rgba(254,253,250,0.95);
+    filter: drop-shadow(0 11px 24px rgba(38,33,25,0.17)); }
+  .nav-wrap[data-compact="1"] .nav .wm { height: 22px; }
+  .nav-wrap[data-compact="1"] .nav .pill { font-size: 9.5px; padding: 8px 15px 11px; letter-spacing: 0.07em; }
+  /* the garland spills far wider than the compressed bar, so it retracts rather than clipping */
+  .nav-wrap[data-compact="1"] .nav-garland { opacity: 0; transform: translateY(-12px) scale(0.96); }
+
   /* ---------- crystal CTA button ---------- */
   .cta-row { margin-top: 40px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
   .micro { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--umber); }
@@ -544,6 +564,94 @@ hr {
   .plan-cast.right { right: max(14px, calc(50% - 648px)); transform: scaleX(-1); }
   @media (max-width: 1180px) { .plan-cast, .plan-art { display: none; } }
   .plan-slot { max-width: 720px; margin: 0 auto; }
+  /* ---------- custom plan form (replaces the Fillout embed) ---------- */
+  .pf { --fbg:#2C2820; --fopt:rgba(251,250,246,0.05); --fbd:rgba(251,250,246,0.15);
+    --ftx:#F7F3EA; --fmu:rgba(247,243,234,0.58);
+    position: relative; background: var(--fbg); border-radius: 18px; padding: 34px 38px 30px;
+    font-family: 'Literata', Georgia, serif; color: var(--ftx);
+    box-shadow: 0 26px 54px -26px rgba(38,33,25,0.55); }
+  .pf-steps { display: flex; align-items: center; justify-content: center; gap: 9px; margin-bottom: 30px; }
+  .pf-step { display: flex; align-items: center; gap: 9px; }
+  .pf-dot { width: 22px; height: 22px; border-radius: 50%; border: 1.6px solid rgba(247,243,234,0.32);
+    display: grid; place-items: center; flex: none; transition: all var(--dur-fast) var(--ease-out); }
+  .pf-dot i { width: 8px; height: 8px; border-radius: 50%; background: var(--ftx); opacity: 0; transition: opacity var(--dur-fast); }
+  .pf-step[data-on="1"] .pf-dot { border-color: rgba(247,243,234,0.75); background: rgba(247,243,234,0.09); }
+  .pf-step[data-on="1"] .pf-dot i { opacity: 1; }
+  .pf-step[data-done="1"] .pf-dot { background: #4A4335; border-color: #4A4335; }
+  .pf-step[data-done="1"] .pf-dot i { opacity: 0; }
+  .pf-step[data-done="1"] .pf-dot::after { content: ""; width: 9px; height: 5px; border-left: 1.8px solid var(--ftx);
+    border-bottom: 1.8px solid var(--ftx); transform: rotate(-45deg) translate(1px,-1px); }
+  .pf-name { font-size: 15px; color: var(--fmu); white-space: nowrap; }
+  .pf-rule { width: 34px; height: 1.5px; background: rgba(247,243,234,0.2); flex: none; }
+  .pf-back { position: absolute; top: 30px; left: 34px; width: 30px; height: 30px; padding: 0;
+    background: none; border: 0; color: var(--ftx); cursor: pointer; opacity: 0.9; }
+  .pf-back:hover { opacity: 1; transform: translateX(-2px); }
+  .pf-back[hidden] { display: none; }
+
+  .pf-screen { display: none; }
+  .pf-screen[data-on="1"] { display: block; animation: pfIn 340ms var(--ease-out) both; }
+  @keyframes pfIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .pf-q { margin: 0 0 22px; }
+  .pf-q + .pf-q { margin-top: 34px; }
+  .pf-q h3 { font-family: 'Literata', Georgia, serif; font-size: 25px; font-weight: 600; line-height: 1.25;
+    margin: 0; color: var(--ftx); -webkit-text-stroke: 0; }
+  .pf-q .req { color: var(--fmu); }
+  .pf-q p { font-size: 16px; line-height: 1.5; color: var(--fmu); margin: 9px 0 0; max-width: 62ch; }
+  .pf-in { margin-top: 18px; }
+  .pf-in input[type="text"], .pf-in input[type="email"], .pf-in textarea {
+    width: 100%; box-sizing: border-box; background: var(--fopt); color: var(--ftx);
+    border: 1.5px solid var(--fbd); border-radius: 9px; padding: 15px 16px;
+    font-family: 'Literata', Georgia, serif; font-size: 18px; line-height: 1.4; outline: none;
+    transition: border-color var(--dur-fast) var(--ease-out); }
+  .pf-in textarea { min-height: 118px; resize: vertical; }
+  .pf-in input::placeholder, .pf-in textarea::placeholder { color: rgba(247,243,234,0.3); }
+  .pf-in input:focus, .pf-in textarea:focus { border-color: rgba(247,243,234,0.72); }
+  .pf-opts { display: flex; flex-direction: column; gap: 9px; align-items: flex-start; }
+  .pf-opt { display: inline-flex; align-items: center; gap: 13px; min-width: min(330px, 100%); max-width: 100%;
+    background: var(--fopt); border: 1.5px solid var(--fbd); border-radius: 9px;
+    padding: 13px 20px 13px 16px; cursor: pointer; color: var(--ftx);
+    font-family: 'Literata', Georgia, serif; font-size: 18px; text-align: left;
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
+  .pf-opt:hover { border-color: rgba(247,243,234,0.42); }
+  .pf-opt i { width: 17px; height: 17px; border-radius: 50%; border: 1.8px solid rgba(247,243,234,0.34);
+    flex: none; display: grid; place-items: center; }
+  .pf-opt[aria-checked="true"] { border-color: var(--ftx); background: rgba(247,243,234,0.09); }
+  .pf-opt[aria-checked="true"] i { border-color: var(--ftx); }
+  .pf-opt[aria-checked="true"] i::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ftx); }
+  .pf-opt:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
+
+  .pf-next { margin-top: 30px; display: inline-flex; align-items: center; gap: 10px;
+    background: var(--ftx); color: #201C15; border: 0; border-radius: 9px;
+    padding: 15px 26px; cursor: pointer;
+    font-family: 'Literata', Georgia, serif; font-size: 19px; font-weight: 600;
+    transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
+  .pf-next:hover { transform: translateY(-1px); background: #fff; }
+  .pf-next:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
+  .pf-err { margin-top: 13px; font-size: 15px; color: #E9A78E; min-height: 1em; }
+  .pf-note { margin-top: 22px; text-align: center; font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.09em; text-transform: uppercase; color: rgba(247,243,234,0.34); }
+  .pf-done { text-align: center; padding: 26px 0 14px; }
+  .pf-done h3 { font-size: 30px; margin: 0 0 12px; }
+  .pf-done p { color: var(--fmu); font-size: 17px; margin: 0 auto; max-width: 46ch; line-height: 1.6; }
+  .pf-sprig { width: 62px; height: 62px; margin: 0 auto 18px; }
+  .pf-sprig canvas { width: 100%; height: 100%; display: block; }
+
+  @media (max-width: 760px){
+    .pf { padding: 26px 20px 24px; border-radius: 14px; }
+    .pf-back { top: 22px; left: 16px; }
+    .pf-steps { gap: 6px; margin-bottom: 26px; }
+    .pf-rule { width: 15px; }
+    .pf-name { font-size: 13px; }
+    .pf-q h3 { font-size: 21px; }
+    .pf-q p { font-size: 15px; }
+    .pf-opt, .pf-in input, .pf-in textarea, .pf-next { font-size: 16.5px; }
+    .pf-opt { min-width: 100%; box-sizing: border-box; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pf-screen[data-on="1"] { animation: none; }
+    .pf-next:hover, .pf-back:hover { transform: none; }
+  }
+
   /* placeholder frame — remove once the real Fillout embed is pasted in */
   .fillout-placeholder { min-height: 460px; border: 1.5px dashed var(--hairline); border-radius: var(--r-panel, 14px); background: rgba(254,253,250,0.55);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 40px; }
@@ -731,9 +839,10 @@ hr {
           <h2>Want a free 3-day live event <em>plan</em>?</h2>
           <p>Interested if 3-day virtual events / webinars will work for you specifically? We’ll make you a mockup plan around your own offer, numbers, and audience. Answer the questions below. Takes ~5 minutes, and the AfterHarvest team will send you the plan in 24–48 hours.</p>
         </div>
-        <!-- ===== FILLOUT INLINE FORM EMBED ===== -->
-        <div style="width:100%;height:500px;" data-fillout-id="7UzHxLiu4rus" data-fillout-embed-type="standard" data-fillout-inherit-parameters="" data-fillout-dynamic-resize=""></div>
-        <script src="assets/asset-5.js"></script>
+        <!-- ===== PLAN FORM (own build, replaces Fillout) =====
+             Screens + copy live in the SCREENS array in the script at the end of this file.
+             Set ENDPOINT there to your Apps Script URL. See FORM-BACKEND.md. -->
+        <div class="pf" id="plan-form-app"></div>
       </div>
     </div>
   </section>
@@ -813,6 +922,36 @@ hr {
     function run(){ shapeNav(); }
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(run); } else { window.addEventListener('load', run); }
     window.addEventListener('resize', function(){ clearTimeout(window.__navT); window.__navT = setTimeout(shapeNav, 150); });
+
+    // ---- compress on scroll. shapeNav reads the live rect, so re-running it every frame
+    //      through the transition keeps the stitched edge true while the bar narrows.
+    (function(){
+      var wrap = document.querySelector('.nav-wrap'); if (!wrap) return;
+      var compact = false, queued = false, raf = null;
+      function reshapeFor(ms){
+        cancelAnimationFrame(raf);
+        var end = (window.performance ? performance.now() : Date.now()) + ms;
+        (function loop(){
+          shapeNav();
+          var now = window.performance ? performance.now() : Date.now();
+          if (now < end) raf = requestAnimationFrame(loop);
+        })();
+      }
+      function check(){
+        queued = false;
+        var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        if (!compact && y > 90) { compact = true; }
+        else if (compact && y < 40) { compact = false; }   // hysteresis, so it cannot flutter
+        else return;
+        wrap.setAttribute('data-compact', compact ? '1' : '0');
+        if (REDUCE) { shapeNav(); return; }
+        reshapeFor(560);
+      }
+      window.addEventListener('scroll', function(){
+        if (queued) return; queued = true; requestAnimationFrame(check);
+      }, { passive: true });
+      check();
+    })();
   })();
 
   // VSL poster → plays data-vsl-src if provided, else hints to add an embed
@@ -1038,6 +1177,252 @@ hr {
         customElements.whenDefined('wistia-player').then(attach);
       } else attach();
       setTimeout(attach, 3000);   // backstop if whenApiReady never settles
+    }
+  })();
+  // ---------- custom plan form: partial capture, resume, one row per visitor ----------
+  (function(){
+    var root = document.getElementById('plan-form-app');
+    if (!root) return;
+
+    // Paste the Google Apps Script web-app URL here (see FORM-BACKEND.md).
+    // Left empty, the form still works and answers are kept in localStorage,
+    // but nothing is sent anywhere.
+    var ENDPOINT = '';
+
+    var LS = 'ah_plan_form_v1';
+    var SECTIONS = ['Start', 'Audience', 'Experience', 'Offer', 'Finish'];
+
+    // Copy is verbatim from the Fillout build. Edit here to change a question.
+    var SCREENS = [
+      { s:0, f:[{ k:'anonymous', t:'radio', q:'Prefer to stay anonymous?', req:true,
+        d:"Either way works, and the plan's the same. Skipping anonymity lets us research your business deeper, which sharpens your plan.",
+        o:["I'm fine being looked up", 'Keep me anonymous'] }] },
+      { s:0, f:[{ k:'email', t:'email', q:'Where do we send the plan?', req:true,
+        d:"Any email works, even a burner (if you preferred to stay anonymous). Your details stay between us, and we won't use them for marketing.",
+        ph:'you@example.com' }] },
+      { s:1, f:[{ k:'name', t:'text', q:'What should we call you?', req:true }] },
+      { s:1, f:[{ k:'links', t:'textarea', q:'Drop your main links',
+        d:"Site, channel, newsletter, whatever shows your world. Paste as many as you like, we'll do the digging." }] },
+      { s:1, f:[{ k:'list_size', t:'text', q:'Email list size', req:true }] },
+      { s:1, f:[{ k:'open_rate', t:'radio', q:'Typical open rate on a normal email', req:true,
+        d:'Ballpark is fine.',
+        o:['Under 20%', '20-35%', '35-50%', 'Over 50%', 'Honestly not sure'] }] },
+      { s:2, f:[
+        { k:'ran_event', t:'radio', q:'Ever run a live event?', req:true,
+          o:["Never (that's why I'm here)", 'Webinars', 'A challenge', 'A multi-day summit'] },
+        { k:'event_result', t:'textarea', q:"How'd it go, roughly?",
+          d:'Registrants, show-up, sales, whatever you remember.' }] },
+      { s:3, f:[
+        { k:'what_you_sell', t:'text', q:'What do you sell?', req:true,
+          d:"Keep it general, like 'a $997 cohort course for designers.' No need to name your brand or product. If you want to come up with a new offer to sell on the event, name it as well." },
+        { k:'offer_price', t:'text', q:'Main offer price', req:true,
+          d:"If nothing's built yet, put the price you'd charge. The plan can start there." },
+        { k:'price_type', t:'radio', q:'Is that one-time or recurring?', req:true,
+          o:['One-time', 'Recurring'] }] },
+      { s:3, f:[
+        { k:'launch_style', t:'radio', q:'When you promote or launch, what does that usually look like?', req:true,
+          o:['An email promo or cart open', 'A webinar', 'A challenge or live event',
+             'Mostly evergreen, no big pushes', "Haven't really launched anything yet"] },
+        { k:'launch_collect', t:'radio', q:'Roughly what does one usually collect?', req:true,
+          d:'Your average is fin ballpark range is enough for the plan.',
+          o:['Under $10K', '$10-25K', '$25-50K', '$50-100K', '$100-250K', '$250K+'] }] },
+      { s:3, f:[{ k:'timing', t:'radio', q:'If the plan looks right, when would you want to run this?', req:true,
+        o:['Within ~60 days', 'This quarter', 'Next quarter', 'Just exploring'] }] },
+      { s:4, f:[{ k:'objection', t:'textarea', q:"Last one. What's the one thing that would make you NOT do this?" }],
+        submit:'get my plan' }
+    ];
+
+    var state, at = 0, saveT = null, lastSent = '';
+
+    function uid(){
+      try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch(e){}
+      return 'r-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,10);
+    }
+    function load(){
+      try { var raw = localStorage.getItem(LS); if (raw) return JSON.parse(raw); } catch(e){}
+      return null;
+    }
+    function persist(){
+      try { localStorage.setItem(LS, JSON.stringify(state)); } catch(e){}
+    }
+
+    var prev = load();
+    state = (prev && prev.rid) ? prev : { rid: uid(), answers: {}, started: new Date().toISOString(), done: false };
+
+    // ---- send. Every save carries the same rid so the sheet updates one row per visitor
+    // rather than appending a new row per keystroke.
+    function payload(final){
+      return {
+        rid: state.rid,
+        started: state.started,
+        updated: new Date().toISOString(),
+        step: at + 1,
+        of: SCREENS.length,
+        complete: !!final,
+        answers: state.answers,
+        page: location.href,
+        referrer: document.referrer || ''
+      };
+    }
+    function send(final, useBeacon){
+      if (!ENDPOINT) return;
+      var body = JSON.stringify(payload(final));
+      if (!final && body === lastSent) return;     // nothing changed since last save
+      lastSent = body;
+      try {
+        if (useBeacon && navigator.sendBeacon) {
+          navigator.sendBeacon(ENDPOINT, new Blob([body], { type: 'text/plain;charset=UTF-8' }));
+          return;
+        }
+        // text/plain keeps it a CORS simple request, so Apps Script needs no preflight
+        fetch(ENDPOINT, { method:'POST', mode:'no-cors', keepalive:true,
+          headers:{ 'Content-Type':'text/plain;charset=UTF-8' }, body: body }).catch(function(){});
+      } catch(e){}
+    }
+    function saveSoon(final){
+      persist();
+      clearTimeout(saveT);
+      if (final) { send(true, false); return; }
+      saveT = setTimeout(function(){ send(false, false); }, 900);
+    }
+    // the whole point: capture people who never press submit
+    window.addEventListener('pagehide', function(){ send(state.done, true); });
+    document.addEventListener('visibilitychange', function(){
+      if (document.hidden) send(state.done, true);
+    });
+
+    // ---- render
+    function el(tag, cls, html){
+      var n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (html != null) n.innerHTML = html;
+      return n;
+    }
+    function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    var stepsEl = el('div','pf-steps');
+    var backEl = el('button','pf-back','<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    backEl.type = 'button'; backEl.setAttribute('aria-label','Back');
+    var bodyEl = el('div','pf-body');
+    root.appendChild(backEl); root.appendChild(stepsEl); root.appendChild(bodyEl);
+
+    function drawSteps(){
+      stepsEl.innerHTML = '';
+      var cur = SCREENS[at] ? SCREENS[at].s : SECTIONS.length - 1;
+      SECTIONS.forEach(function(nm, i){
+        if (i) stepsEl.appendChild(el('span','pf-rule'));
+        var st = el('span','pf-step');
+        st.setAttribute('data-on', i === cur ? '1' : '0');
+        st.setAttribute('data-done', i < cur ? '1' : '0');
+        st.appendChild(el('span','pf-dot','<i></i>'));
+        if (i === cur) st.appendChild(el('span','pf-name', esc(nm)));
+        stepsEl.appendChild(st);
+      });
+    }
+
+    function field(f){
+      var wrap = el('div','pf-q');
+      wrap.appendChild(el('h3', null, esc(f.q) + (f.req ? ' <span class="req">*</span>' : '')));
+      if (f.d) wrap.appendChild(el('p', null, esc(f.d)));
+      var box = el('div','pf-in');
+      var val = state.answers[f.k];
+
+      if (f.t === 'radio') {
+        var opts = el('div','pf-opts');
+        opts.setAttribute('role','radiogroup');
+        opts.setAttribute('aria-label', f.q);
+        f.o.forEach(function(o){
+          var b = el('button','pf-opt','<i></i><span>' + esc(o) + '</span>');
+          b.type = 'button'; b.setAttribute('role','radio');
+          b.setAttribute('aria-checked', val === o ? 'true' : 'false');
+          b.addEventListener('click', function(){
+            state.answers[f.k] = o;
+            [].forEach.call(opts.children, function(c){ c.setAttribute('aria-checked','false'); });
+            b.setAttribute('aria-checked','true');
+            clearErr(wrap); saveSoon(false);
+          });
+          opts.appendChild(b);
+        });
+        box.appendChild(opts);
+      } else {
+        var inp = f.t === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+        if (f.t !== 'textarea') inp.type = (f.t === 'email' ? 'email' : 'text');
+        if (f.ph) inp.placeholder = f.ph;
+        inp.setAttribute('aria-label', f.q);
+        if (val != null) inp.value = val;
+        inp.addEventListener('input', function(){
+          state.answers[f.k] = inp.value;
+          clearErr(wrap); saveSoon(false);
+        });
+        box.appendChild(inp);
+      }
+      wrap.appendChild(box);
+      wrap.appendChild(el('div','pf-err'));
+      wrap._f = f;
+      return wrap;
+    }
+    function clearErr(wrap){ var e = wrap.querySelector('.pf-err'); if (e) e.textContent = ''; }
+
+    function draw(){
+      var sc = SCREENS[at];
+      bodyEl.innerHTML = '';
+      backEl.hidden = at === 0;
+      var screen = el('div','pf-screen');
+      screen.setAttribute('data-on','1');
+      var qs = sc.f.map(function(f){ var w = field(f); screen.appendChild(w); return w; });
+
+      var next = el('button','pf-next', esc(sc.submit || 'Next') +
+        (sc.submit ? '' : ' <span aria-hidden="true">&rarr;</span>'));
+      next.type = 'button';
+      next.addEventListener('click', function(){
+        var bad = null;
+        qs.forEach(function(w){
+          var f = w._f, v = state.answers[f.k];
+          var empty = v == null || String(v).trim() === '';
+          var badEmail = f.t === 'email' && !empty && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).trim());
+          if ((f.req && empty) || badEmail) {
+            w.querySelector('.pf-err').textContent = badEmail ? 'That email does not look right.' : 'This one is needed.';
+            if (!bad) bad = w;
+          }
+        });
+        if (bad) { bad.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+        if (sc.submit) { finish(); return; }
+        at++; saveSoon(false); draw();
+        root.scrollIntoView({ behavior:'smooth', block:'start' });
+      });
+      screen.appendChild(next);
+      bodyEl.appendChild(screen);
+      drawSteps();
+    }
+
+    function finish(){
+      state.done = true;
+      saveSoon(true);
+      backEl.hidden = true;
+      stepsEl.innerHTML = '';
+      bodyEl.innerHTML = '';
+      var d = el('div','pf-done');
+      var sprig = el('div','pf-sprig');
+      d.appendChild(sprig);
+      d.appendChild(el('h3', null, "That's everything."));
+      d.appendChild(el('p', null, 'The AfterHarvest team will send your plan in 24 to 48 hours. Check the inbox you gave us.'));
+      bodyEl.appendChild(d);
+      if (window.AHStitch) {
+        var cv = document.createElement('canvas'); sprig.appendChild(cv);
+        AHStitch.mount(cv, { kind:'wheat', cols:14, rows:22, cell:2.6, seed:41, twinkle:false, animate:false });
+      }
+    }
+
+    if (state.done) finish(); else {
+      // resume where they stopped
+      for (var i = 0; i < SCREENS.length; i++) {
+        var filled = SCREENS[i].f.some(function(f){
+          var v = state.answers[f.k]; return v != null && String(v).trim() !== '';
+        });
+        if (!filled) break;
+        at = Math.min(i + 1, SCREENS.length - 1);
+      }
+      draw();
     }
   })();
 </script>
