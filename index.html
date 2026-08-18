@@ -769,7 +769,9 @@ hr {
     .ch-seam { margin: 0 4px; height: 26px; }
     .ch-knot { padding: 0 7px; pointer-events: none; }
     .knot-bloom { width: 16px; height: 16px; top: 13px; }
-    .ch-track, .ch-done { top: 12px; }
+    /* no stitched run on mobile: at this width the dashes plus eleven knots read as clutter.
+       Position still comes through from the needle and from which blooms have opened. */
+    .ch-track, .ch-done { display: none; }
     .ch-needle { top: 6px; }
     .knot-dot { margin-top: 9px; }
     .ch-toggle { min-height: 52px; padding: 14px 10px; font-size: 11px; }
