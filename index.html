@@ -778,6 +778,11 @@ hr {
 
 
 
+  /* Key facts are hidden on desktop by preference. Safe here in a way it would not be on
+     mobile: Search Console reports "Crawled as: Googlebot smartphone", so the mobile
+     rendering is what gets indexed, and there the block stays fully visible. */
+  @media (min-width: 761px){ .kf { display: none; } }
+
   /* key facts: short declarative statements, the form an AI answer can lift and attribute */
   .kf { margin: 0 0 52px; padding: 0 0 44px; border-bottom: 1px solid var(--hairline); }
   .kf h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 34px;
