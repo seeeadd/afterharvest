@@ -659,6 +659,19 @@ hr {
   .pf-step[data-done="1"] .pf-dot i { opacity: 0; }
   .pf-step[data-done="1"] .pf-dot::after { content: ""; width: 9px; height: 5px; border-left: 1.8px solid var(--ftx);
     border-bottom: 1.8px solid var(--ftx); transform: rotate(-45deg) translate(1px,-1px); }
+
+  /* the motif sits over the marker: full once the section is behind you, faint while in it */
+  .pf-motif { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px;
+    transform: translate(-50%,-50%) scale(0.55); opacity: 0; pointer-events: none;
+    transition: opacity 420ms var(--ease-out), transform 520ms var(--ease-out); }
+  .pf-motif canvas { width: 100%; height: 100%; display: block; }
+  .pf-step { position: relative; }
+  .pf-step[data-on="1"] .pf-motif { opacity: 0.42; transform: translate(-50%,-50%) scale(1); }
+  .pf-step[data-done="1"] .pf-motif { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  /* finished steps hand the marker over to the motif entirely */
+  .pf-step[data-done="1"] .pf-dot { background: transparent; border-color: transparent; }
+  .pf-step[data-done="1"] .pf-dot::after { display: none; }
+  .pf-step[data-on="1"] .pf-dot i { opacity: 0; }
   .pf-name { font-size: 15px; color: var(--fmu); white-space: nowrap; }
   .pf-rule { width: 34px; height: 1.5px; background: rgba(247,243,234,0.2); flex: none; }
   .pf-back { position: absolute; top: 30px; left: 34px; width: 30px; height: 30px; padding: 0;
@@ -1359,6 +1372,9 @@ hr {
 
     var LS = 'ah_plan_form_v1';
     var SECTIONS = ['Start', 'Audience', 'Experience', 'Offer', 'Finish'];
+    // a motif per section, drawn from the same stitch engine as the hero and the chapter seam
+    var SECTION_MOTIF = { Start: 'sun', Audience: 'sheaf', Experience: 'signpost',
+                          Offer: 'seedpod', Finish: 'wheat' };
 
     // Copy is verbatim from the Fillout build. Edit here to change a question.
     var SCREENS = [
@@ -1506,6 +1522,14 @@ hr {
         st.setAttribute('data-on', i === cur ? '1' : '0');
         st.setAttribute('data-done', i < cur ? '1' : '0');
         st.appendChild(el('span','pf-dot','<i></i>'));
+        // reached steps stitch themselves in; the one in progress shows the same motif faintly
+        if (i <= cur && window.AHStitch) {
+          var host = el('span','pf-motif');
+          var cv = document.createElement('canvas'); host.appendChild(cv);
+          AHStitch.mount(cv, { kind: SECTION_MOTIF[nm] || 'wheat',
+            cols: 13, rows: 13, cell: 2, seed: 11 + i * 7, twinkle: false, animate: false });
+          st.appendChild(host);
+        }
         if (i === cur) st.appendChild(el('span','pf-name', esc(nm)));
         stepsEl.appendChild(st);
       });
