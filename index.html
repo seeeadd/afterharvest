@@ -662,7 +662,7 @@ hr {
 
   /* the motif sits over the marker: full once the section is behind you, faint while in it */
   .pf-dot { position: relative; overflow: visible; }
-  .pf-motif { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px;
+  .pf-motif { position: absolute; left: 50%; top: 50%; width: 23px; height: 23px;
     transform: translate(-50%,-50%) scale(0.55); opacity: 0; pointer-events: none;
     transition: opacity 420ms var(--ease-out), transform 520ms var(--ease-out); }
   .pf-motif canvas { width: 100%; height: 100%; display: block; }
@@ -1528,7 +1528,7 @@ hr {
         if (i <= cur && window.AHStitch) {
           var host = el('span','pf-motif');
           var cv = document.createElement('canvas'); host.appendChild(cv);
-          AHStitch.mount(cv, { kind: SECTION_MOTIF[nm], cols: 10, rows: 10, cell: 3,
+          AHStitch.mount(cv, { kind: SECTION_MOTIF[nm], cols: 10, rows: 10, cell: 2.3,
             seed: 11 + i * 7, twinkle: false, animate: false });
           st.querySelector('.pf-dot').appendChild(host);
         }
