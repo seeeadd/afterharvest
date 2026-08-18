@@ -879,6 +879,26 @@ hr {
   .tx-body[data-open="true"] ~ .tx-more, .tx-more { margin-top: 0; }
 
 
+
+  /* inline booking calendar: below the form, and framed so it reads as the alternative
+     rather than a second primary CTA */
+  .plan-book { margin: 46px auto 0; max-width: 720px; }
+  .plan-book-head { display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 12px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
+  .plan-book-head .rule { height: 1px; flex: 1; max-width: 90px; background: var(--hairline); }
+  .plan-book-lead { text-align: center; font-family: 'Literata', Georgia, serif;
+    font-size: 15.5px; line-height: 1.65; color: var(--umber); margin: 0 auto 22px; max-width: 56ch; }
+  .plan-book-frame { background: var(--card); border: 1px solid var(--hairline);
+    border-radius: var(--r-panel); padding: 6px; overflow: hidden;
+    box-shadow: 0 18px 38px -30px rgba(38,33,25,0.5); }
+  #cal-3-day-event { width: 100%; min-height: 560px; }
+  @media (max-width: 760px){
+    .plan-book { margin-top: 34px; }
+    .plan-book-lead { font-size: 15px; }
+    #cal-3-day-event { min-height: 640px; }
+  }
+
   /* booking link: deliberately quiet, it must not compete with the form above it */
   .plan-alt { margin: 22px 0 0; text-align: center;
     font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--umber); }
@@ -1098,13 +1118,21 @@ hr {
              Set ENDPOINT there to your Apps Script URL. See FORM-BACKEND.md. -->
         <div class="pf" id="plan-form-app"></div>
 
-        <!-- popup, not the inline embed: a month calendar here would outweigh the form -->
-        <p class="plan-alt">Rather skip the plan and just talk?
-          <a class="plan-alt-link" href="https://cal.com/team/afterharvest/3-day-event"
-             data-cal-namespace="3-day-event"
-             data-cal-link="team/afterharvest/3-day-event"
-             data-cal-config='{"layout":"month_view"}'>Book a call</a>
-        </p>
+        <!-- Inline calendar, deliberately below the form and visually subordinate to it.
+             The form is the primary path: it produces a plan, and the plan does the selling. -->
+        <div class="plan-book">
+          <div class="plan-book-head">
+            <span class="rule"></span>
+            <span>or skip the plan and just talk</span>
+            <span class="rule"></span>
+          </div>
+          <p class="plan-book-lead">Already sure a 3-day event is right for you? Pick a time and
+            we'll go through it live. Answering the form first means we arrive with a plan already
+            built for your offer.</p>
+          <div class="plan-book-frame">
+            <div id="cal-3-day-event"></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -2030,11 +2058,20 @@ hr {
 
 
 
-  <!-- Cal.com popup embed. Popup rather than inline: the calendar opens over the page
-       instead of occupying it, so neither placement competes with the form. -->
+  <!-- Cal.com. Inline calendar under the form, plus the popup for the thank-you screen,
+       both on the same namespace so the script loads once. -->
   <script type="text/javascript">
   (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
   Cal("init", "3-day-event", {origin:"https://app.cal.com"});
+  Cal.config = Cal.config || {};
+  Cal.config.forwardQueryParams = true;
+
+  Cal.ns["3-day-event"]("inline", {
+    elementOrSelector: "#cal-3-day-event",
+    config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true","theme":"light"},
+    calLink: "team/afterharvest/3-day-event"
+  });
+
   Cal.ns["3-day-event"]("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"#B06A4A"},"dark":{"cal-brand":"#F7F3EA"}},"hideEventTypeDetails":false,"layout":"month_view"});
   </script>
 </body></html>
