@@ -552,8 +552,27 @@ hr {
     border-radius: var(--r-panel) var(--r-panel) 0 0;
     max-height: 0; overflow: hidden; pointer-events: none;
     transition: max-height 340ms var(--ease-out); }
-  .ch-index[data-open="true"] { max-height: min(56vh, 380px); overflow-y: auto; pointer-events: auto;
+  .ch-index[data-open="true"] { max-height: min(56vh, 380px); pointer-events: auto;
     box-shadow: 0 -18px 40px -20px rgba(0,0,0,0.6); }
+  .ch-scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 18px;
+    scrollbar-width: none; }
+  .ch-scroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+  /* a length of thread instead of a scrollbar. iOS hides overlay scrollbars outright, so
+     a native one would tell nobody that seven more chapters are below the fold. */
+  .ch-rail { position: absolute; top: 12px; bottom: 12px; right: 8px; width: 3px; z-index: 2;
+    background: repeating-linear-gradient(180deg, rgba(247,243,234,0.18) 0 3px, transparent 3px 9px);
+    opacity: 0; pointer-events: none; transition: opacity 260ms var(--ease-out); }
+  .ch-rail i { position: absolute; left: -1.5px; width: 6px; border-radius: 4px; display: block;
+    background: repeating-linear-gradient(180deg, var(--wheat) 0 6px, rgba(200,155,75,0.28) 6px 10px);
+    box-shadow: 0 0 7px rgba(200,155,75,0.4);
+    transition: top 90ms linear, height 160ms var(--ease-out); }
+  .ch-index[data-scrollable="true"] .ch-rail { opacity: 1; }
+  /* the list bleeds out at the bottom edge while there is more to reach */
+  .ch-fade { position: absolute; left: 0; right: 0; bottom: 0; height: 52px; z-index: 1;
+    pointer-events: none; opacity: 0; transition: opacity 260ms var(--ease-out);
+    background: linear-gradient(180deg, rgba(24,19,13,0) 0%, rgba(24,19,13,0.92) 78%); }
+  .ch-index[data-more="true"] .ch-fade { opacity: 1; }
   .ch-toggle { flex: none; display: inline-flex; align-items: center; gap: 8px;
     min-height: 26px; padding: 5px 9px; cursor: pointer; white-space: nowrap;
     background: var(--sm-ctl-bg); border: 1px solid var(--sm-ctl-bd); border-radius: 20px;
@@ -764,6 +783,9 @@ hr {
     .plan { padding: 44px 0 64px; }
     .plan-head h2 { font-size: 31px; -webkit-text-stroke: 1px currentColor; }
 
+    /* the scattered hero blooms land on top of the headline and subhead at this width */
+    .blooms { display: none; }
+
     /* knots sit too close to tap reliably at this width, so the index is the control */
     .ch { margin-top: -1px; padding: 2px 12px 5px; }
     .ch-seam { margin: 0 4px; height: 26px; }
@@ -858,6 +880,7 @@ hr {
           <!-- the list opens upward over the video: attached to what it navigates,
                costs no page flow, and never sits between the video and the CTA -->
           <div class="ch-index" id="vsl-chapter-index" data-open="false">
+            <div class="ch-scroll" id="ch-scroll">
             <ul class="ch-list" id="ch-list" data-open="false">
             <li><button class="ch-item" type="button" data-t="0"><span class="ch-n">01</span><span class="ch-label">The Offer in 60 Seconds</span><span class="ch-time">0:00</span></button></li>
             <li><button class="ch-item" type="button" data-t="154"><span class="ch-n">02</span><span class="ch-label">Why we emailed YOU</span><span class="ch-time">2:34</span></button></li>
@@ -871,6 +894,11 @@ hr {
             <li><button class="ch-item" type="button" data-t="970"><span class="ch-n">10</span><span class="ch-label">What You're Guaranteed To Make</span><span class="ch-time">16:10</span></button></li>
             <li><button class="ch-item" type="button" data-t="1116"><span class="ch-n">11</span><span class="ch-label">Get Your Free (Non AI) 3-Day Event Plan</span><span class="ch-time">18:36</span></button></li>
         </ul>
+            </div>
+            <!-- a thread rail rather than a system scrollbar: iOS hides overlay scrollbars
+                 entirely, so nothing would signal there are more chapters below -->
+            <div class="ch-rail" aria-hidden="true"><i></i></div>
+            <div class="ch-fade" aria-hidden="true"></div>
           </div>
           <div class="ch-seam">
             <div class="ch-track" aria-hidden="true"><div class="ch-done"></div></div>
@@ -1067,6 +1095,9 @@ hr {
     var needle = nav.querySelector('.ch-needle');
     var cap = document.querySelector('.ch-cap');
     var index = document.getElementById('vsl-chapter-index');
+    var scroller = document.getElementById('ch-scroll');
+    var rail = index && index.querySelector('.ch-rail');
+    var thumb = rail && rail.querySelector('i');
     var toggle = document.querySelector('.ch-toggle');
     var list = document.getElementById('ch-list');
     var duration = parseFloat(nav.getAttribute('data-duration')) || 1212;
@@ -1205,6 +1236,26 @@ hr {
 
     if (/[?&]reset=1/.test(location.search)) { try { localStorage.removeItem(LS_KEY); } catch(e){} }
 
+    // draws the thread rail: thumb length is the visible share, position is how far down
+    function updateRail(){
+      if (!scroller || !rail || !thumb || !index) return;
+      var vis = scroller.clientHeight, total = scroller.scrollHeight, top = scroller.scrollTop;
+      var scrollable = total > vis + 4;
+      index.setAttribute('data-scrollable', scrollable ? 'true' : 'false');
+      index.setAttribute('data-more', (scrollable && top + vis < total - 6) ? 'true' : 'false');
+      if (!scrollable) return;
+      // derive from the scroller (rail is inset 12px top and bottom of the same box) so a
+      // zero-height reading on the rail itself cannot stall the thumb
+      var railH = rail.clientHeight || Math.max(0, vis - 24);
+      if (railH < 20) return;   // panel still animating open; a later pass draws it
+      var thumbH = Math.max(30, Math.round(railH * vis / total));
+      var travel = railH - thumbH;
+      thumb.style.height = thumbH + 'px';
+      thumb.style.top = Math.round(travel * (top / (total - vis))) + 'px';
+    }
+    if (scroller) scroller.addEventListener('scroll', updateRail, { passive: true });
+    window.addEventListener('resize', function(){ clearTimeout(window.__rlT); window.__rlT = setTimeout(updateRail, 150); });
+
     function setOpen(open){
       if (!index || !toggle) return;
       index.setAttribute('data-open', open ? 'true' : 'false');
@@ -1213,9 +1264,15 @@ hr {
       // drive the height directly: measured from content, so it never depends on a
       // stale attribute-selector match and never clips a longer chapter list
       var cap = Math.min(Math.round(window.innerHeight * 0.56), 380);
-      index.style.maxHeight = open ? Math.min(index.scrollHeight, cap) + 'px' : '0px';
-      index.style.overflowY = open ? 'auto' : 'hidden';
+      var content = list ? list.offsetHeight + 16 : cap;
+      var h = open ? Math.min(content, cap) : 0;
+      index.style.maxHeight = h + 'px';
+      if (scroller) scroller.style.maxHeight = h + 'px';
       index.style.pointerEvents = open ? 'auto' : 'none';
+      if (open) {
+        requestAnimationFrame(updateRail);
+        setTimeout(updateRail, 380);   // again once the open transition has settled
+      }
     }
     if (toggle && index) {
       toggle.addEventListener('click', function(e){
