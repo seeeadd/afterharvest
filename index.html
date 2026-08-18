@@ -878,6 +878,23 @@ hr {
   .tx-more:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
   .tx-body[data-open="true"] ~ .tx-more, .tx-more { margin-top: 0; }
 
+
+  /* booking link: deliberately quiet, it must not compete with the form above it */
+  .plan-alt { margin: 22px 0 0; text-align: center;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--umber); }
+  .plan-alt-link { color: var(--rust); text-decoration: none;
+    border-bottom: 1px solid rgba(176,106,74,0.45); padding-bottom: 2px; cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+  .plan-alt-link:hover { color: var(--ink); border-color: var(--ink); }
+  /* and the same offer on the thank-you screen, the highest-intent moment on the page */
+  .pf-book { display: inline-flex; align-items: center; gap: 9px; margin-top: 22px;
+    padding: 14px 26px; cursor: pointer; text-decoration: none;
+    background: var(--ftx); color: #201C15; border: 0; border-radius: 6px;
+    font-family: 'Literata', Georgia, serif; font-size: 17px; font-weight: 600;
+    transition: transform var(--dur-fast) var(--ease-out); }
+  .pf-book:hover { transform: translateY(-1px); }
+  .pf-done .pf-book { margin-top: 26px; }
+
   /* ---------- refined closing footer ---------- */
   footer.foot { position: relative; margin-top: 46px; border-top: 1px solid var(--hairline); background: linear-gradient(180deg, #FFFEFB, #FCFAF4); background-image: url("assets/asset-14.svg"), url("assets/asset-15.svg"); background-size: 200px 200px, 26px 26px; padding: 46px 0 40px; overflow: hidden; }
   footer.foot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 130% at 88% 0%, rgba(232,161,0,0.06), transparent 62%); pointer-events: none; }
@@ -1080,6 +1097,14 @@ hr {
              Screens + copy live in the SCREENS array in the script at the end of this file.
              Set ENDPOINT there to your Apps Script URL. See FORM-BACKEND.md. -->
         <div class="pf" id="plan-form-app"></div>
+
+        <!-- popup, not the inline embed: a month calendar here would outweigh the form -->
+        <p class="plan-alt">Rather skip the plan and just talk?
+          <a class="plan-alt-link" href="https://cal.com/team/afterharvest/3-day-event"
+             data-cal-namespace="3-day-event"
+             data-cal-link="team/afterharvest/3-day-event"
+             data-cal-config='{"layout":"month_view"}'>Book a call</a>
+        </p>
       </div>
     </div>
   </section>
@@ -1943,6 +1968,15 @@ hr {
       d.appendChild(sprig);
       d.appendChild(el('h3', null, "That's everything."));
       d.appendChild(el('p', null, 'The AfterHarvest team will send your plan in 24 to 48 hours. Check the inbox you gave us.'));
+      var book = document.createElement('a');
+      book.className = 'pf-book';
+      book.href = 'https://cal.com/team/afterharvest/3-day-event';
+      book.textContent = 'Or book a call now';
+      // real href as well as the popup hooks, so it still works if the embed script fails
+      book.setAttribute('data-cal-namespace', '3-day-event');
+      book.setAttribute('data-cal-link', 'team/afterharvest/3-day-event');
+      book.setAttribute('data-cal-config', '{"layout":"month_view"}');
+      d.appendChild(book);
       bodyEl.appendChild(d);
       if (window.AHStitch) {
         var cv = document.createElement('canvas'); sprig.appendChild(cv);
@@ -1995,4 +2029,12 @@ hr {
 </script>
 
 
+
+  <!-- Cal.com popup embed. Popup rather than inline: the calendar opens over the page
+       instead of occupying it, so neither placement competes with the form. -->
+  <script type="text/javascript">
+  (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+  Cal("init", "3-day-event", {origin:"https://app.cal.com"});
+  Cal.ns["3-day-event"]("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"#B06A4A"},"dark":{"cal-brand":"#F7F3EA"}},"hideEventTypeDetails":false,"layout":"month_view"});
+  </script>
 </body></html>
