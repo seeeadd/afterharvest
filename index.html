@@ -478,6 +478,7 @@ hr {
     --sm-ctl: var(--umber);
     --sm-ctl-bd: var(--hairline);
     --sm-ctl-bg: transparent;
+    --sm-bloom: 0.42;
     background: var(--sm-bg); border: 1px solid var(--hairline); border-top: 0;
     border-radius: 0 0 var(--r-panel) var(--r-panel);
     padding: 2px 14px 6px 20px; box-shadow: 0 30px 60px -18px rgba(38,33,25,0.4);
@@ -490,7 +491,8 @@ hr {
     --sm-dot-bd: rgba(247,243,234,0.34);
     --sm-ctl: rgba(247,243,234,0.78);
     --sm-ctl-bd: rgba(247,243,234,0.20);
-    --sm-ctl-bg: rgba(247,243,234,0.08); }
+    --sm-ctl-bg: rgba(247,243,234,0.08);
+    --sm-bloom: 1; }
   .ch-seam { flex: 1; min-width: 0; }
   .ch-toggle-wrap { flex: none; }
   .ch[hidden], .ch[data-progress="none"] { display: none; }
@@ -524,7 +526,9 @@ hr {
     transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
   .knot-n { display: none; }   /* numerals made the strip read as a control panel */
   .ch-knot[data-passed="true"] { z-index: 2; }
-  .ch-knot[data-passed="true"] .knot-bloom { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  /* the blooms sit back until you approach the bar, then come up to full */
+  .ch-knot[data-passed="true"] .knot-bloom { opacity: var(--sm-bloom); transform: translate(-50%, -50%) scale(1); }
+  .ch-knot[data-passed="true"]:hover .knot-bloom { opacity: 1; }
   .ch-knot[data-passed="true"] .knot-dot { opacity: 0; transform: scale(0.3); }
   .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { border-color: var(--sm-ink); }
   .ch-index[data-progress="none"] .ch-toggle { border-top: 0; }
