@@ -299,7 +299,7 @@ hr {
   .nav-garland canvas { display: block; margin: 0 auto; filter: drop-shadow(0 4px 7px rgba(38,33,25,0.13)); }
   .nav {
     position: relative; z-index: 2; border-radius: 13px;
-    display: flex; align-items: center; gap: 22px; padding: 13px 14px 13px 22px;
+    display: flex; align-items: center; gap: 22px; padding: 8px 10px 8px 20px;
     background: rgba(254,253,250,0.88);
     /* the blur is held at one value across both states on purpose: animating a
        backdrop-filter forces a full re-raster of everything behind the bar on
@@ -309,9 +309,9 @@ hr {
     filter: drop-shadow(0 8px 20px rgba(38,33,25,0.11)) drop-shadow(0 2px 5px rgba(38,33,25,0.06));
   }
   .nav .brand { display: flex; align-items: center; }
-  .nav .wm { height: 31px; display: block; width: auto; }
+  .nav .wm { height: 26px; display: block; width: auto; }
   .nav .spacer { margin-left: auto; }
-  .nav .pill { padding: 10px 18px 13px; font-size: 10.5px; }
+  .nav .pill { padding: 8px 16px 11px; font-size: 10px; }
   .nav .pill .pill-ico { width: 15px; height: 15px; transition: width 460ms var(--ease-out), height 460ms var(--ease-out); }
   @media (max-width: 760px){
     .nav .pill { padding: 10px 14px 13px; }
@@ -467,7 +467,7 @@ hr {
   .hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--eggshell), rgba(251,250,246,0) 16%, rgba(251,250,246,0) 84%, var(--eggshell)); }
 
   /* VSL — 16:9 video slot */
-  .vsl { position: relative; z-index: 10; margin: 56px auto 0; max-width: 1040px; }
+  .vsl { position: relative; z-index: 10; margin: 14px auto 0; max-width: 1040px; }
   .vsl-frame { position: relative; aspect-ratio: 16 / 9; border-radius: var(--r-panel); overflow: hidden; background: #241d15; border: 1px solid var(--hairline); box-shadow: 0 30px 60px -18px rgba(38,33,25,0.4); }
   .vsl-poster { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; cursor: pointer; background: radial-gradient(120% 120% at 50% 0%, #3a3122, #201a12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
   .vsl-poster:focus-visible { outline: 3px solid var(--yolk); outline-offset: -3px; }
@@ -1050,6 +1050,19 @@ hr {
   /* Cal needs roughly 900px to lay out details-left / calendar-right. At 720 it
      collapsed into one very tall column, so the container runs the full measure. */
   .plan-book { position: relative; z-index: 4; margin: 52px auto 0; max-width: 100%; }
+  /* ---------- the path: step numbers in the page's own eyebrow voice ----------
+     Watch, plan, call. Just the number in wheat and the label; the section styling
+     already carries everything else. */
+  .step-n { color: var(--wheat); font-weight: 600; margin-right: 2px; white-space: nowrap; }
+  .vsl-step { display: flex; align-items: center; justify-content: center; gap: 11px;
+    margin: 0 0 14px; font-family: var(--font-mono); font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber);
+    margin: 52px 0 0;
+    /* the hero's decorative background paints over static content; the video escapes it
+       with position:relative, and this line needs the same escape or it vanishes */
+    position: relative; z-index: 3; }
+  .vsl-step .rule { height: 1px; width: 56px; background: var(--hairline); }
+
   .plan-book-head { display: flex; align-items: center; justify-content: center; gap: 12px;
     margin-bottom: 12px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
     letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
@@ -1346,6 +1359,11 @@ hr {
            Replace the <button class="vsl-poster">…</button> below with your player embed, e.g.:
              <iframe src="https://your-video-host/embed/ID" allow="autoplay; fullscreen" allowfullscreen></iframe>
            (or keep the branded poster and set data-vsl-src on .vsl to a direct video file URL). -->
+      <div class="vsl-step" aria-label="Step 1 of 3">
+        <span class="rule"></span>
+        <span><span class="step-n">Step 01</span> &middot; Watch the video</span>
+        <span class="rule"></span>
+      </div>
       <div class="vsl" data-vsl-src="">
         <div class="vsl-frame">
           <script src="https://fast.wistia.com/player.js" async></script>
@@ -1425,7 +1443,9 @@ hr {
     <div class="wrap">
       <div class="plan-slot">
         <div class="plan-head">
-          <div class="icp"><span class="rule"></span> Application <span class="rule"></span></div>
+          <div class="icp" aria-label="Step 2 of 3"><span class="rule"></span>
+            <span><span class="step-n">Step 02</span> &middot; Get your free plan</span>
+            <span class="rule"></span></div>
           <h2>Want a free 3-day live event <em>plan</em>?</h2>
           <p>Interested if 3-day virtual events / webinars will work for you specifically? We’ll make you a mockup plan around your own offer, numbers, and audience. Answer the questions below. Takes ~5 minutes, and <em>the AfterHarvest team will send you the plan in 24–48 hours</em>.</p>
         </div>
@@ -1455,7 +1475,7 @@ hr {
       <div class="plan-book">
         <div class="plan-book-head">
           <span class="rule"></span>
-          <span>or just book a call</span>
+          <span><span class="step-n">Step 03</span> &middot; book the call</span>
           <span class="rule"></span>
         </div>
         <p class="plan-book-lead">Already know you want to run one? Grab a time. Thirty minutes,
