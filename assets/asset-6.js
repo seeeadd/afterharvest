@@ -882,42 +882,46 @@
     }
   }
   function stepMotif(G, kind, W,H, rnd){
-    var cx=Math.round(W*0.5);
+    /* 10x10 at cell 3. Few, chunky stitches and flat tones: at marker size the
+       renderer's per-cell shading is most of the mark, so shading is what has to go. */
+    var L=P.creamLt, M=P.cream, A=P.wheat, R=P.rust, S=P.sage;
+    function px(x,y,t){ put(G,x,y,t); }
+    function box(x0,y0,x1,y1,t){ for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++) put(G,x,y,t); }
     switch(kind){
-      case 'ui-flag':                                   /* Start */
-        blockRect(G,3,2,3,11,P.olive);                  /* pole */
-        blockRect(G,4,2,9,3,P.rust);                    /* banner */
-        blockRect(G,4,4,8,5,mix(P.rust,P.poppyHot,0.5));
-        blockRect(G,4,6,6,6,mix(P.rust,P.creamSh,0.35));
-        blockRect(G,2,11,5,12,mix(P.olive,P.oliveDk,0.5));
+      case 'ui-flag':
+        box(1,0,1,8,M);                       /* pole */
+        box(2,0,6,1,R); box(2,2,5,2,R); box(2,3,4,3,R);
+        box(0,8,3,8,M);                       /* footing */
         break;
-      case 'ui-people':                                 /* Audience */
-        figure(G,3,4,5,mix(P.sage,P.sageLt,0.5),P.olive);
-        figure(G,10,4,5,mix(P.sage,P.sageLt,0.5),P.olive);
-        figure(G,6.5,2,7,P.creamLt,P.creamSh);          /* front and centre */
+      case 'ui-people':
+        box(1,0,2,1,S); box(7,0,8,1,S);       /* two behind */
+        box(0,3,3,5,S); box(6,3,9,5,S);
+        box(4,0,5,1,L);                       /* one in front */
+        box(3,2,6,6,L);
+        box(2,7,7,7,L);
         break;
-      case 'ui-medal':                                  /* Experience */
-        blockRect(G,4,1,5,5,mix(P.rust,P.rustDk,0.4));  /* ribbon tails */
-        blockRect(G,8,1,9,5,mix(P.rust,P.rustDk,0.15));
-        disc(G,cx,9,3.4,P.wheat,P.wheatDk);
-        disc(G,cx,9,1.5,P.yolk,P.gold);
+      case 'ui-medal':
+        box(2,0,3,3,R); box(6,0,7,3,R);       /* ribbon tails */
+        box(3,4,6,4,A);
+        box(2,5,7,8,A);                       /* disc */
+        box(1,6,8,7,A);
+        box(4,6,5,7,L);                       /* face */
         break;
-      case 'ui-cart':                                   /* Offer */
-        blockRect(G,1,2,2,3,mix(P.olive,P.creamSh,0.4)); /* handle */
-        blockRect(G,3,4,3,7,mix(P.olive,P.creamSh,0.4));
-        blockRect(G,4,4,11,4,P.creamLt);                 /* basket rim */
-        for(var y=5;y<=8;y++) blockRect(G,4+(y-5)*0.5,y,11-(y-5)*0.5,y, y%2? P.wheat : mix(P.wheat,P.creamLt,0.45));
-        disc(G,5,11,1.3,P.creamSh,P.umber);              /* wheels */
-        disc(G,10,11,1.3,P.creamSh,P.umber);
+      case 'ui-cart':
+        box(0,0,1,0,M); box(1,1,1,2,M);       /* handle */
+        box(2,2,9,2,L);                       /* rim */
+        box(2,3,9,4,A);
+        box(3,5,8,5,A);                       /* tapered basket */
+        box(2,7,3,8,M); box(7,7,8,8,M);       /* wheels */
         break;
-      case 'ui-tick':                                    /* Finish */
-        for(var i=0;i<4;i++) put(G,3+i,7+i, i?P.creamLt:mix(P.creamLt,P.sage,0.4));
-        for(var j=0;j<6;j++) put(G,7+j,10-j, P.creamLt);
-        for(var i2=0;i2<4;i2++) put(G,3+i2,8+i2, mix(P.creamLt,P.sage,0.55));
-        for(var j2=0;j2<6;j2++) put(G,7+j2,11-j2, mix(P.creamLt,P.sage,0.55));
+      case 'ui-tick':
+        box(0,4,1,5,S);
+        box(1,5,2,6,L); box(2,6,3,7,L);
+        box(3,6,4,7,L); box(4,4,5,6,L);
+        box(5,3,6,5,L); box(6,2,7,4,L); box(7,1,8,3,L);
         break;
       default:
-        disc(G,cx,Math.round(H*0.5),3,P.creamLt,P.creamSh);
+        box(3,3,6,6,L);
     }
   }
 
