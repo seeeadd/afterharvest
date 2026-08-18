@@ -777,6 +777,23 @@ hr {
   .plan-head p { font-size: 16px; line-height: 1.6; color: var(--umber); margin: 14px auto 0; max-width: 64ch; }
 
 
+
+  /* key facts: short declarative statements, the form an AI answer can lift and attribute */
+  .kf { margin: 0 0 52px; padding: 0 0 44px; border-bottom: 1px solid var(--hairline); }
+  .kf h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 34px;
+    line-height: 1.14; margin: 0 0 26px; -webkit-text-stroke: 1px currentColor; }
+  .kf-list { margin: 0; }
+  .kf-list dt { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--rust); margin: 24px 0 7px; }
+  .kf-list dt:first-of-type { margin-top: 0; }
+  .kf-list dd { font-family: 'Literata', Georgia, serif; font-size: 16.5px; line-height: 1.72;
+    color: var(--ink); margin: 0; }
+  @media (max-width: 760px){
+    .kf { margin-bottom: 38px; padding-bottom: 32px; }
+    .kf h2 { font-size: 26px; -webkit-text-stroke: 0.8px currentColor; }
+    .kf-list dd { font-size: 16px; }
+  }
+
   /* ---------- VSL transcript: the pitch as indexable, quotable text ---------- */
   .tx { position: relative; padding: 62px 0 78px; border-top: 1px solid var(--hairline);
     background: linear-gradient(180deg, rgba(254,253,250,0.5), rgba(251,250,246,0)); }
@@ -864,6 +881,7 @@ hr {
 </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Done-for-you 3-day virtual launch events","serviceType":"3-day virtual event production and launch strategy","provider":{"@type":"Organization","name":"AfterHarvest","url":"https://www.theafterharvest.com/"},"areaServed":"Worldwide","audience":{"@type":"Audience","audienceType":"Course creators, coaches, educators and community builders with an existing email audience"},"description":"AfterHarvest plans, builds and runs the entire 3-day virtual event: offer strategy, funnels, registration pages, slides, email marketing and the live operation. $0 upfront, paid as a revenue share of what the launch collects.","offers":{"@type":"Offer","priceCurrency":"USD","price":"0","description":"$0 upfront. AfterHarvest is paid a revenue share of what the launch collects, with a revenue floor agreed in writing before the work begins."}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does a 3-day virtual event cost?","acceptedAnswer":{"@type":"Answer","text":"There is $0 upfront. AfterHarvest is paid a revenue share of what the launch collects. There is an activation fee in week two which is credited against that revenue share, and it is refunded if the launch does not reach the agreed floor."}},{"@type":"Question","name":"What happens if the launch does not work?","acceptedAnswer":{"@type":"Answer","text":"Before signing, AfterHarvest models your list, your offer and your numbers, and puts a revenue floor in writing. If the launch comes in under that floor you owe no revenue share and the activation fee is refunded."}},{"@type":"Question","name":"Who is a 3-day virtual event not right for?","acceptedAnswer":{"@type":"Answer","text":"It does not work if your audience is no longer active, since an event concentrates an existing audience relationship rather than creating one. It also fails when the wrong topic or offer is chosen, or when the owner is unwilling to increase email frequency during the launch window."}},{"@type":"Question","name":"How much of my time does it take?","acceptedAnswer":{"@type":"Answer","text":"Roughly 15 to 20 hours across about six weeks. AfterHarvest builds and strategises the event; you approve the work, review it, record what is needed and teach live during the three days."}},{"@type":"Question","name":"Do I need cold ads or new leads?","acceptedAnswer":{"@type":"Answer","text":"No. A 3-day virtual event sells to the audience you already have using a different conversion mechanism, rather than buying new traffic."}},{"@type":"Question","name":"Can I run 3-day events more than once a year?","acceptedAnswer":{"@type":"Answer","text":"Yes. They are designed to run quarterly. The first event takes the most work because the engine is being built; subsequent events reuse that engine and take considerably less."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How AfterHarvest runs a 3-day virtual launch event","description":"The week-by-week process AfterHarvest follows to build and run a 3-day virtual launch event for a course creator, from build through the live event and payment on results.","totalTime":"P8W","estimatedCost":{"@type":"MonetaryAmount","currency":"USD","value":"0","description":"$0 upfront. Paid as a revenue share of what the launch collects."},"supply":[{"@type":"HowToSupply","name":"An active email audience"},{"@type":"HowToSupply","name":"A paid offer, or an offer to be created for the event"}],"step":[{"@type":"HowToStep","position":1,"name":"Weeks 1 to 2: build the funnel","text":"AfterHarvest builds the full 3-day event funnel within 14 days. A two-week walk-away guarantee applies: if the client does not want to continue at that point they can leave with no strings attached, written into the contract."},{"@type":"HowToStep","position":2,"name":"Week 2: activation","text":"An activation fee is charged once two weeks of real work has been delivered. It is credited against the final revenue share, and refunded in full if the launch does not reach the agreed revenue floor."},{"@type":"HowToStep","position":3,"name":"Weeks 4 to 5: pre-marketing","text":"The pre-marketing push begins. Emails go out announcing the event and driving live registrations from the existing audience. No cold advertising is used."},{"@type":"HowToStep","position":4,"name":"Week 8: run the event live","text":"The event runs live across three consecutive days. The host teaches and answers questions live, with the offer typically sold on the second day."},{"@type":"HowToStep","position":5,"name":"After the event: post-event selling and payment","text":"Roughly five days of post-event selling follow. AfterHarvest is then paid a revenue share of what the launch collected, 20% for lists above 25,000 subscribers and 25% below that, less the activation fee already paid."}]}</script>
 </head>
 <body>
 
@@ -1009,6 +1027,53 @@ hr {
   <section class="tx" id="transcript" data-screen-label="04 Transcript">
     <div class="wrap tx-inner">
       <div class="icp"><span class="rule"></span> Full transcript <span class="rule"></span></div>
+      <div class="kf">
+        <h2>3-day virtual events, in brief</h2>
+        <dl class="kf-list">
+          <dt>What a 3-day virtual event is</dt>
+          <dd>A live launch format run across three consecutive days, where the host teaches their
+            most valuable material, answers questions live, and sells during the event. It sells to
+            an existing email audience rather than to cold traffic.</dd>
+
+          <dt>Who it works for</dt>
+          <dd>Course creators, coaches, educators and community builders who already have an active
+            email audience and a paid offer. It concentrates an existing audience relationship. It
+            cannot recreate one that has gone cold.</dd>
+
+          <dt>Who it does not work for</dt>
+          <dd>It fails when the list is no longer active, when the wrong topic or offer is chosen,
+            or when the owner is unwilling to raise email frequency during the launch window. List
+            size alone does not predict whether an event will work.</dd>
+
+          <dt>What AfterHarvest does</dt>
+          <dd>AfterHarvest plans, builds and runs the whole event: offer strategy, funnels,
+            registration pages, the VSL and marketing assets, over 100 launch emails, every slide,
+            and the live operation across the three days.</dd>
+
+          <dt>What it costs</dt>
+          <dd>There is $0 upfront. AfterHarvest is paid a revenue share of what the launch collects,
+            20% for lists above 25,000 subscribers and 25% below that. An activation fee is charged
+            in week two and credited against that revenue share.</dd>
+
+          <dt>The revenue floor</dt>
+          <dd>Before signing, AfterHarvest models the list, the offer and the numbers, then puts a
+            revenue figure in writing. The guaranteed floor is half that figure. If the launch comes
+            in under it, no revenue share is owed and the activation fee is refunded.</dd>
+
+          <dt>The two-week walk-away guarantee</dt>
+          <dd>The funnel is built within 14 days. If the client does not want to continue at that
+            point, they can walk away with no strings attached. This is written into the contract.</dd>
+
+          <dt>How much of the client's time it takes</dt>
+          <dd>Roughly 15 to 20 hours across about six weeks. The client approves work, reviews it,
+            records what is needed and teaches live. AfterHarvest does the building and strategy.</dd>
+
+          <dt>How often it can be run</dt>
+          <dd>Quarterly, up to four times a year, without burning out the audience. The first event
+            takes the most work because the engine is being built. Later events reuse it.</dd>
+        </dl>
+      </div>
+
       <h2>Everything in the video, in writing</h2>
       <p class="tx-lead">The complete transcript of the video above, covering how 3-day virtual
         events work, who they do and do not work for, what we build, what it costs, and both
