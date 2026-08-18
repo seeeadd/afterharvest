@@ -662,10 +662,10 @@ hr {
 
   /* the motif sits over the marker: full once the section is behind you, faint while in it */
   .pf-dot { position: relative; overflow: visible; }
-  .pf-motif { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px;
+  .pf-motif { position: absolute; left: 50%; top: 50%; width: 21px; height: 21px; color: var(--ftx);
     transform: translate(-50%,-50%) scale(0.55); opacity: 0; pointer-events: none;
     transition: opacity 420ms var(--ease-out), transform 520ms var(--ease-out); }
-  .pf-motif canvas { width: 100%; height: 100%; display: block; }
+  .pf-motif svg { width: 100%; height: 100%; display: block; }
   .pf-step[data-on="1"] .pf-motif { opacity: 0.42; transform: translate(-50%,-50%) scale(1); }
   .pf-step[data-done="1"] .pf-motif { opacity: 1; transform: translate(-50%,-50%) scale(1); }
   /* finished steps hand the marker over to the motif entirely */
@@ -1373,8 +1373,21 @@ hr {
     var LS = 'ah_plan_form_v1';
     var SECTIONS = ['Start', 'Audience', 'Experience', 'Offer', 'Finish'];
     // a motif per section, drawn from the same stitch engine as the hero and the chapter seam
-    var SECTION_MOTIF = { Start: 'ui-flag', Audience: 'ui-people', Experience: 'ui-medal',
-                          Offer: 'ui-cart', Finish: 'ui-tick' };
+    // thin-line glyphs, not cross-stitch: the stitch renderer's per-cell shading turns to
+    // mush below about 40px, which is why the pixel motifs read as smudges at marker size.
+    var G0 = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.35" ' +
+             'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+    var SECTION_ICON = {
+      Start:      G0 + '<path d="M5.6 3.2v13.6"/><path d="M5.6 4.2h8.9l-2 2.7 2 2.7H5.6z"/></svg>',
+      Audience:   G0 + '<circle cx="10" cy="7" r="2.3"/><path d="M5.9 15.6a4.1 4.1 0 018.2 0"/>' +
+                       '<circle cx="4.3" cy="8.6" r="1.6"/><path d="M1.6 14.4a2.9 2.9 0 013.1-2.4"/>' +
+                       '<circle cx="15.7" cy="8.6" r="1.6"/><path d="M18.4 14.4a2.9 2.9 0 00-3.1-2.4"/></svg>',
+      Experience: G0 + '<circle cx="10" cy="12.4" r="4.3"/><path d="M10 10.6l.85 1.7 1.85.27-1.35 1.3.32 1.84L10 14.84l-1.67.87.32-1.84-1.35-1.3 1.85-.27z"/>' +
+                       '<path d="M7.2 8.3L5.6 2.9h8.8l-1.6 5.4"/></svg>',
+      Offer:      G0 + '<path d="M2.2 3.1h2.1l2.1 8.6h8.3"/><path d="M5.6 5.7h11.4l-1.5 4.6H6.7"/>' +
+                       '<circle cx="7.6" cy="15.6" r="1.35"/><circle cx="14.4" cy="15.6" r="1.35"/></svg>',
+      Finish:     G0 + '<path d="M4.2 10.6l3.9 3.9L16 5.9"/></svg>'
+    };
 
     // Copy is verbatim from the Fillout build. Edit here to change a question.
     var SCREENS = [
@@ -1522,13 +1535,9 @@ hr {
         st.setAttribute('data-on', i === cur ? '1' : '0');
         st.setAttribute('data-done', i < cur ? '1' : '0');
         st.appendChild(el('span','pf-dot','<i></i>'));
-        // reached steps stitch themselves in; the one in progress shows the same motif faintly
-        if (i <= cur && window.AHStitch) {
-          var host = el('span','pf-motif');
-          var cv = document.createElement('canvas'); host.appendChild(cv);
-          AHStitch.mount(cv, { kind: SECTION_MOTIF[nm] || 'wheat',
-            cols: 13, rows: 13, cell: 2, seed: 11 + i * 7, twinkle: false, animate: false });
-          st.querySelector('.pf-dot').appendChild(host);
+        // reached steps draw their glyph; the one in progress shows it faintly
+        if (i <= cur && SECTION_ICON[nm]) {
+          st.querySelector('.pf-dot').appendChild(el('span','pf-motif', SECTION_ICON[nm]));
         }
         if (i === cur) st.appendChild(el('span','pf-name', esc(nm)));
         stepsEl.appendChild(st);
