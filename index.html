@@ -824,20 +824,20 @@ hr {
      rendering (Search Console reports "Crawled as: Googlebot smartphone"), so
      display:none here would hide it from the crawler that decides the ranking.
      Clipping keeps every word rendered, in the DOM and in the layout. */
-  .tx-more { display: none; }
-  @media (max-width: 760px){
-    .tx-body { max-height: 300px; overflow: hidden; position: relative;
-      -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
-              mask-image: linear-gradient(180deg, #000 62%, transparent 100%); }
-    .tx-body[data-open="true"] { max-height: none; -webkit-mask-image: none; mask-image: none; }
-    .tx-more { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px;
-      padding: 12px 20px; cursor: pointer; background: transparent;
-      border: 1px solid var(--hairline); border-radius: var(--r-panel);
-      font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
-      letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
-    .tx-more:hover { color: var(--ink); border-color: var(--wheat); }
-    .tx-more:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
-  }
+  /* clipped at every width, not hidden. Nothing is display:none, so the words stay
+     rendered and in the DOM for the crawler while the page stays short for readers. */
+  .tx-body { max-height: 230px; overflow: hidden; position: relative;
+    -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+            mask-image: linear-gradient(180deg, #000 55%, transparent 100%); }
+  .tx-body[data-open="true"] { max-height: none; -webkit-mask-image: none; mask-image: none; }
+  .tx-more { display: inline-flex; align-items: center; gap: 8px; margin-top: 20px;
+    padding: 12px 22px; cursor: pointer; background: transparent;
+    border: 1px solid var(--hairline); border-radius: var(--r-panel);
+    font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
+  .tx-more:hover { color: var(--ink); border-color: var(--wheat); }
+  .tx-more:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
+  @media (max-width: 760px){ .tx-body { max-height: 200px; } }
 
   /* ---------- refined closing footer ---------- */
   footer.foot { position: relative; margin-top: 46px; border-top: 1px solid var(--hairline); background: linear-gradient(180deg, #FFFEFB, #FCFAF4); background-image: url("assets/asset-14.svg"), url("assets/asset-15.svg"); background-size: 200px 200px, 26px 26px; padding: 46px 0 40px; overflow: hidden; }
