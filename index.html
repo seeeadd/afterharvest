@@ -645,7 +645,7 @@ hr {
   /* ---------- custom plan form (replaces the Fillout embed) ---------- */
   .pf { --fbg:#2C2820; --fopt:rgba(251,250,246,0.05); --fbd:rgba(251,250,246,0.15);
     --ftx:#F7F3EA; --fmu:rgba(247,243,234,0.58);
-    position: relative; background: var(--fbg); border-radius: 18px; padding: 34px 38px 30px;
+    position: relative; background: var(--fbg); border-radius: var(--r-panel); padding: 34px 38px 30px;
     font-family: 'Literata', Georgia, serif; color: var(--ftx);
     box-shadow: 0 26px 54px -26px rgba(38,33,25,0.55); }
   .pf-steps { display: flex; align-items: center; justify-content: center; gap: 9px; margin-bottom: 30px; }
@@ -678,7 +678,7 @@ hr {
   .pf-in { margin-top: 18px; }
   .pf-in input[type="text"], .pf-in input[type="email"], .pf-in textarea {
     width: 100%; box-sizing: border-box; background: var(--fopt); color: var(--ftx);
-    border: 1.5px solid var(--fbd); border-radius: 9px; padding: 15px 16px;
+    border: 1.5px solid var(--fbd); border-radius: 6px; padding: 15px 16px;
     font-family: 'Literata', Georgia, serif; font-size: 18px; line-height: 1.4; outline: none;
     transition: border-color var(--dur-fast) var(--ease-out); }
   .pf-in textarea { min-height: 118px; resize: vertical; }
@@ -686,7 +686,7 @@ hr {
   .pf-in input:focus, .pf-in textarea:focus { border-color: rgba(247,243,234,0.72); }
   .pf-opts { display: flex; flex-direction: column; gap: 9px; align-items: flex-start; }
   .pf-opt { display: inline-flex; align-items: center; gap: 13px; min-width: min(330px, 100%); max-width: 100%;
-    background: var(--fopt); border: 1.5px solid var(--fbd); border-radius: 9px;
+    background: var(--fopt); border: 1.5px solid var(--fbd); border-radius: 6px;
     padding: 13px 20px 13px 16px; cursor: pointer; color: var(--ftx);
     font-family: 'Literata', Georgia, serif; font-size: 18px; text-align: left;
     transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
@@ -699,7 +699,7 @@ hr {
   .pf-opt:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
 
   .pf-next { margin-top: 30px; display: inline-flex; align-items: center; gap: 10px;
-    background: var(--ftx); color: #201C15; border: 0; border-radius: 9px;
+    background: var(--ftx); color: #201C15; border: 0; border-radius: 6px;
     padding: 15px 26px; cursor: pointer;
     font-family: 'Literata', Georgia, serif; font-size: 19px; font-weight: 600;
     transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
@@ -714,7 +714,7 @@ hr {
   .pf-reset:hover { color: rgba(247,243,234,0.85); border-bottom-color: rgba(247,243,234,0.4); }
   .pf-reset:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
   .pf-reset[hidden] { display: none; }
-  .pf-back { border-radius: 7px; }
+  .pf-back { border-radius: 5px; }
   .pf-back:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
   .pf-note { margin-top: 22px; text-align: center; font-family: var(--font-mono); font-size: 10px;
     letter-spacing: 0.09em; text-transform: uppercase; color: rgba(247,243,234,0.34); }
@@ -725,7 +725,7 @@ hr {
   .pf-sprig canvas { width: 100%; height: 100%; display: block; }
 
   @media (max-width: 760px){
-    .pf { padding: 26px 20px 24px; border-radius: 14px; }
+    .pf { padding: 26px 20px 24px; border-radius: var(--r-panel); }
     .pf-back { top: 22px; left: 16px; }
     .pf-steps { gap: 6px; margin-bottom: 26px; }
     .pf-rule { width: 15px; }
