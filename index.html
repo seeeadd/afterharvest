@@ -468,11 +468,29 @@ hr {
      No time gate: a flower opens at every chapter the playhead reaches, and you don't hide a reward. */
   /* the seam is the player's bottom lip, not a panel on the page: flush, same width,
      same dark ground, so nothing page-like sits between the video and the CTA */
+  /* light at rest so it does not sit under the video as a dark slab; it darkens on
+     approach. One token set, so ground, stitching, needle, dots and control swap together. */
   .ch { position: relative; z-index: 10; margin: 0;
-    background: #241d15; border: 1px solid var(--hairline); border-top: 0;
+    --sm-bg: var(--card);
+    --sm-line: rgba(110,101,84,0.30);
+    --sm-ink: var(--ink);
+    --sm-dot-bd: rgba(110,101,84,0.42);
+    --sm-ctl: var(--umber);
+    --sm-ctl-bd: var(--hairline);
+    --sm-ctl-bg: transparent;
+    background: var(--sm-bg); border: 1px solid var(--hairline); border-top: 0;
     border-radius: 0 0 var(--r-panel) var(--r-panel);
     padding: 2px 14px 6px 20px; box-shadow: 0 30px 60px -18px rgba(38,33,25,0.4);
-    display: flex; align-items: center; gap: 14px; }
+    display: flex; align-items: center; gap: 14px;
+    transition: background var(--dur-slow) var(--ease-out); }
+  .ch:hover, .ch:focus-within, .ch[data-open="true"] {
+    --sm-bg: #241d15;
+    --sm-line: rgba(247,243,234,0.20);
+    --sm-ink: var(--eggshell);
+    --sm-dot-bd: rgba(247,243,234,0.34);
+    --sm-ctl: rgba(247,243,234,0.78);
+    --sm-ctl-bd: rgba(247,243,234,0.20);
+    --sm-ctl-bg: rgba(247,243,234,0.08); }
   .ch-seam { flex: 1; min-width: 0; }
   .ch-toggle-wrap { flex: none; }
   .ch[hidden], .ch[data-progress="none"] { display: none; }
@@ -484,14 +502,16 @@ hr {
 
   .ch-seam { position: relative; height: 30px; margin: 0 4px; }
   .ch-track { position: absolute; left: 0; right: 0; top: 14px; height: 2px;
-    background: repeating-linear-gradient(90deg, rgba(247,243,234,0.20) 0 3px, transparent 3px 9px); }
+    background: repeating-linear-gradient(90deg, var(--sm-line) 0 3px, transparent 3px 9px); }
   .ch-done { position: absolute; left: 0; top: 0; height: 2px; width: 0;
     background: repeating-linear-gradient(90deg, var(--wheat) 0 7px, transparent 7px 12px);
     transition: width 700ms linear; }
   .ch-needle { position: absolute; top: 8px; left: 0; width: 2px; height: 14px; margin-left: -1px;
-    background: var(--eggshell); border-radius: 1px; transition: left 700ms linear; }
+    background: var(--sm-ink); border-radius: 1px;
+    transition: left 700ms linear, background var(--dur-slow) var(--ease-out); }
   .ch-needle::after { content: ""; position: absolute; left: -2.5px; top: -4px; width: 7px; height: 7px;
-    background: var(--eggshell); border-radius: 50%; }
+    background: var(--sm-ink); border-radius: 50%;
+    transition: background var(--dur-slow) var(--ease-out); }
   .ch-knot { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column;
     align-items: center; padding: 0 11px; background: none; border: 0; cursor: default; }
   .knot-bloom { position: absolute; top: 15px; left: 50%; width: 19px; height: 19px;
@@ -500,13 +520,13 @@ hr {
     transition: opacity 400ms var(--ease-out), transform 520ms var(--ease-out); }
   .knot-bloom canvas { width: 100%; height: 100%; display: block; }
   .knot-dot { width: 9px; height: 9px; margin-top: 11px; border-radius: 50%; display: block;
-    background: #241d15; border: 1.5px solid rgba(247,243,234,0.34);
+    background: var(--sm-bg); border: 1.5px solid var(--sm-dot-bd);
     transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
   .knot-n { display: none; }   /* numerals made the strip read as a control panel */
   .ch-knot[data-passed="true"] { z-index: 2; }
   .ch-knot[data-passed="true"] .knot-bloom { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   .ch-knot[data-passed="true"] .knot-dot { opacity: 0; transform: scale(0.3); }
-  .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { border-color: var(--eggshell); }
+  .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { border-color: var(--sm-ink); }
   .ch-index[data-progress="none"] .ch-toggle { border-top: 0; }
   .ch[data-state="unlocked"] .ch-knot { cursor: pointer; }
   .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { transform: scale(1.45); border-color: var(--ink); }
@@ -523,12 +543,11 @@ hr {
     box-shadow: 0 -18px 40px -20px rgba(0,0,0,0.6); }
   .ch-toggle { flex: none; display: inline-flex; align-items: center; gap: 8px;
     min-height: 26px; padding: 5px 9px; cursor: pointer; white-space: nowrap;
-    background: rgba(247,243,234,0.07); border: 1px solid rgba(247,243,234,0.16); border-radius: 20px;
-    font-family: var(--font-mono); font-size: 10px; color: rgba(247,243,234,0.72);
-    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
-                border-color var(--dur-fast) var(--ease-out); }
-  .ch-toggle:hover { background: rgba(247,243,234,0.14); color: var(--eggshell);
-    border-color: rgba(247,243,234,0.34); }
+    background: var(--sm-ctl-bg); border: 1px solid var(--sm-ctl-bd); border-radius: 20px;
+    font-family: var(--font-mono); font-size: 10px; color: var(--sm-ctl);
+    transition: background var(--dur-slow) var(--ease-out), color var(--dur-slow) var(--ease-out),
+                border-color var(--dur-slow) var(--ease-out); }
+  .ch-toggle:hover { color: var(--sm-ink); border-color: var(--sm-ink); }
   .ch-cap { display: none; }
   .ch-cap { color: var(--ink); letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ch-more { display: inline-flex; align-items: center; gap: 7px;
@@ -1171,6 +1190,7 @@ hr {
     function setOpen(open){
       if (!index || !toggle) return;
       index.setAttribute('data-open', open ? 'true' : 'false');
+      nav.setAttribute('data-open', open ? 'true' : 'false');   // keep the lip dark under a dark panel
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       // drive the height directly: measured from content, so it never depends on a
       // stale attribute-selector match and never clips a longer chapter list
