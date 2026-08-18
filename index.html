@@ -778,47 +778,60 @@ hr {
 
 
 
-  /* ---------- "in brief": the offer as three panels, in the order a buyer asks ----------
-     Format, then work, then money. Each panel is headed by a stitched motif at 42px, which
-     is the size the embroidery actually reads at. */
-  .kf { margin: 0 0 34px; }
-  .kf h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 36px;
-    line-height: 1.12; margin: 0 0 10px; -webkit-text-stroke: 1px currentColor; }
-  .kf-lead { font-family: 'Literata', Georgia, serif; font-size: 16.5px; line-height: 1.7;
-    color: var(--umber); margin: 0 0 40px; max-width: 60ch; }
+  /* ---------- "in brief": its own band, full page width ----------
+     Format, then work, then money, in the order a buyer asks. Panels are cards on the
+     same cream-and-hairline chassis as the video, so the section belongs to the page. */
+  .brief { position: relative; padding: 78px 0 84px; overflow: hidden;
+    border-top: 1px solid var(--hairline);
+    background:
+      radial-gradient(120% 70% at 50% 0%, rgba(200,155,75,0.055), rgba(251,250,246,0) 62%),
+      var(--eggshell); }
+  .brief-sprig { position: absolute; top: 64px; width: 74px; height: 150px; opacity: 0.5;
+    pointer-events: none; z-index: 0; }
+  .brief-sprig.left  { left:  max(10px, calc(50% - 640px)); }
+  .brief-sprig.right { right: max(10px, calc(50% - 640px)); transform: scaleX(-1); }
+  .brief-sprig canvas { width: 100%; height: 100%; display: block; }
+  @media (max-width: 1180px){ .brief-sprig { display: none; } }
+  .brief .wrap { position: relative; z-index: 1; }
 
-  .kf-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
-  .kf-panel { padding: 0 30px; border-left: 1px solid var(--hairline); }
-  .kf-panel:first-child { padding-left: 0; border-left: 0; }
-  .kf-panel:last-child { padding-right: 0; }
+  .kf { margin: 0; }
+  .kf .icp { margin-bottom: 14px; }
+  .kf h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 46px;
+    line-height: 1.08; margin: 0 0 12px; -webkit-text-stroke: 1.4px currentColor; }
+  .kf-lead { font-family: 'Literata', Georgia, serif; font-size: 17.5px; line-height: 1.7;
+    color: var(--umber); margin: 0 auto 46px; max-width: 62ch; }
 
-  .kf-head { display: flex; align-items: center; gap: 11px; margin: 0 0 22px;
-    padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
-  .kf-motif { width: 42px; height: 42px; flex: none; display: block; }
+  .kf-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .kf-panel { background: var(--card); border: 1px solid var(--hairline);
+    border-radius: var(--r-panel); padding: 26px 26px 30px;
+    box-shadow: 0 18px 38px -30px rgba(38,33,25,0.5); }
+
+  .kf-head { display: flex; align-items: center; gap: 12px; margin: 0 0 20px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--hairline); }
+  .kf-motif { width: 52px; height: 52px; flex: none; display: block; }
   .kf-motif canvas { width: 100%; height: 100%; display: block; }
-  .kf-n { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
-    color: var(--wheat); }
-  .kf-head h3 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 21px;
-    line-height: 1; margin: 0; color: var(--ink); }
+  .kf-n { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--wheat); }
+  .kf-head h3 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 23px;
+    line-height: 1; margin: 0 0 0 auto; color: var(--ink); }
 
   .kf-panel dl { margin: 0; }
   .kf-panel dt { font-family: var(--font-mono); font-size: 10px; font-weight: 600;
-    letter-spacing: 0.09em; text-transform: uppercase; color: var(--rust);
-    margin: 22px 0 6px; }
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--rust); margin: 24px 0 7px; }
   .kf-panel dt:first-of-type { margin-top: 0; }
-  .kf-panel dd { font-family: 'Literata', Georgia, serif; font-size: 15.5px; line-height: 1.68;
+  .kf-panel dd { font-family: 'Literata', Georgia, serif; font-size: 15.5px; line-height: 1.7;
     color: var(--ink); margin: 0; }
 
   @media (max-width: 980px){
-    .kf-grid { grid-template-columns: 1fr; }
-    .kf-panel { padding: 30px 0 0; border-left: 0; border-top: 1px solid var(--hairline); }
-    .kf-panel:first-child { padding-top: 0; border-top: 0; }
+    .kf-grid { grid-template-columns: 1fr; gap: 16px; }
+    .kf-head h3 { margin-left: 0; }
   }
   @media (max-width: 760px){
-    .kf h2 { font-size: 27px; -webkit-text-stroke: 0.8px currentColor; }
+    .brief { padding: 52px 0 56px; }
+    .kf h2 { font-size: 30px; -webkit-text-stroke: 0.9px currentColor; }
     .kf-lead { font-size: 16px; margin-bottom: 30px; }
-    .kf-head h3 { font-size: 19px; }
-    .kf-motif { width: 36px; height: 36px; }
+    .kf-panel { padding: 22px 20px 24px; }
+    .kf-head h3 { font-size: 20px; }
+    .kf-motif { width: 42px; height: 42px; }
     .kf-panel dd { font-size: 16px; }
   }
 
@@ -1072,12 +1085,14 @@ hr {
   </section>
 
 
-  <!-- ============ VSL TRANSCRIPT ============
-       The whole pitch lives in a 20 minute video, which no crawler can watch and no
-       AI system can quote. Published here so the page has something to rank and cite. -->
-  <section class="tx" id="transcript" data-screen-label="04 Transcript">
-    <div class="wrap tx-inner">
-      <div class="icp"><span class="rule"></span> Full transcript <span class="rule"></span></div>
+  <!-- ============ IN BRIEF ============
+       Its own band at full page width. Nested inside the transcript's 748px reading
+       column the three panels were 223px each, which is what made it read as a strip
+       rather than a section. -->
+  <section class="brief" id="in-brief" data-screen-label="04 In brief">
+    <div class="brief-sprig left" aria-hidden="true"></div>
+    <div class="brief-sprig right" aria-hidden="true"></div>
+    <div class="wrap">
       <div class="kf">
         <div class="icp"><span class="rule"></span> In brief <span class="rule"></span></div>
         <h2>3-day virtual events, in brief</h2>
@@ -1149,7 +1164,15 @@ hr {
           </section>
         </div>
       </div>
+    </div>
+  </section>
 
+  <!-- ============ VSL TRANSCRIPT ============
+       The whole pitch lives in a 20 minute video, which no crawler can watch and no
+       AI system can quote. Published here so the page has something to rank and cite. -->
+  <section class="tx" id="transcript" data-screen-label="04 Transcript">
+    <div class="wrap tx-inner">
+      <div class="icp"><span class="rule"></span> Full transcript <span class="rule"></span></div>
       <h2>Everything in the video, in writing</h2>
       <p class="tx-lead">The complete transcript of the video above, covering how 3-day virtual
         events work, who they do and do not work for, what we build, what it costs, and both
@@ -1956,6 +1979,12 @@ hr {
   // stitched motif at the head of each "in brief" panel
   (function(){
     if (!window.AHStitch) return;
+    document.querySelectorAll('.brief-sprig').forEach(function(host, i){
+      if (host.querySelector('canvas')) return;
+      var c = document.createElement('canvas'); host.appendChild(c);
+      AHStitch.mount(c, { kind: i ? 'lavender' : 'stalk', cols: 15, rows: 30, cell: 2.4,
+        seed: 31 + i * 17, twinkle: false, animate: false });
+    });
     document.querySelectorAll('.kf-motif').forEach(function(host, i){
       if (host.querySelector('canvas')) return;
       var cv = document.createElement('canvas'); host.appendChild(cv);
