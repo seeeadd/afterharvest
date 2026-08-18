@@ -761,6 +761,8 @@ hr {
   .foot-id { display: flex; align-items: flex-end; gap: 15px; }
   .foot-sprig { position: relative; flex: none; align-self: flex-end; line-height: 0; filter: drop-shadow(0 3px 6px rgba(38,33,25,0.14)); }
   .foot-id .wm2 { height: 27px; width: auto; display: block; }
+  .foot-id .foot-mark-img { height: 30px; width: 30px; display: block; margin: 0 0 11px;
+    filter: drop-shadow(0 2px 4px rgba(38,33,25,0.16)); }
   .foot-id .tag { font-family: 'Olivera', var(--font-display); font-style: italic; font-size: 15px; color: var(--wheat); margin: 9px 0 0; }
   .foot-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .foot-meta span, .foot-meta a { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--umber); text-decoration: none; }
@@ -791,9 +793,9 @@ hr {
     .ch-seam { margin: 0 4px; height: 26px; }
     .ch-knot { padding: 0 7px; pointer-events: none; }
     .knot-bloom { width: 16px; height: 16px; top: 13px; }
-    /* no stitched run on mobile: at this width the dashes plus eleven knots read as clutter.
-       Position still comes through from the needle and from which blooms have opened. */
-    .ch-track, .ch-done { display: none; }
+    /* one line only: the stitched run passes through the knot centres (dot centre sits at
+       13px here, so the 2px track at 12px lands on it) */
+    .ch-track, .ch-done { display: block; top: 12px; }
     .ch-needle { top: 6px; }
     .knot-dot { margin-top: 9px; }
     .ch-toggle { min-height: 52px; padding: 14px 10px; font-size: 11px; }
@@ -961,6 +963,7 @@ hr {
       <div class="foot-id">
         <div class="foot-sprig" aria-hidden="true"></div>
         <div class="txt">
+          <img class="foot-mark-img" src="assets/ah-mark-nav.svg" alt="" aria-hidden="true">
           <img class="wm2" src="assets/asset-1.svg" alt="afterharvest">
           <p class="tag">Done-for-you 3-day virtual events / webinars.</p>
         </div>
