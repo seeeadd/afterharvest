@@ -508,12 +508,16 @@ hr {
   .ch-done { position: absolute; left: 0; top: 0; height: 2px; width: 0;
     background: repeating-linear-gradient(90deg, var(--wheat) 0 7px, transparent 7px 12px);
     transition: width 700ms linear; }
-  .ch-needle { position: absolute; top: 8px; left: 0; width: 2px; height: 14px; margin-left: -1px;
-    background: var(--sm-ink); border-radius: 1px;
-    transition: left 700ms linear, background var(--dur-slow) var(--ease-out); }
-  .ch-needle::after { content: ""; position: absolute; left: -2.5px; top: -4px; width: 7px; height: 7px;
-    background: var(--sm-ink); border-radius: 50%;
-    transition: background var(--dur-slow) var(--ease-out); }
+  /* a real needle: thin, tapered to a point, with a silver highlight down the shaft.
+     The old round head read as a pin and pulled the eye straight to it. */
+  .ch-needle { position: absolute; top: 7px; left: 0; width: 1.5px; height: 17px; margin-left: -0.75px;
+    background: linear-gradient(90deg,
+      rgba(96,94,88,0.85) 0%, #ffffff 38%, #f1f0ea 58%, rgba(112,110,103,0.8) 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%);
+    filter: drop-shadow(0 0 1.5px rgba(255,255,255,0.55));
+    transition: left 700ms linear; }
+  .ch-needle::after { content: ""; position: absolute; left: 50%; top: 2px; width: 1px; height: 3.5px;
+    margin-left: -0.5px; border-radius: 1px; background: rgba(38,33,25,0.45); }
   .ch-knot { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column;
     align-items: center; padding: 0 11px; background: none; border: 0; cursor: default; }
   .knot-bloom { position: absolute; top: 15px; left: 50%; width: 19px; height: 19px;
