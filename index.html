@@ -471,7 +471,10 @@ hr {
   .ch { position: relative; z-index: 10; margin: 0;
     background: #241d15; border: 1px solid var(--hairline); border-top: 0;
     border-radius: 0 0 var(--r-panel) var(--r-panel);
-    padding: 2px 20px 6px; box-shadow: 0 30px 60px -18px rgba(38,33,25,0.4); }
+    padding: 2px 14px 6px 20px; box-shadow: 0 30px 60px -18px rgba(38,33,25,0.4);
+    display: flex; align-items: center; gap: 14px; }
+  .ch-seam { flex: 1; min-width: 0; }
+  .ch-toggle-wrap { flex: none; }
   .ch[hidden], .ch[data-progress="none"] { display: none; }
   .vsl.has-seam .vsl-frame { border-radius: var(--r-panel) var(--r-panel) 0 0; }
   .vsl.has-seam .vsl-note { display: none; }   /* empty <p> was holding the lip 20px off the frame */
@@ -509,41 +512,47 @@ hr {
   .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { transform: scale(1.45); border-color: var(--ink); }
   .ch-knot:focus-visible { outline: 2px solid var(--yolk); outline-offset: 1px; border-radius: 3px; }
 
-  /* the index is a control, so it lives below the CTA and stays visually subordinate to it */
-  .ch-index { position: relative; z-index: 9; max-width: 1040px; margin: 30px auto 0;
-    border-top: 1px solid var(--hairline); padding: 0 18px; }
-  .ch-index[hidden], .ch-index[data-state="idle"] { display: none; }
-  .ch-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%;
-    min-height: 48px; padding: 13px 6px; cursor: pointer; text-align: left;
-    background: transparent; border: 0; border-top: 1px solid var(--hairline);
-    font-family: var(--font-mono); font-size: 11.5px; color: var(--umber); }
+  /* opens upward over the video: attached to what it navigates, zero page flow */
+  .ch-index { position: absolute; left: 0; right: 0; bottom: 100%; z-index: 6;
+    background: rgba(24,19,13,0.955);
+    -webkit-backdrop-filter: blur(14px) saturate(150%); backdrop-filter: blur(14px) saturate(150%);
+    border-radius: var(--r-panel) var(--r-panel) 0 0;
+    max-height: 0; overflow: hidden; pointer-events: none;
+    transition: max-height 340ms var(--ease-out); }
+  .ch-index[data-open="true"] { max-height: min(56vh, 380px); overflow-y: auto; pointer-events: auto;
+    box-shadow: 0 -18px 40px -20px rgba(0,0,0,0.6); }
+  .ch-toggle { flex: none; display: inline-flex; align-items: center; gap: 8px;
+    min-height: 26px; padding: 5px 9px; cursor: pointer; white-space: nowrap;
+    background: rgba(247,243,234,0.07); border: 1px solid rgba(247,243,234,0.16); border-radius: 20px;
+    font-family: var(--font-mono); font-size: 10px; color: rgba(247,243,234,0.72);
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out); }
+  .ch-toggle:hover { background: rgba(247,243,234,0.14); color: var(--eggshell);
+    border-color: rgba(247,243,234,0.34); }
+  .ch-cap { display: none; }
   .ch-cap { color: var(--ink); letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .ch-more { flex: none; display: inline-flex; align-items: center; gap: 8px;
-    color: rgba(110,101,84,0.58);
-    font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
-    transition: color var(--dur-fast) var(--ease-out); }
-  .ch-toggle:hover .ch-more { color: var(--umber); }
+  .ch-more { display: inline-flex; align-items: center; gap: 7px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .ch-more span { display: none; }   /* "jump to any part" is too long for the lip */
   .ch-toggle:focus-visible { outline: 2px solid var(--yolk); outline-offset: -2px; }
   .ch-chev { width: 12px; height: 12px; flex: none; transition: transform var(--dur-fast) var(--ease-out); }
   .ch-toggle[aria-expanded="true"] .ch-chev { transform: rotate(180deg); }
 
-  .ch-list { list-style: none; margin: 0; padding: 0; max-height: 0; overflow: hidden;
+  .ch-list { list-style: none; margin: 0; padding: 6px 8px 10px;
     display: grid; grid-auto-flow: column; grid-template-rows: repeat(6, auto);
-    grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px;
-    transition: max-height var(--dur-slow) var(--ease-out); }
-  .ch-list[data-open="true"] { max-height: 340px; }
+    grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 22px; }
   .ch-item { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px;
     padding: 10px 8px 10px 10px; cursor: pointer; text-align: left;
-    font-family: var(--font-mono); font-size: 11.5px; color: var(--umber);
-    background: transparent; border: 0; border-bottom: 1px solid var(--hairline);
-    border-left: 2px solid transparent;
+    font-family: var(--font-mono); font-size: 11.5px; color: rgba(247,243,234,0.72);
+    background: transparent; border: 0; border-bottom: 1px solid rgba(247,243,234,0.09);
+    border-left: 2px solid transparent; border-radius: 4px;
     transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
                 border-left-color var(--dur-fast) var(--ease-out); }
-  .ch-item:hover { color: var(--ink); background: rgba(254,253,250,0.72); }
+  .ch-item:hover { color: var(--eggshell); background: rgba(247,243,234,0.08); }
   .ch-item:focus-visible { outline: 2px solid var(--yolk); outline-offset: -2px; }
-  .ch-item[aria-current="true"] { color: var(--ink); border-left-color: var(--wheat);
-    background: rgba(232,161,0,0.055); }
-  .ch-item[aria-current="true"] .ch-n { color: var(--ink); }
+  .ch-item[aria-current="true"] { color: var(--eggshell); border-left-color: var(--wheat);
+    background: rgba(232,161,0,0.10); }
+  .ch-item[aria-current="true"] .ch-n { color: var(--yolk); }
   /* the same bloom from the seam, so the list and the timeline read as one system */
   .ch-flag { flex: none; width: 18px; height: 18px; position: relative; }
   .ch-flag canvas { width: 100%; height: 100%; display: block;
@@ -553,7 +562,7 @@ hr {
   .ch-n { flex: none; color: var(--wheat); font-size: 10px; font-variant-numeric: tabular-nums; }
   .ch-label { flex: 1; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* duration bar — how long this chapter actually runs, which the flat list threw away */
-  .ch-len { flex: none; width: 42px; height: 2px; background: var(--hairline); position: relative; }
+  .ch-len { flex: none; width: 42px; height: 2px; background: rgba(247,243,234,0.16); position: relative; }
   .ch-len i { position: absolute; inset: 0 auto 0 0; background: var(--wheat); opacity: 0.55; }
   .ch-time { flex: none; width: 38px; text-align: right; font-size: 10px; opacity: 0.66;
     font-variant-numeric: tabular-nums; }
@@ -809,10 +818,33 @@ hr {
              cross-stitch flower as the playhead passes it (chapterBloom in asset-6.js).
              Titles/times mirror Wistia's chapterList and are re-read from it at runtime. -->
         <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="1212" hidden>
+          <!-- the list opens upward over the video: attached to what it navigates,
+               costs no page flow, and never sits between the video and the CTA -->
+          <div class="ch-index" id="vsl-chapter-index" data-open="false">
+            <ul class="ch-list" id="ch-list" data-open="false">
+            <li><button class="ch-item" type="button" data-t="0"><span class="ch-n">01</span><span class="ch-label">The Offer in 60 Seconds</span><span class="ch-time">0:00</span></button></li>
+            <li><button class="ch-item" type="button" data-t="154"><span class="ch-n">02</span><span class="ch-label">Why we emailed YOU</span><span class="ch-time">2:34</span></button></li>
+            <li><button class="ch-item" type="button" data-t="184"><span class="ch-n">03</span><span class="ch-label">Why Your List Isn't Buying</span><span class="ch-time">3:04</span></button></li>
+            <li><button class="ch-item" type="button" data-t="281"><span class="ch-n">04</span><span class="ch-label">This won't work if...</span><span class="ch-time">4:41</span></button></li>
+            <li><button class="ch-item" type="button" data-t="454"><span class="ch-n">05</span><span class="ch-label">Running One Every 90 Days</span><span class="ch-time">7:34</span></button></li>
+            <li><button class="ch-item" type="button" data-t="554"><span class="ch-n">06</span><span class="ch-label">WHY specifically 3-DAY LIVE EVENTS</span><span class="ch-time">9:14</span></button></li>
+            <li><button class="ch-item" type="button" data-t="730"><span class="ch-n">07</span><span class="ch-label">WHY HAVEN’T YOU RAN ONE?</span><span class="ch-time">12:10</span></button></li>
+            <li><button class="ch-item" type="button" data-t="756"><span class="ch-n">08</span><span class="ch-label">What Happens After You Say Yes</span><span class="ch-time">12:36</span></button></li>
+            <li><button class="ch-item" type="button" data-t="830"><span class="ch-n">09</span><span class="ch-label">How Long This Actually Takes + Guarantees</span><span class="ch-time">13:50</span></button></li>
+            <li><button class="ch-item" type="button" data-t="970"><span class="ch-n">10</span><span class="ch-label">What You're Guaranteed To Make</span><span class="ch-time">16:10</span></button></li>
+            <li><button class="ch-item" type="button" data-t="1116"><span class="ch-n">11</span><span class="ch-label">Get Your Free (Non AI) 3-Day Event Plan</span><span class="ch-time">18:36</span></button></li>
+        </ul>
+          </div>
           <div class="ch-seam">
             <div class="ch-track" aria-hidden="true"><div class="ch-done"></div></div>
             <div class="ch-needle" aria-hidden="true"></div>
           </div>
+          <button class="ch-toggle" type="button" aria-expanded="false" aria-controls="ch-list">
+            <span class="ch-cap">The Offer in 60 Seconds</span>
+            <span class="ch-more"><b class="ch-count">11</b> chapters<span> &middot; jump to any part</span>
+              <svg class="ch-chev" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </span>
+          </button>
         </nav>
         <p class="vsl-note" aria-hidden="true"></p>
       </div>
@@ -833,28 +865,6 @@ hr {
         </a>
       </div>
 
-      <!-- chapter index: a control, so it sits BELOW the CTA and never outranks it -->
-      <div class="ch-index" id="vsl-chapter-index" data-state="idle" hidden>
-        <button class="ch-toggle" type="button" aria-expanded="false" aria-controls="ch-list">
-          <span class="ch-cap">The Offer in 60 Seconds</span>
-          <span class="ch-more"><b class="ch-count">11</b> chapters<span> &middot; jump to any part</span>
-            <svg class="ch-chev" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          </span>
-        </button>
-        <ul class="ch-list" id="ch-list" data-open="false">
-          <li><button class="ch-item" type="button" data-t="0"><span class="ch-n">01</span><span class="ch-label">The Offer in 60 Seconds</span><span class="ch-time">0:00</span></button></li>
-          <li><button class="ch-item" type="button" data-t="154"><span class="ch-n">02</span><span class="ch-label">Why we emailed YOU</span><span class="ch-time">2:34</span></button></li>
-          <li><button class="ch-item" type="button" data-t="184"><span class="ch-n">03</span><span class="ch-label">Why Your List Isn't Buying</span><span class="ch-time">3:04</span></button></li>
-          <li><button class="ch-item" type="button" data-t="281"><span class="ch-n">04</span><span class="ch-label">This won't work if...</span><span class="ch-time">4:41</span></button></li>
-          <li><button class="ch-item" type="button" data-t="454"><span class="ch-n">05</span><span class="ch-label">Running One Every 90 Days</span><span class="ch-time">7:34</span></button></li>
-          <li><button class="ch-item" type="button" data-t="554"><span class="ch-n">06</span><span class="ch-label">WHY specifically 3-DAY LIVE EVENTS</span><span class="ch-time">9:14</span></button></li>
-          <li><button class="ch-item" type="button" data-t="730"><span class="ch-n">07</span><span class="ch-label">WHY HAVEN’T YOU RAN ONE?</span><span class="ch-time">12:10</span></button></li>
-          <li><button class="ch-item" type="button" data-t="756"><span class="ch-n">08</span><span class="ch-label">What Happens After You Say Yes</span><span class="ch-time">12:36</span></button></li>
-          <li><button class="ch-item" type="button" data-t="830"><span class="ch-n">09</span><span class="ch-label">How Long This Actually Takes + Guarantees</span><span class="ch-time">13:50</span></button></li>
-          <li><button class="ch-item" type="button" data-t="970"><span class="ch-n">10</span><span class="ch-label">What You're Guaranteed To Make</span><span class="ch-time">16:10</span></button></li>
-          <li><button class="ch-item" type="button" data-t="1116"><span class="ch-n">11</span><span class="ch-label">Get Your Free (Non AI) 3-Day Event Plan</span><span class="ch-time">18:36</span></button></li>
-        </ul>
-      </div>
     </div>
   </section>
 
@@ -1055,6 +1065,7 @@ hr {
         var k = document.createElement('button');
         k.type='button'; k.className='ch-knot'; k.setAttribute('data-t', sp.t);
         k.setAttribute('aria-label', sp.label);
+        k.title = clock(sp.t) + '  ' + sp.label;
         k.innerHTML = '<span class="knot-bloom"></span><span class="knot-dot"></span>' +
                       '<span class="knot-n">' + pad(i+1) + '</span>';
         seam.appendChild(k); knots.push(k);
@@ -1114,11 +1125,7 @@ hr {
       // square off the player's bottom corners only while the lip is actually showing
       if (nav.getAttribute('data-progress') !== 'none') vsl.classList.add('has-seam');
       else vsl.classList.remove('has-seam');
-      if (index) {                       // the index lives below the CTA now, so mirror state to it
-        index.setAttribute('data-state', st);
-        index.setAttribute('data-progress', nav.getAttribute('data-progress') || '');
-        if (index.hidden) index.hidden = false;
-      }
+
       if (st === 'unlocked') { try { localStorage.setItem(LS_KEY,'1'); } catch(e){} }
     }
 
@@ -1161,11 +1168,30 @@ hr {
 
     if (/[?&]reset=1/.test(location.search)) { try { localStorage.removeItem(LS_KEY); } catch(e){} }
 
-    if (toggle && list) {
-      toggle.addEventListener('click', function(){
-        var open = list.getAttribute('data-open') === 'true';
-        list.setAttribute('data-open', open ? 'false' : 'true');
-        toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+    function setOpen(open){
+      if (!index || !toggle) return;
+      index.setAttribute('data-open', open ? 'true' : 'false');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      // drive the height directly: measured from content, so it never depends on a
+      // stale attribute-selector match and never clips a longer chapter list
+      var cap = Math.min(Math.round(window.innerHeight * 0.56), 380);
+      index.style.maxHeight = open ? Math.min(index.scrollHeight, cap) + 'px' : '0px';
+      index.style.overflowY = open ? 'auto' : 'hidden';
+      index.style.pointerEvents = open ? 'auto' : 'none';
+    }
+    if (toggle && index) {
+      toggle.addEventListener('click', function(e){
+        e.stopPropagation();
+        setOpen(index.getAttribute('data-open') !== 'true');
+      });
+      // it overlays the video, so it must be easy to dismiss
+      document.addEventListener('click', function(e){
+        if (index.getAttribute('data-open') !== 'true') return;
+        if (index.contains(e.target) || toggle.contains(e.target)) return;
+        setOpen(false);
+      });
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape') setOpen(false);
       });
     }
 
@@ -1175,6 +1201,7 @@ hr {
       var t = parseInt(btn.getAttribute('data-t'), 10) || 0;
       if (seekTo) seekTo(t);
       progress(t);
+      setOpen(false);
       vsl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     nav.addEventListener('click', onPick);
