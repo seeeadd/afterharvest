@@ -22,8 +22,10 @@
 {"@context":"https://schema.org","@type":"WebSite","name":"AfterHarvest","alternateName":["After Harvest"],"url":"https://www.theafterharvest.com/"}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"AfterHarvest","alternateName":["After Harvest"],"url":"https://www.theafterharvest.com/","email":"sean@theseancanela.com","description":"Done-for-you 3-day virtual launch events / webinars for course creators, coaches, and community builders."}
+{"@context":"https://schema.org","@type":"Organization","@id":"https://www.theafterharvest.com/#org","name":"AfterHarvest","alternateName":["After Harvest"],"url":"https://www.theafterharvest.com/","email":"sean@theseancanela.com","description":"Done-for-you 3-day virtual launch events / webinars for course creators, coaches, and community builders.","foundingDate":"2025","founder":[{"@type":"Person","@id":"https://www.theafterharvest.com/#theia-ahmadi","name":"Theia Ahmadi","jobTitle":"Co-founder","worksFor":{"@id":"https://www.theafterharvest.com/#org"}},{"@type":"Person","@id":"https://www.theafterharvest.com/#sean-canela","name":"Sean Canela","jobTitle":"Co-founder","email":"sean@theseancanela.com","worksFor":{"@id":"https://www.theafterharvest.com/#org"}}],"employee":[{"@id":"https://www.theafterharvest.com/#sean-canela"},{"@id":"https://www.theafterharvest.com/#theia-ahmadi"}]}
 </script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://www.theafterharvest.com/#sean-canela","name":"Sean Canela","jobTitle":"Co-founder","email":"sean@theseancanela.com","description":"Co-founder of AfterHarvest, which builds and runs done-for-you 3-day virtual launch events for course creators, coaches and community builders. Writes the launch plans and runs the strategy calls.","worksFor":{"@id":"https://www.theafterharvest.com/#org"},"affiliation":{"@id":"https://www.theafterharvest.com/#org"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://www.theafterharvest.com/#theia-ahmadi","name":"Theia Ahmadi","jobTitle":"Co-founder","description":"Co-founder of AfterHarvest, which builds and runs done-for-you 3-day virtual launch events for course creators, coaches and community builders.","worksFor":{"@id":"https://www.theafterharvest.com/#org"},"affiliation":{"@id":"https://www.theafterharvest.com/#org"}}</script>
 <!-- shared design tokens + @font-face (same file the full site uses → identical rendering) -->
 <style>/* ============================================================
    AFTERHARVEST — WEBFONTS  (v1.6)
@@ -291,15 +293,20 @@ hr {
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 40px; }
 
   /* ---------- floating, irregular sticky header + stitched garland ---------- */
-  .nav-wrap { position: sticky; top: 18px; z-index: 40; display: flex; justify-content: center; padding: 18px 20px 0; }
+  .nav-wrap { position: sticky; top: 18px; z-index: 40; display: flex; justify-content: center; padding: 14px 20px 0; }
   .nav-shell { position: relative; width: min(1000px, 100%); }
   .nav-garland { position: absolute; left: -60px; right: -60px; top: -34px; height: 132px; z-index: 1; pointer-events: none; overflow: visible; }
   .nav-garland canvas { display: block; margin: 0 auto; filter: drop-shadow(0 4px 7px rgba(38,33,25,0.13)); }
   .nav {
     position: relative; z-index: 2; border-radius: 13px;
     display: flex; align-items: center; gap: 22px; padding: 13px 14px 13px 22px;
-    background: rgba(254,253,250,0.88); -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px);
-    border: 1px solid var(--hairline); filter: drop-shadow(0 7px 16px rgba(38,33,25,0.1));
+    background: rgba(254,253,250,0.88);
+    /* the blur is held at one value across both states on purpose: animating a
+       backdrop-filter forces a full re-raster of everything behind the bar on
+       every frame, which is what made the compression stutter. */
+    -webkit-backdrop-filter: blur(16px) saturate(165%); backdrop-filter: blur(16px) saturate(165%);
+    border: 1px solid var(--hairline);
+    filter: drop-shadow(0 8px 20px rgba(38,33,25,0.11)) drop-shadow(0 2px 5px rgba(38,33,25,0.06));
   }
   .nav .brand { display: flex; align-items: center; }
   .nav .wm { height: 31px; display: block; width: auto; }
@@ -318,30 +325,32 @@ hr {
   .nav .brand { min-width: 0; }
   .nav .pill { flex: none; }
 
-  /* compressed header — narrows and slims once you leave the top of the page */
-  .nav-wrap { transition: top 460ms var(--ease-out), padding-top 460ms var(--ease-out); }
-  .nav-shell { transition: width 460ms var(--ease-out); }
-  .nav { transition: padding 460ms var(--ease-out), gap 460ms var(--ease-out),
-                     background-color 460ms var(--ease-out), filter 460ms var(--ease-out); }
-  .nav .wm { transition: height 460ms var(--ease-out); }
-  .nav .pill { transition: font-size 460ms var(--ease-out), padding 460ms var(--ease-out),
+  /* compressed header — narrows and slims once you leave the top of the page.
+     One easing, one duration, and nothing in this transition set repaints the
+     page behind it. */
+  .nav-wrap { --nav-ease: cubic-bezier(0.22, 0.61, 0.24, 1); --nav-dur: 420ms; }
+  .nav-wrap { transition: top var(--nav-dur) var(--nav-ease); }
+  .nav-shell { transition: width var(--nav-dur) var(--nav-ease); will-change: width; }
+  .nav { transition: padding var(--nav-dur) var(--nav-ease), gap var(--nav-dur) var(--nav-ease),
+                     background-color var(--nav-dur) var(--nav-ease); }
+  .nav .wm { transition: height var(--nav-dur) var(--nav-ease); }
+  .nav .pill { transition: font-size var(--nav-dur) var(--nav-ease), padding var(--nav-dur) var(--nav-ease),
                            transform var(--dur-fast) var(--ease-out), filter 0.28s var(--ease-out),
                            color 0.28s var(--ease-out); }
-  .nav-garland { transition: opacity 300ms var(--ease-out), transform 460ms var(--ease-out); }
+  .nav-garland { transition: opacity 240ms linear, transform var(--nav-dur) var(--nav-ease);
+    will-change: opacity, transform; }
   .nav .brand .lockup { display: flex; align-items: center; gap: 0; }
   .nav .wm { transition: height 460ms var(--ease-out); }
   /* the stitched mark rides in only when the bar compresses */
   .nav .wm-mark { height: 0; width: 0; opacity: 0; margin-right: 0; display: block;
-    transition: height 460ms var(--ease-out), width 460ms var(--ease-out),
-                margin-right 460ms var(--ease-out), opacity 300ms var(--ease-out); }
+    transition: height var(--nav-dur) var(--nav-ease), width var(--nav-dur) var(--nav-ease),
+                margin-right var(--nav-dur) var(--nav-ease), opacity 240ms linear; }
 
-  .nav-wrap[data-compact="1"] { top: 9px; padding-top: 9px; }
+  .nav-wrap[data-compact="1"] { top: 8px; }
   .nav-wrap[data-compact="1"] .nav-shell { width: min(580px, 100%); }
   /* frosted, and still the hand-cut crystal edge: shapeNav keeps clipping it */
   .nav-wrap[data-compact="1"] .nav { padding: 8px 9px 8px 15px; gap: 14px;
-    background-color: rgba(254,253,250,0.66);
-    -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
-    filter: drop-shadow(0 10px 24px rgba(38,33,25,0.15)) drop-shadow(0 2px 5px rgba(38,33,25,0.07)); }
+    background-color: rgba(254,253,250,0.70); }
   .nav-wrap[data-compact="1"] .nav .wm { height: 21px; }
   .nav-wrap[data-compact="1"] .nav .wm-mark { height: 21px; width: 21px; opacity: 1; margin-right: 10px; }
   .nav-wrap[data-compact="1"] .nav .pill { font-size: 9.5px; padding: 9px 15px 11px; letter-spacing: 0.075em; }
@@ -653,6 +662,95 @@ hr {
   .plan-cast.left  { left:  max(14px, calc(50% - 648px)); }
   .plan-cast.right { right: max(14px, calc(50% - 648px)); transform: scaleX(-1); }
   @media (max-width: 1180px) { .plan-cast, .plan-art { display: none; } }
+
+  /* ---------- the cast peeks out from behind the form ----------
+     Every figure sits fully BEHIND the card in its resting state, so it is invisible.
+     Peeking means sliding far enough past the card edge to be seen, holding, then
+     sliding back into hiding. Anchored to .plan-slot, so they track the form and never
+     wander down to the calendar. */
+  .plan-slot { position: relative; }
+  .pf { position: relative; z-index: 3; }
+  /* Open to the sides and upward so the peekers and their bubbles show, but cut dead
+     level with the bottom of the card, so nothing hangs into the copy underneath. */
+  .pf-stage { position: relative; clip-path: inset(-380px -360px 0 -360px); }
+
+  /* Three hiding places: two on the left, one on the right, each a different figure.
+     Small enough that the head clears the card edge without half a body coming with it. */
+  .pk { position: absolute; z-index: 1; width: 132px; pointer-events: none; user-select: none;
+    opacity: 0; transform: translate(var(--hx,0), var(--hy,0)) rotate(var(--hr,0deg));
+    transform-origin: var(--org, 100% 100%); }
+  .pk .pk-fig { display: block; width: 100%; height: auto;
+    filter: drop-shadow(0 14px 22px rgba(38,33,25,0.2)); }
+
+  /* Transitions, not keyframes. A keyframe animation toggled quickly can end up parked
+     at its 0% frame and never run, which left figures invisible while their bubble was
+     up. A transition always interpolates from wherever the element currently is. */
+  .pk { transition: opacity 260ms linear 40ms,
+                    transform 460ms cubic-bezier(0.5, 0.02, 0.78, 0.2); }
+  .pk[data-out="1"] { opacity: 1; transform: translate(0,0) rotate(var(--or));
+    transition: opacity 300ms linear,
+                transform 880ms cubic-bezier(0.2, 1.12, 0.28, 1); }
+  .pk[data-out="1"] .pk-fig { animation: pk-sway 4.6s ease-in-out 1s infinite; }
+  @keyframes pk-sway { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(-1.2deg); } }
+  .pk[data-slot="b"][data-out="1"] .pk-fig { animation-name: pk-sway-flip; }
+  @keyframes pk-sway-flip { 0%,100% { transform: scaleX(-1) rotate(0deg); }
+                            50% { transform: scaleX(-1) rotate(-1.2deg); } }
+
+  /* Head is centred in a 132px figure, so -50px puts the face on the card edge.
+     A 132px figure is 246px tall and the card is only ~470px, so every top has to sit
+     above ~260 or the clip at the card's bottom takes the figure's head off. */
+  .pk[data-slot="a"] { left: -50px;  top: 96px;  --hx: 84px;  --hr: 4deg;  --or: -8deg; --org: 100% 100%; }
+  .pk[data-slot="b"] { right: -50px; top: 178px; --hx: -84px; --hr: -4deg; --or: 8deg;  --org: 0 100%; }
+  .pk[data-slot="c"] { left: -46px;  top: 258px; --hx: 80px;  --hr: 3deg;  --or: -6deg; --org: 100% 100%; }
+  .pk[data-slot="b"] .pk-fig { transform: scaleX(-1); }
+
+  @media (max-width: 1240px) { .pk, .pk-say { display: none; } }
+  @media (prefers-reduced-motion: reduce){
+    .pk { transition: opacity 180ms linear; }
+    .pk[data-out="1"] { transition: opacity 180ms linear; }
+    .pk[data-out="1"] .pk-fig { animation: none; } }
+
+  /* The bubble is a SIBLING of the figure, not a child. As a child it sat inside the
+     figure's z-index 1 and the card at z-index 3 sliced it in half. Out here it clears
+     the card, and it sits entirely in the margin so it never covers the form either. */
+  .pk-say { position: absolute; z-index: 6; width: 208px; pointer-events: none; }
+  .pk-say[data-slot="a"] { right: calc(100% + 16px); top: 74px; }
+  .pk-say[data-slot="b"] { left:  calc(100% + 16px); top: 156px; }
+  .pk-say[data-slot="c"] { right: calc(100% + 16px); top: 236px; }
+
+  .say { position: relative; box-sizing: border-box; padding: 12px 14px 13px;
+    background: var(--card); border: 1px solid var(--hairline); border-radius: 12px 12px 12px 3px;
+    box-shadow: 0 14px 30px -18px rgba(38,33,25,0.55), 0 2px 5px rgba(38,33,25,0.06);
+    font-family: 'Literata', Georgia, serif; font-size: 13px; line-height: 1.48;
+    color: var(--ink);
+    opacity: 0; transform: translateY(8px) scale(0.95); transform-origin: 100% 100%;
+    transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out); }
+  .pk-say[data-slot="b"] .say { border-radius: 12px 12px 3px 12px; transform-origin: 0 100%; }
+  .say[data-in="1"] { opacity: 1; transform: none;
+    transition: opacity 300ms var(--ease-out),
+                transform 460ms cubic-bezier(0.22, 1.34, 0.36, 1); }
+  .say[data-in="1"] .say-txt { animation: say-drift 5.5s ease-in-out 0.5s infinite; }
+  @keyframes say-drift { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+  /* tail points across at whoever is speaking */
+  .say::after { content: ""; position: absolute; bottom: 16px; width: 11px; height: 11px;
+    background: var(--card); transform: rotate(45deg); }
+  .pk-say[data-slot="a"] .say::after, .pk-say[data-slot="c"] .say::after {
+    right: -6px; border-right: 1px solid var(--hairline); border-top: 1px solid var(--hairline); }
+  .pk-say[data-slot="b"] .say::after {
+    left: -6px; border-left: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+  .say-dots { display: flex; gap: 4px; align-items: center; height: 8px; }
+  .say-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--umber);
+    opacity: 0.35; animation: say-dot 1.1s ease-in-out infinite; }
+  .say-dots i:nth-child(2){ animation-delay: 0.16s; }
+  .say-dots i:nth-child(3){ animation-delay: 0.32s; }
+  @keyframes say-dot { 0%,60%,100% { opacity: 0.25; transform: translateY(0); }
+                       30% { opacity: 0.9; transform: translateY(-3px); } }
+  .say-txt { display: block; }
+  .say-txt { display: block; }
+  @media (prefers-reduced-motion: reduce){
+    .say, .say[data-in="1"] { transition: opacity 160ms linear; transform: none; }
+    .say[data-in="1"] .say-txt { animation: none; }
+    .say-dots i { animation: none; } }
   .plan-slot { max-width: 720px; margin: 0 auto; }
   /* ---------- custom plan form (replaces the Fillout embed) ---------- */
   .pf { --fbg:#2C2820; --fopt:rgba(251,250,246,0.05); --fbd:rgba(251,250,246,0.15);
@@ -770,126 +868,194 @@ hr {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 40px; }
   .fillout-placeholder .lab { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--umber); }
   .fillout-placeholder .hint { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; color: var(--umber); opacity: 0.7; max-width: 46ch; line-height: 1.7; }
-  .plan-head { text-align: center; margin: 0 auto 30px; max-width: 760px; }
+  .plan-head { text-align: center; margin: 0 auto 30px; max-width: none; }
+  @media (min-width: 1040px){
+    /* the heading and lead read wider than the form they introduce */
+    .plan-head { margin-left: -110px; margin-right: -110px; }
+  }
   .plan-head .icp { justify-content: center; margin-bottom: 16px; }
   .plan-head h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 40px; line-height: 1.08; margin: 0; -webkit-text-stroke: 1.3px currentColor; }
   .plan-head h2 em { font-style: italic; }
-  .plan-head p { font-size: 16px; line-height: 1.6; color: var(--umber); margin: 14px auto 0; max-width: 64ch; }
+  /* the payoff line carries the weight, since it is the only promise in the paragraph */
+  .plan-head p em { font-style: italic; font-weight: 600; color: var(--ink); }
+  .plan-head p { font-size: 16px; line-height: 1.6; color: var(--umber); margin: 14px auto 0; max-width: 90ch; }
 
 
 
-  /* ---------- "in brief": a stitched sampler, not cards ----------
-     Bands separated by the same thread rule the chapter seam uses, an asymmetric rail
-     carrying the number and the group name, and nothing boxed. The page already speaks
-     embroidery; three rounded rectangles did not. */
-  .brief { position: relative; padding: 88px 0 92px; overflow: hidden;
+  /* ---------- "in brief": the chapter seam, stood on end ----------
+     A thread runs the height of the section with a knot at each band, the same device
+     the video carries horizontally. The rail was 400px of dead space; now it holds the
+     thread and a display numeral, so the asymmetry earns its width. */
+  .brief { position: relative; padding: 30px 0 34px; overflow: hidden;
     border-top: 1px solid var(--hairline);
-    background: linear-gradient(180deg, rgba(200,155,75,0.045), rgba(251,250,246,0) 46%), var(--eggshell); }
-  .brief-sprig { position: absolute; top: 96px; width: 66px; height: 138px; opacity: 0.42;
+    background: linear-gradient(180deg, rgba(200,155,75,0.05), rgba(251,250,246,0) 40%), var(--eggshell); }
+  /* the band runs to ink and the footer starts immediately, so the footer's own
+     top margin was showing the body cream through as a strip */
+  .brief + footer.foot { margin-top: 0; }
+  .brief-sprig { position: absolute; top: 34px; width: 50px; height: 96px; opacity: 0.32;
     pointer-events: none; z-index: 0; }
-  .brief-sprig.left  { left:  max(10px, calc(50% - 632px)); }
-  .brief-sprig.right { right: max(10px, calc(50% - 632px)); transform: scaleX(-1); }
+  .brief-sprig.left  { left:  max(8px, calc(50% - 636px)); }
+  .brief-sprig.right { right: max(8px, calc(50% - 636px)); transform: scaleX(-1); }
   .brief-sprig canvas { width: 100%; height: 100%; display: block; }
-  @media (max-width: 1180px){ .brief-sprig { display: none; } }
+  @media (max-width: 1240px){ .brief-sprig { display: none; } }
   .brief .wrap { position: relative; z-index: 1; }
 
   .kf { margin: 0; }
   .kf .icp { margin-bottom: 16px; }
-  .kf h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 52px;
-    line-height: 1.04; margin: 0 0 14px; -webkit-text-stroke: 1.5px currentColor; max-width: 15ch; }
+  .kf h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 54px;
+    line-height: 1.02; margin: 0 0 16px; -webkit-text-stroke: 1.5px currentColor; max-width: 14ch; }
   .kf-lead { font-family: 'Literata', Georgia, serif; font-size: 17px; line-height: 1.68;
-    color: var(--umber); margin: 0 0 8px; max-width: 54ch; }
+    color: var(--umber); margin: 0; max-width: 52ch; }
 
-  .kf-bands { margin-top: 52px; }
-  /* the thread: identical gradient to the chapter seam's unstitched run */
-  .kf-band { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 0 54px;
-    padding: 42px 0; border-top: 2px solid transparent;
-    border-image: repeating-linear-gradient(90deg, rgba(110,101,84,0.34) 0 3px, transparent 3px 9px) 2; }
-  .kf-band:last-child { padding-bottom: 6px; }
+  /* Collapsed, this section is a title and one control, so it sits as a single row
+     instead of a full band. The long content still opens full width beneath it. */
+  .brief .kf { display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 56px; align-items: end; }
+  .brief .kf > .icp  { grid-column: 1; grid-row: 1; margin-bottom: 10px; }
+  .brief .kf > h2    { grid-column: 1; grid-row: 2; font-size: 42px; max-width: 15ch;
+    -webkit-text-stroke: 1.2px currentColor; margin-bottom: 13px; }
+  .brief .kf-lead    { grid-column: 1; grid-row: 3; font-size: 16.5px; max-width: 48ch; }
+  /* the wrapper's box is dropped so the button and the body can sit in the grid */
+  .brief .kf-more    { display: contents; }
+  .brief .tx-more    { grid-column: 2; grid-row: 3; align-self: end; }
+  .brief .tx-body    { grid-column: 1 / -1; grid-row: 4; }
+  @media (max-width: 900px){
+    .brief .kf { display: block; }
+    .brief .tx-more { margin-top: 26px; }
+  }
 
-  .kf-rail { position: sticky; top: 108px; align-self: start; }
-  .kf-num { display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
-    color: var(--wheat); margin-bottom: 10px; }
-  .kf-rail h3 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 30px;
-    line-height: 1.05; margin: 0; color: var(--ink); }
+  /* the thread */
+  .kf-bands { position: relative; margin-top: 66px; padding-left: 92px; }
+  .kf-bands::before { content: ""; position: absolute; left: 26px; top: 10px; bottom: 34px; width: 2px;
+    background: repeating-linear-gradient(180deg, rgba(110,101,84,0.34) 0 3px, transparent 3px 9px); }
+  /* stitching already run, drawn behind the numerals */
+  .kf-bands::after { content: ""; position: absolute; left: 26px; top: 10px; height: 34%; width: 2px;
+    background: repeating-linear-gradient(180deg, var(--wheat) 0 7px, transparent 7px 12px); }
 
-  .kf-facts { margin: 0; display: grid; gap: 30px; }
+  .kf-band { position: relative; display: grid; grid-template-columns: 188px minmax(0, 1fr);
+    gap: 0 56px; padding: 52px 0; }
+  .kf-band:first-child { padding-top: 6px; }
+  .kf-band + .kf-band { border-top: 1px solid var(--hairline); }
+  /* knot on the thread, level with its numeral */
+  .kf-band::before { content: ""; position: absolute; left: -71px; top: 60px; width: 11px; height: 11px;
+    border-radius: 50%; background: var(--eggshell); border: 2px solid var(--wheat); z-index: 2; }
+  .kf-band:first-child::before { top: 14px; }
+
+  .kf-rail { position: sticky; top: 116px; align-self: start; }
+  .kf-num { display: block; font-family: 'Olivera', var(--font-display); font-weight: 700;
+    font-size: 76px; line-height: 0.82; color: transparent;
+    -webkit-text-stroke: 1.4px var(--wheat); margin: 0 0 14px -4px; }
+  .kf-rail h3 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 29px;
+    line-height: 1.04; margin: 0; color: var(--ink); }
+
+  .kf-facts { margin: 0; display: grid; gap: 28px; }
   .kf-facts dt { font-family: var(--font-mono); font-size: 10px; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin: 0 0 8px; }
-  .kf-facts dd { font-family: 'Literata', Georgia, serif; font-size: 16.5px; line-height: 1.74;
-    color: var(--ink); margin: 0; max-width: 66ch; }
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin: 0 0 7px; }
+  .kf-facts dd { font-family: 'Literata', Georgia, serif; font-size: 16.5px; line-height: 1.72;
+    color: var(--ink); margin: 0; max-width: 62ch; }
 
   @media (max-width: 900px){
-    .kf-band { grid-template-columns: 1fr; gap: 0; padding: 32px 0; }
-    .kf-rail { position: static; margin-bottom: 24px; display: flex; align-items: baseline; gap: 12px; }
-    .kf-num { margin-bottom: 0; }
+    .kf-bands { padding-left: 46px; margin-top: 44px; }
+    .kf-bands::before, .kf-bands::after { left: 12px; }
+    .kf-band { grid-template-columns: 1fr; gap: 0; padding: 34px 0; }
+    .kf-band::before { left: -39px; top: 40px; }
+    .kf-band:first-child::before { top: 8px; }
+    .kf-rail { position: static; margin-bottom: 22px; }
+    .kf-num { font-size: 54px; margin-bottom: 8px; }
   }
   @media (max-width: 760px){
-    .brief { padding: 56px 0 60px; }
-    .kf h2 { font-size: 32px; -webkit-text-stroke: 0.9px currentColor; }
+    .brief { padding: 26px 0 30px; }
+    .kf h2 { font-size: 33px; -webkit-text-stroke: 0.9px currentColor; }
     .kf-lead { font-size: 16px; }
-    .kf-bands { margin-top: 34px; }
     .kf-rail h3 { font-size: 24px; }
-    .kf-facts { gap: 24px; }
+    .kf-facts { gap: 22px; }
     .kf-facts dd { font-size: 16px; }
   }
 
   /* ---------- VSL transcript: the pitch as indexable, quotable text ---------- */
-  .tx { position: relative; padding: 62px 0 78px; border-top: 1px solid var(--hairline);
-    background: linear-gradient(180deg, rgba(254,253,250,0.5), rgba(251,250,246,0)); }
-  .tx-inner { max-width: 748px; margin: 0 auto; }
-  .tx .icp { margin-bottom: 14px; }
-  .tx h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 38px;
-    line-height: 1.12; margin: 0 0 10px; -webkit-text-stroke: 1px currentColor; }
-  .tx .tx-lead { font-family: 'Literata', Georgia, serif; font-size: 17px; line-height: 1.7;
-    color: var(--umber); margin: 0 0 34px; }
-  .tx h3 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 23px;
-    line-height: 1.25; color: var(--ink); margin: 36px 0 11px; }
-  .tx p { font-family: 'Literata', Georgia, serif; font-size: 16.5px; line-height: 1.78;
-    color: var(--umber); margin: 0 0 15px; }
-  @media (max-width: 760px){
-    .tx { padding: 44px 0 56px; }
-    .tx h2 { font-size: 29px; -webkit-text-stroke: 0.8px currentColor; }
-    .tx h3 { font-size: 20px; margin: 28px 0 9px; }
-    .tx p { font-size: 16px; }
-  }
-
-
-  /* Transcript is clipped on phones rather than hidden. Google indexes the mobile
-     rendering (Search Console reports "Crawled as: Googlebot smartphone"), so
-     display:none here would hide it from the crawler that decides the ranking.
-     Clipping keeps every word rendered, in the DOM and in the layout. */
-  /* Collapsed to a single line so the form reads as the final section. Kept as a
-     disclosure rather than hidden outright: text withheld from every human but served
-     to crawlers is what Google treats as cloaking, and 4,000 words is a lot to hide. */
-  .tx { padding: 58px 0 62px; }
-  .tx .icp, .tx h2, .tx .tx-lead { display: none; }
+  /* the transcript now closes the brief, where the lead already points at it, rather
+     than sitting orphaned in a band of its own before the footer */
+  /* the whole breakdown, plus the transcript, sits behind one control. The page
+     ends at the form; this is for the reader who wants the long version. */
+  .kf-more { margin-top: 40px; padding-top: 32px; border-top: 2px solid transparent;
+    border-image: repeating-linear-gradient(90deg, rgba(110,101,84,0.34) 0 3px, transparent 3px 9px) 2; }
+  .tx-body .kf-bands { margin-top: 54px; }
+  .tx-lede { margin: 62px 0 0; }
   .tx-body { max-height: 0; overflow: hidden; position: relative;
     -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
             mask-image: linear-gradient(180deg, #000 55%, transparent 100%); }
   .tx-body[data-open="true"] { max-height: none; -webkit-mask-image: none; mask-image: none; }
-  .tx-more { display: inline-flex; align-items: center; gap: 8px; margin-top: 0;
+  .tx-body h3 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 22px;
+    line-height: 1.22; color: var(--ink); margin: 34px 0 10px; }
+  .tx-body p { font-family: 'Literata', Georgia, serif; font-size: 16px; line-height: 1.76;
+    color: var(--umber); margin: 0 0 14px; max-width: 68ch; }
+  .tx-more { display: inline-flex; align-items: center; gap: 8px; margin: 0;
     padding: 12px 22px; cursor: pointer; background: transparent;
     border: 1px solid var(--hairline); border-radius: var(--r-panel);
     font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
     letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
   .tx-more:hover { color: var(--ink); border-color: var(--wheat); }
+  .tx-more-c { flex: none; transition: transform 260ms var(--ease-out); }
+  .tx-more[aria-expanded="true"] .tx-more-c { transform: rotate(180deg); }
   .tx-more:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
-  .tx-body[data-open="true"] ~ .tx-more, .tx-more { margin-top: 0; }
+  @media (max-width: 760px){
+    .kf-more { margin-top: 34px; padding-top: 26px; }
+    .tx-body h3 { font-size: 20px; }
+  }
 
 
+
+  /* ---------- the brief runs dark ----------
+     The page is cream from the hero to the footer. This band is the one place it
+     goes to ink, which separates the long-form content from the pitch above it and
+     gives the footer something to sit against. Scoped entirely to .brief. */
+  .brief { background: linear-gradient(180deg, rgba(200,155,75,0.10), rgba(30,25,18,0) 34%),
+                       linear-gradient(180deg, #241E17 0%, #1A1610 60%, #1F1A13 100%);
+    border-top: 1px solid rgba(240,234,221,0.13); }
+  /* the same faceted crystal the hero runs, held right down and faded out below the
+     band so it does not have to stretch when the transcript opens */
+  .brief-crystal { position: absolute; left: 0; right: 0; top: 0; height: 430px;
+    z-index: 0; pointer-events: none;
+    -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+            mask-image: linear-gradient(180deg, #000 62%, transparent 100%); }
+  .brief .icp { color: rgba(238,232,219,0.6); }
+  .brief .icp .rule { background: rgba(238,232,219,0.26); }
+  .brief .kf > h2 { color: #FBF8F1; }
+  .brief .kf-lead { color: rgba(238,232,219,0.72); }
+
+  .brief .tx-more { border-color: rgba(240,208,148,0.34); color: rgba(238,232,219,0.82); }
+  .brief .tx-more:hover { border-color: var(--wheat); color: #FBF8F1; }
+
+  .brief .tx-body h3 { color: #FBF8F1; }
+  .brief .tx-body p  { color: rgba(238,232,219,0.7); }
+
+  /* the thread, its knots and the rules between bands */
+  .brief .kf-bands::before { background: repeating-linear-gradient(180deg,
+    rgba(238,232,219,0.28) 0 3px, transparent 3px 9px); }
+  .brief .kf-band + .kf-band { border-top-color: rgba(238,232,219,0.14); }
+  .brief .kf-band::before { background: #1D1811; }
+  .brief .kf-rail h3 { color: #FBF8F1; }
+  .brief .kf-facts dt { color: #D9926C; }
+  .brief .kf-facts dd { color: rgba(238,232,219,0.78); }
+  .brief .kf-more { border-image: repeating-linear-gradient(90deg,
+    rgba(238,232,219,0.3) 0 3px, transparent 3px 9px) 2; }
+
+  /* the stitching is drawn in dark thread, so it is flipped to read on the dark ground */
+  .brief-sprig canvas { filter: invert(1) hue-rotate(180deg) brightness(1.08); }
+  .brief-sprig { opacity: 0.4; }
+  .brief .kf-band canvas { filter: invert(1) hue-rotate(180deg) brightness(1.08); }
 
   /* inline booking calendar: below the form, and framed so it reads as the alternative
      rather than a second primary CTA */
   /* Cal needs roughly 900px to lay out details-left / calendar-right. At 720 it
      collapsed into one very tall column, so the container runs the full measure. */
-  .plan-book { margin: 52px auto 0; max-width: 100%; }
+  .plan-book { position: relative; z-index: 4; margin: 52px auto 0; max-width: 100%; }
   .plan-book-head { display: flex; align-items: center; justify-content: center; gap: 12px;
     margin-bottom: 12px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
     letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
   .plan-book-head .rule { height: 1px; flex: 1; max-width: 90px; background: var(--hairline); }
   .plan-book-lead { text-align: center; font-family: 'Literata', Georgia, serif;
-    font-size: 15.5px; line-height: 1.65; color: var(--umber); margin: 0 auto 22px; max-width: 56ch; }
+    font-size: 15.5px; line-height: 1.65; color: var(--umber); margin: 0 auto 22px; max-width: 84ch; }
   .plan-book-frame { background: var(--card); border: 1px solid var(--hairline);
     border-radius: var(--r-panel); padding: 6px; overflow: hidden;
     box-shadow: 0 18px 38px -30px rgba(38,33,25,0.5); }
@@ -916,6 +1082,151 @@ hr {
   .pf-book:hover { transform: translateY(-1px); }
   .pf-done .pf-book { margin-top: 26px; }
 
+
+  /* ---------- booking dock: a cut stone, dark, sat on the cream page ---------- */
+  .dock { position: fixed; right: 22px; bottom: 22px; z-index: 60; width: 336px;
+    /* The page's own paper. The silhouette does the gem work; the surface stays quiet.
+       No radiating wedges: a conic from a single point reads as a pinwheel, not a cut. */
+    background:
+      linear-gradient(160deg, #FEFDFA 0%, #F8F5EF 54%, #FCFAF6 100%);
+    border: 0; padding: 38px 30px 30px; color: var(--ink);
+    filter:
+      drop-shadow(0 24px 44px rgba(38,33,25,0.19))
+      drop-shadow(0 3px 8px rgba(38,33,25,0.10));
+    /* Sixteen sides and not one of them square to the page. Every edge is slanted,
+       every edge is a different length, and the widest point sits above centre on the
+       right and below centre on the left, so the outline cannot resolve as a rectangle
+       with the corners taken off. */
+    clip-path: polygon(
+      46px 6px,
+      calc(100% - 62px) 0,
+      calc(100% - 18px) 22px,
+      calc(100% - 3px) 74px,
+      100% 46%,
+      calc(100% - 9px) 63%,
+      calc(100% - 2px) 79%,
+      calc(100% - 14px) calc(100% - 34px),
+      calc(100% - 58px) calc(100% - 4px),
+      52px 100%,
+      14px calc(100% - 30px),
+      2px calc(100% - 72px),
+      0 57%,
+      10px 41%,
+      1px 30%,
+      5px 62px);
+    opacity: 0; transform: translateY(14px);
+    transition: opacity 460ms var(--ease-out), transform 520ms var(--ease-out); }
+  /* two planes, not ten. Light rakes across the stone from the upper right and the
+     lower left falls into shadow, which is the only place any colour lives. */
+  .dock::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      linear-gradient(232deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.34) 26%,
+                      rgba(255,255,255,0) 50%),
+      linear-gradient(52deg, rgba(146,134,176,0.13) 0%, rgba(146,134,176,0.04) 24%,
+                      rgba(146,134,176,0) 44%),
+      /* one seam where the two planes meet, and nothing else */
+      linear-gradient(146deg, transparent calc(52% - 0.7px), rgba(255,255,255,0.55) 52%,
+                      transparent calc(52% + 0.7px)); }
+  .dock > * { position: relative; z-index: 1; }
+  .dock .dock-thread { z-index: 2; }
+  .dock[hidden] { display: none; }
+  /* the girdle: a lit edge all the way round, brightest where the light comes from */
+  .dock::before { content: ""; position: absolute; inset: -1px; z-index: -1;
+    background: linear-gradient(150deg,
+      rgba(255,255,255,0.92) 0%, var(--hairline) 44%,
+      rgba(228,221,204,0.9) 70%, rgba(168,157,190,0.5) 100%);
+    clip-path: inherit; }
+  .dock[data-in="1"] { opacity: 1; transform: none; }
+  .dock-thread { position: absolute; left: 58px; right: 70px; top: 9px; height: 2px;
+    transform: rotate(-1.5deg); transform-origin: left center;
+    background: repeating-linear-gradient(90deg,
+      rgba(200,155,75,0.6) 0 7px, transparent 7px 12px); }
+  .dock-x { position: absolute; top: 26px; right: 20px; width: 24px; height: 24px; padding: 0;
+    display: grid; place-items: center; background: none; border: 0; cursor: pointer;
+    color: var(--umber); opacity: 0.5; transition: opacity var(--dur-fast) var(--ease-out); }
+  .dock-x svg { width: 13px; height: 13px; }
+  .dock-x:hover { opacity: 1; }
+
+  .dock-who { display: flex; align-items: center; gap: 11px; margin: 2px 0 16px; }
+  .dock-av { position: relative; flex: none; width: 42px; height: 42px; }
+  .dock-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;
+    border: 1px solid rgba(255,255,255,0.95); }
+  .dock-av i { position: absolute; right: 0; top: 1px; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--sage, #8A9068); border: 2px solid #FAF8F3; }
+  .dock-id { display: block; min-width: 0; }
+  .dock-id b { display: block; font-family: 'Literata', Georgia, serif; font-size: 15px;
+    font-weight: 600; color: var(--ink); line-height: 1.2; }
+  .dock-id em { display: block; font-family: var(--font-mono); font-style: normal; font-size: 10px;
+    letter-spacing: 0.05em; color: var(--umber); margin-top: 3px; }
+
+  .dock-head { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 21px;
+    letter-spacing: 0.02em; line-height: 1.14; color: var(--ink); margin: 0 0 8px; }
+  .dock-copy { font-family: 'Literata', Georgia, serif; font-size: 14px; line-height: 1.58;
+    color: var(--umber); margin: 0 0 16px; }
+
+  .dock-pick { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--umber); margin: 0 0 8px; }
+  .dock-days { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px; }
+  .dock-day { display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 9px 2px; cursor: pointer; background: rgba(255,255,255,0.55);
+    border: 1px solid var(--hairline); border-radius: 5px;
+    color: var(--umber);
+    transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out),
+                background var(--dur-fast) var(--ease-out); }
+  .dock-day .dow { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em;
+    text-transform: uppercase; }
+  .dock-day .dom { font-family: 'Literata', Georgia, serif; font-size: 15px; font-weight: 600;
+    color: var(--ink); line-height: 1.1; }
+  .dock-day:hover { border-color: var(--wheat); background: rgba(255,255,255,0.92);
+    color: var(--ink); }
+  .dock-day[aria-pressed="true"] { border-color: var(--wheat); background: rgba(200,155,75,0.09);
+    color: var(--ink); }
+
+  .dock-cta { display: flex; align-items: center; justify-content: center; gap: 9px;
+    width: 100%; box-sizing: border-box; text-align: center;
+    text-decoration: none; color: var(--eggshell);
+    background: linear-gradient(178deg, #332C22 0%, #262119 60%, #201C15 100%);
+    border-radius: 5px; padding: 13px 16px;
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+    transition: transform var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out); }
+  .dock-cta:hover { transform: translateY(-1px); filter: brightness(1.18); color: var(--eggshell); }
+  /* the handset is the same drawing language as the nav pill: hairline outline in the
+     button's own colour, wheat reserved for the detail that carries meaning */
+  .dock-cta-ico { width: 15px; height: 15px; flex: none; display: block; margin-top: -1px; }
+  .dock-cta:hover .dock-cta-ico { transform: rotate(-8deg); }
+  .dock-cta-ico { transition: transform var(--dur-fast) var(--ease-out); }
+  /* ---------- dismiss: the stone cracks from the point you hit, then breaks ---------- */
+  .dock-crack { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; }
+  .dock[data-shatter="1"] { transition: none; }
+  .dock[data-shatter="1"] .dock-crack { opacity: 1; }
+  .dock[data-shatter="1"] > *:not(.dock-crack) { opacity: 0; transition: opacity 130ms linear; }
+  .dock-crack path { stroke: #FFFDF8; stroke-width: 1.6; fill: none;
+    stroke-linecap: round; stroke-linejoin: round;
+    filter: drop-shadow(0 0 2.5px rgba(255,255,255,0.95))
+            drop-shadow(0 0 6px rgba(200,155,75,0.5));
+    stroke-dasharray: var(--len); stroke-dashoffset: var(--len);
+    animation: ah-crack 165ms cubic-bezier(0.3,0.9,0.4,1) var(--cd, 0ms) forwards; }
+  @keyframes ah-crack { to { stroke-dashoffset: 0; } }
+
+  .dock-shatter { position: fixed; z-index: 61; pointer-events: none; }
+  .dock-shatter .shard { position: absolute; inset: 0; will-change: transform, opacity;
+    animation: ah-shard 640ms cubic-bezier(0.17,0.72,0.3,1) var(--delay, 0ms) forwards; }
+  .dock-shatter .shard-face { position: absolute; inset: 0;
+    filter: drop-shadow(0 1px 2px rgba(38,33,25,0.22)); }
+  @keyframes ah-shard {
+    0%   { transform: translate3d(0,0,0) rotate(0deg); opacity: 1; }
+    14%  { transform: translate3d(calc(var(--tx) * 0.05), calc(var(--ty) * 0.05), 0)
+                     rotate(calc(var(--rot) * 0.07)); opacity: 1; }
+    100% { transform: translate3d(var(--tx), var(--ty), 0) rotate(var(--rot)) scale(0.93);
+           opacity: 0; } }
+  @media (prefers-reduced-motion: reduce){
+    .dock-crack, .dock-shatter { display: none !important; } }
+
+  @media (max-width: 900px){ .dock { display: none !important; } }
+  @media (prefers-reduced-motion: reduce){ .dock { transition: opacity 200ms linear; transform: none; } }
+
   /* ---------- refined closing footer ---------- */
   footer.foot { position: relative; margin-top: 46px; border-top: 1px solid var(--hairline); background: linear-gradient(180deg, #FFFEFB, #FCFAF4); background-image: url("assets/asset-14.svg"), url("assets/asset-15.svg"); background-size: 200px 200px, 26px 26px; padding: 46px 0 40px; overflow: hidden; }
   footer.foot::before { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 130% at 88% 0%, rgba(232,161,0,0.06), transparent 62%); pointer-events: none; }
@@ -927,6 +1238,10 @@ hr {
   .foot-sprig { position: relative; flex: none; align-self: flex-end; line-height: 0; filter: drop-shadow(0 3px 6px rgba(38,33,25,0.14)); }
   .foot-id .wm2 { height: 35px; width: auto; display: block; }
   .foot-id .tag { font-family: 'Olivera', var(--font-display); font-style: italic; font-size: 15px; color: var(--wheat); margin: 9px 0 0; }
+  /* the founder credit is a real entity signal, so it stays in the HTML, but quiet */
+  .foot-id .tag.founders { font-family: 'Literata', Georgia, serif; font-style: normal;
+    font-size: 12.5px; color: var(--umber); margin-top: 7px; }
+  .foot-id .tag.founders b { font-weight: 600; color: var(--ink); }
   .foot-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
   .foot-meta span, .foot-meta a { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--umber); text-decoration: none; }
   .foot-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--wheat); flex: none; }
@@ -982,7 +1297,7 @@ hr {
   }
 </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Done-for-you 3-day virtual launch events","serviceType":"3-day virtual event production and launch strategy","provider":{"@type":"Organization","name":"AfterHarvest","url":"https://www.theafterharvest.com/"},"areaServed":"Worldwide","audience":{"@type":"Audience","audienceType":"Course creators, coaches, educators and community builders with an existing email audience"},"description":"AfterHarvest plans, builds and runs the entire 3-day virtual event: offer strategy, funnels, registration pages, slides, email marketing and the live operation. $0 upfront, paid as a revenue share of what the launch collects.","offers":{"@type":"Offer","priceCurrency":"USD","price":"0","description":"$0 upfront. AfterHarvest is paid a revenue share of what the launch collects, with a revenue floor agreed in writing before the work begins."}}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does a 3-day virtual event cost?","acceptedAnswer":{"@type":"Answer","text":"There is $0 upfront. AfterHarvest is paid a revenue share of what the launch collects. There is an activation fee in week two which is credited against that revenue share, and it is refunded if the launch does not reach the agreed floor."}},{"@type":"Question","name":"What happens if the launch does not work?","acceptedAnswer":{"@type":"Answer","text":"Before signing, AfterHarvest models your list, your offer and your numbers, and puts a revenue floor in writing. If the launch comes in under that floor you owe no revenue share and the activation fee is refunded."}},{"@type":"Question","name":"Who is a 3-day virtual event not right for?","acceptedAnswer":{"@type":"Answer","text":"It does not work if your audience is no longer active, since an event concentrates an existing audience relationship rather than creating one. It also fails when the wrong topic or offer is chosen, or when the owner is unwilling to increase email frequency during the launch window."}},{"@type":"Question","name":"How much of my time does it take?","acceptedAnswer":{"@type":"Answer","text":"Roughly 15 to 20 hours across about six weeks. AfterHarvest builds and strategises the event; you approve the work, review it, record what is needed and teach live during the three days."}},{"@type":"Question","name":"Do I need cold ads or new leads?","acceptedAnswer":{"@type":"Answer","text":"No. A 3-day virtual event sells to the audience you already have using a different conversion mechanism, rather than buying new traffic."}},{"@type":"Question","name":"Can I run 3-day events more than once a year?","acceptedAnswer":{"@type":"Answer","text":"Yes. They are designed to run quarterly. The first event takes the most work because the engine is being built; subsequent events reuse that engine and take considerably less."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does a 3-day virtual event cost?","acceptedAnswer":{"@type":"Answer","text":"There is $0 upfront. AfterHarvest is paid a revenue share of what the launch collects. There is an activation fee in week two which is credited against that revenue share, and it is refunded if the launch does not reach the agreed floor."}},{"@type":"Question","name":"What happens if the launch does not work?","acceptedAnswer":{"@type":"Answer","text":"Before signing, AfterHarvest models your list, your offer and your numbers, and puts a revenue floor in writing. If the launch comes in under that floor you owe no revenue share and the activation fee is refunded."}},{"@type":"Question","name":"Who is a 3-day virtual event not right for?","acceptedAnswer":{"@type":"Answer","text":"It does not work if your audience is no longer active, since an event concentrates an existing audience relationship rather than creating one. It also fails when the wrong topic or offer is chosen, or when the owner is unwilling to increase email frequency during the launch window."}},{"@type":"Question","name":"How much of my time does it take?","acceptedAnswer":{"@type":"Answer","text":"Roughly 15 to 20 hours across about six weeks. AfterHarvest builds and strategises the event; you approve the work, review it, record what is needed and teach live during the three days."}},{"@type":"Question","name":"Who founded AfterHarvest?","acceptedAnswer":{"@type":"Answer","text":"AfterHarvest was co-founded by Theia Ahmadi and Sean Canela. Sean writes the launch plans himself and runs the strategy calls."}},{"@type":"Question","name":"Do I need cold ads or new leads?","acceptedAnswer":{"@type":"Answer","text":"No. A 3-day virtual event sells to the audience you already have using a different conversion mechanism, rather than buying new traffic."}},{"@type":"Question","name":"Can I run 3-day events more than once a year?","acceptedAnswer":{"@type":"Answer","text":"Yes. They are designed to run quarterly. The first event takes the most work because the engine is being built; subsequent events reuse that engine and take considerably less."}}]}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How AfterHarvest runs a 3-day virtual launch event","description":"The week-by-week process AfterHarvest follows to build and run a 3-day virtual launch event for a course creator, from build through the live event and payment on results.","totalTime":"P8W","estimatedCost":{"@type":"MonetaryAmount","currency":"USD","value":"0","description":"$0 upfront. Paid as a revenue share of what the launch collects."},"supply":[{"@type":"HowToSupply","name":"An active email audience"},{"@type":"HowToSupply","name":"A paid offer, or an offer to be created for the event"}],"step":[{"@type":"HowToStep","position":1,"name":"Weeks 1 to 2: build the funnel","text":"AfterHarvest builds the full 3-day event funnel within 14 days. A two-week walk-away guarantee applies: if the client does not want to continue at that point they can leave with no strings attached, written into the contract."},{"@type":"HowToStep","position":2,"name":"Week 2: activation","text":"An activation fee is charged once two weeks of real work has been delivered. It is credited against the final revenue share, and refunded in full if the launch does not reach the agreed revenue floor."},{"@type":"HowToStep","position":3,"name":"Weeks 4 to 5: pre-marketing","text":"The pre-marketing push begins. Emails go out announcing the event and driving live registrations from the existing audience. No cold advertising is used."},{"@type":"HowToStep","position":4,"name":"Week 8: run the event live","text":"The event runs live across three consecutive days. The host teaches and answers questions live, with the offer typically sold on the second day."},{"@type":"HowToStep","position":5,"name":"After the event: post-event selling and payment","text":"Roughly five days of post-event selling follow. AfterHarvest is then paid a revenue share of what the launch collected, 20% for lists above 25,000 subscribers and 25% below that, less the activation fee already paid."}]}</script>
 </head>
 <body>
@@ -1103,21 +1418,35 @@ hr {
 
   <!-- ============ FILLOUT INLINE FORM ============ -->
   <section class="plan" id="plan-form">
-    <div class="plan-art left"></div>
-    <div class="plan-art right"></div>
     <div class="plan-cast left"><img src="assets/asset-3.png" alt="Cross-stitch scarecrow illustration standing beside the AfterHarvest 3-day virtual event application form"></div>
     <div class="plan-cast right"><img src="assets/asset-2.png" alt="Cross-stitch scarecrow illustration marking the AfterHarvest launch event plan request"></div>
+    <div class="plan-art left"></div>
+    <div class="plan-art right"></div>
     <div class="wrap">
       <div class="plan-slot">
         <div class="plan-head">
           <div class="icp"><span class="rule"></span> Application <span class="rule"></span></div>
           <h2>Want a free 3-day live event <em>plan</em>?</h2>
-          <p>Interested if 3-day virtual events / webinars will work for you specifically? We’ll make you a mockup plan around your own offer, numbers, and audience. Answer the questions below. Takes ~5 minutes, and the AfterHarvest team will send you the plan in 24–48 hours.</p>
+          <p>Interested if 3-day virtual events / webinars will work for you specifically? We’ll make you a mockup plan around your own offer, numbers, and audience. Answer the questions below. Takes ~5 minutes, and <em>the AfterHarvest team will send you the plan in 24–48 hours</em>.</p>
         </div>
         <!-- ===== PLAN FORM (own build, replaces Fillout) =====
              Screens + copy live in the SCREENS array in the script at the end of this file.
              Set ENDPOINT there to your Apps Script URL. See FORM-BACKEND.md. -->
+        <div class="pf-stage">
+        <div class="pk" data-slot="a" data-out="0" aria-hidden="true">
+          <img class="pk-fig" src="assets/ah-peek-1.svg" alt="" width="540" height="1008" loading="lazy">
+        </div>
+        <div class="pk" data-slot="b" data-out="0" aria-hidden="true">
+          <img class="pk-fig" src="assets/ah-peek-2.svg" alt="" width="540" height="1008" loading="lazy">
+        </div>
+        <div class="pk" data-slot="c" data-out="0" aria-hidden="true">
+          <img class="pk-fig" src="assets/ah-peek-4.svg" alt="" width="540" height="1008" loading="lazy">
+        </div>
+        <div class="pk-say" data-slot="a" aria-hidden="true"></div>
+        <div class="pk-say" data-slot="b" aria-hidden="true"></div>
+        <div class="pk-say" data-slot="c" aria-hidden="true"></div>
         <div class="pf" id="plan-form-app"></div>
+        </div>
 
       </div>
 
@@ -1126,12 +1455,12 @@ hr {
       <div class="plan-book">
         <div class="plan-book-head">
           <span class="rule"></span>
-          <span>or skip the plan and just talk</span>
+          <span>or just book a call</span>
           <span class="rule"></span>
         </div>
-        <p class="plan-book-lead">Already sure a 3-day event is right for you? Pick a time and
-          we'll go through it live. Answering the form first means we arrive with a plan already
-          built for your offer.</p>
+        <p class="plan-book-lead">Already know you want to run one? Grab a time. Thirty minutes,
+          and you&#x27;ll leave with the shape of your event and the revenue floor we&#x27;d put in
+          writing.</p>
         <div class="plan-book-frame">
           <div id="cal-3-day-event"></div>
         </div>
@@ -1145,15 +1474,24 @@ hr {
        column the three panels were 223px each, which is what made it read as a strip
        rather than a section. -->
   <section class="brief" id="in-brief" data-screen-label="04 In brief">
+    <canvas class="brief-crystal" aria-hidden="true"></canvas>
     <div class="brief-sprig left" aria-hidden="true"></div>
     <div class="brief-sprig right" aria-hidden="true"></div>
     <div class="wrap">
       <div class="kf">
-        <div class="icp"><span class="rule"></span> In brief <span class="rule"></span></div>
+        <div class="icp"><span class="rule"></span> The short version <span class="rule"></span></div>
         <h2>3-day virtual events, in brief</h2>
-        <p class="kf-lead">The format, the work and the money, stated plainly. Everything below
-          is covered at length in the video and in the transcript.</p>
+        <p class="kf-lead">What it is, who it works for, what we build, and how we get paid.
+          The whole video is written out down there too, word for word.</p>
 
+        <div class="kf-more">
+          <button class="tx-more" id="tx-more" type="button" aria-expanded="false" aria-controls="tx-body">
+            <span class="tx-more-t">Read the full breakdown and transcript</span>
+            <svg class="tx-more-c" viewBox="0 0 12 8" width="11" height="7" fill="none" aria-hidden="true">
+              <path d="M1 1.5 6 6.5 11 1.5" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="tx-body" id="tx-body">
         <div class="kf-bands">
 
           <section class="kf-band">
@@ -1220,121 +1558,108 @@ hr {
           </section>
 
         </div>
+
+            <div class="icp tx-lede"><span class="rule"></span> Full transcript <span class="rule"></span></div>
+          <h3>The Offer in 60 Seconds</h3>
+          <p>So if you&#x27;re watching this video so whether you watch the video on our email or not you can watch this video instead to learn exactly what it is we do (in detail) so your next launch is probably already half planned you know you have a bunch of stuff coming up you have launches coming up</p>
+          <p>You have course launches coming up you have plans for YouTube a bunch of stuff this is not for like replacing any of your existing stuff or like breaking any of that instead but your friends probably already are so in the next 60 seconds</p>
+          <h3>Why We Emailed You</h3>
+          <p>I&#x27;m going to tell you exactly 3 things so this is probably you right now but lately you&#x27;ve been seeing all of these other people run these 3-day events we run AfterHarvest to help you specifically with 3-day virtual events alright so usually you have a bunch of agencies who run these 3 day events</p>
+          <p>But on top of that they also run other stuff for their clients so we&#x27;re not that instead so in terms of like what we do I&#x27;m not going to bore you by like telling you every single thing here but we basically at a high level run all of these things you know we run the entire</p>
+          <p>3-day event infrastructure all of these things as you can see here and these are some of the actual work that we have generated for people when it comes to like the funnels and the slides and you know we don&#x27;t only work on that we also work on strategy and pretty much everything you know the live operation</p>
+          <p>All that jazz so for the pricing of our offer we charge $0 upfront yes you heard that right and at this point this probably sounds a little too good to be true how our pricing works is we only ask for a small revenue share after the launch that&#x27;s our offer and if you think about it logically</p>
+          <p>We also have two guarantees here that people have been telling us and at the end of this video I&#x27;ll basically reveal those two guarantees to you um nothing major is like broken or terrible from the looks of it from your funnels maybe you haven&#x27;t ran them yourself but you&#x27;ve for sure heard other people run them</p>
+          <p>So you&#x27;re not completely new to this concept in fact you&#x27;ve probably already considered running one so first if you&#x27;re watching this and want to find out if 3-day event is for you</p>
+          <h3>Why 3-Day Live Events Work</h3>
+          <p>Then this is for you that&#x27;s why we are here that&#x27;s why three day events work so well so they fix all of those problems you know it lets people watch you teach your most valuable content in like a concentrated 3 day format so they don&#x27;t have to spend weeks watching your content they can ask questions with you live</p>
+          <p>Directly on that event they can see objections answered because other people also ask questions live and they can in general see people buy and connect with you in real time and that&#x27;s something that you know like a normal YouTube video cannot replace here&#x27;s the thing a three day event doesn&#x27;t necessarily give you new leads</p>
+          <p>You know it just adds another way for the same audience to buy and often times you&#x27;ll find that you have a hidden gold mine sitting on top of what you have already built with your audience we just sold to the same audience using a different conversion mechanism which is a 3 day virtual event</p>
+          <p>We ran no cold ads and you know a 3 day event for her converted around 4x more which is um</p>
+          <h3>This Won&#x27;t Work If</h3>
+          <p>Quite insane if you think about it that said 3 day events are definitely not for everyone you know so here&#x27;s the three biggest reasons that make 3 day events fail especially if you&#x27;re the wrong type of person because I don&#x27;t want to keep selling you this if it will not work for you</p>
+          <p>In the first place so reason one on why</p>
+          <h3>Why Your List Isn&#x27;t Buying</h3>
+          <p>3 day events could fail is probably because your audience is no longer active and this is one of the biggest reasons on why they fail in general so a big list here doesn&#x27;t automatically mean that it&#x27;s valuable recent launches and buyer behavior matter you know like if your business is affiliate driven then that does</p>
+          <p>Not automatically mean that your own list can carry the event right so you need to have like a good audience in summary so a three day event can concentrate an active good audience relationship it cannot recreate one that is already gone alright so reason 2 on why</p>
+          <h3>Choosing the Right Topic and Offer</h3>
+          <p>It won&#x27;t probably work for you so it won&#x27;t work if the wrong topic or offer is chosen and I see so many people running these events who just think about like the small things like they keep running the tag they keep running like obsessing about the metrics which is good we also do that</p>
+          <p>But they end up missing the big picture which is like the topic you choose or the offer you choose because this is the most important thing if you want to make one perform well so we&#x27;re not one of those normal operators or like agencies who only brute force like the building part of an event</p>
+          <p>We also brute force and really think about hard the strategizing part of the event right we continuously study how other creators and like other operators in the space run these three day events because the strategizing bit you know thinking of the big picture is the most important thing and then follows the small picture stuff right</p>
+          <h3>Sending More Email Without Burning Your List</h3>
+          <p>So so no you know emails go out late you skip emails you don&#x27;t follow it because you&#x27;re scared to like promote more which is fine by the way but ideally for an event this big you need to go out of like your normal comfort zone when it comes to sending more emails and potentially do more now</p>
+          <p>If your objection is like you&#x27;re scared to burn out your audience here&#x27;s the thing we don&#x27;t overmarket we don&#x27;t spam bad emails instead we bump up the email frequency a little bit and then push that out and they&#x27;re actually good emails that we write you just have to send them out but if none of those</p>
+          <p>Sound like any of your problems or anything that you will come up like you have a good audience you&#x27;re open to marketing more and you&#x27;re open to having you know us strategize for you on a three day virtual event then you can then try out one of the fastest growing launch vehicles lately</p>
+          <p>Which is the 3-day virtual event and it helped one of our clients here Jay Clouse hit his biggest launch ever after 9 years with a 3-day virtual event this guy&#x27;s already doing well a 3-day event just helped him crack BIGGER months right if you&#x27;re already set on this entire thing you don&#x27;t need to finish this video</p>
+          <p>Because there&#x27;s a few minutes more of me yapping here so you can click the application below and answering it actually gets you a free launch plan we&#x27;ll build you out a</p>
+          <h3>A Quarterly Revenue Engine</h3>
+          <p>Free launch plan for the 3-day event so here&#x27;s the thing a 3 day event doesn&#x27;t aim to replace any of your existing launches it just plugs a hole that your business is potentially missing right what your business is missing is a big validated revenue engine that you run quarterly because you probably already run monthly launches</p>
+          <p>Maybe you run launches every two months but you&#x27;re missing something that you run quarterly like big events that you run recurring so this is what a 3-day event aims to give you so instead of doing like a normal massive waitlist for an offer with a very long build up only for you to like sell them with a normal sales page</p>
+          <p>A few promo emails maybe give them a few discounts a few bonuses instead of just doing that same old thing you can instead run the most validated format I just told you about a 3-day event and actually get people to join an actual event and actually get people to join an actual event</p>
+          <p>And not just you know a normal email promo because that it still works like the normal email promo it still works don&#x27;t get me wrong but it tends to dry up now for a bunch of creators because it&#x27;s kind of overused right and you can run them four times a year without burning out your audience</p>
+          <p>And I&#x27;m not going to tell you that it&#x27;s not a lot of work it is a lot of work but only the first launch because the third launch the fourth launch fifth launch and however many you wanna run this for it doesn&#x27;t take as much work because you&#x27;ve already built the engine on the first one</p>
+          <p>And that&#x27;s kind of why we&#x27;re here you know we&#x27;re giving you the stuff to run the first one so when you do want to run it again you don&#x27;t have to think about building stuff from scratch right so this quarterly machine might possibly become your biggest revenue channel con converts buyers that you&#x27;re now launching</p>
+          <p>Scant and needs really $0 in cold ads so it gets built to run and managed for you because we&#x27;re here see every time that you run a typical typical launch the amount of people that buy in contrast to your audience size kind of looks like this so machine one this is you running</p>
+          <p>A normal email promo and let&#x27;s say this entire thing is like your email list so when you run one you get these people which are buyers which is fine you get quite a lot of people there but on machine 2 which is a three day event if you run the event and get this much</p>
+          <p>People interested</p>
+          <h3>Client Results</h3>
+          <p>And can sell this much people with different offers one of our clients Bailey Vann had her BIGGEST MONTH ever with us after running a 3 day virtual event for your information before we continue her launches were already working before she came to us you know she made like 10 to 15 students per launch</p>
+          <p>Around $20k because it was high ticket and after coming to us and selling the same offer but using a different launch vehicle like a 3-day virtual event she was able to get these results which is $120,000+ this was the person that I told you about who um we converted like a quarter of our email list</p>
+          <p>To join the three day event alright so this wasn&#x27;t luck either we tried it again and broke through another $100,000+ launch on our second launch with her using a three day event because she wanted to test like the hypothesis and we kind of also did if this will burn out her audience on the second month</p>
+          <p>So it didn&#x27;t end up burning out her audience instead it generated another six figure launch for her and this was all without cold ads selling to the same audience as you can see here so now I&#x27;m going to say a bold statement with running 3-day virtual events now obviously I&#x27;m not going to go ahead and</p>
+          <p>Continue this by telling you you&#x27;ll also have your biggest launch ever because we cannot talk about the future like what it is but instead if this has been working so well then I am quite positive that if you are the right type of person within the right conditions then and you have a</p>
+          <p>Pretty good chance of having one of if not your biggest launches using a 3-day virtual event and no here&#x27;s the thing these summits</p>
+          <h3>Running Them Quarterly</h3>
+          <p>Or like 3-day events are not just one time cash grabs you know you can run them quarterly maybe you run them January and then April November whatever and have multiple offers with your current revenue running in the back end so it&#x27;s really not just a quarterly thing um if you run one of these</p>
+          <p>If you run one of these you sometimes have evergreen offers running month by month so it generates you income all throughout the year and if you run it that way you actually won&#x27;t burn out people because it all happens in the back end for people who sign up to the summit itself I know I&#x27;m getting ahead of myself here</p>
+          <p>But this just proves a point that in your calendar if you were to run this it fits throughout the entire year you don&#x27;t have to think of a perfect time to plug these summits in</p>
+          <h3>Why You Haven&#x27;t Run One Yet</h3>
+          <p>So now that we&#x27;ve established that these summits work let me ask you a question so honestly your reasons are probably already valid you know you might have simply never heard of these summits or if you&#x27;re like most you&#x27;re familiar with these summits but you know that they take a bunch load of time to do</p>
+          <p>Right they take a lot of effort time to build all of the funnel slides everything and on top of that you have to think about how to run money you have to strategize on like a bunch of those stuff right you have to think about content tech automation registration pages email and obviously</p>
+          <p>Run the live operation itself a bunch of things you know and it is a headache if you think about it and this is months of work for a system and this is months of work for a system that you still have to learn the task yourself from scratch because if you haven&#x27;t run a three day event yourself</p>
+          <p>Trust me it takes a lot of work for running your first one or instead of like you doing this yourself</p>
+          <h3>What We Do Versus What You Do</h3>
+          <p>You can instead hire someone else to do it for you and help you strategize the entire thing yourself so here&#x27;s a list of things that you&#x27;ll do versus what we will do in terms of running this 3-day event so I&#x27;m not going to say every single thing here but we basically build and strategize and finish up everything</p>
+          <p>And optimize everything and the tasks that you only have to do is approve the tasks that we do I&#x27;m review them record obviously and then teach people live and so how this works in terms of time investment is you&#x27;ll only spend one um 15 to 20 hours in the span of like six weeks</p>
+          <p>For the above and for us we&#x27;ll spend up to like because building this takes a lot of time so that&#x27;s the contrast on like</p>
+          <h3>What Happens After You Say Yes</h3>
+          <p>What we&#x27;ll do and like what you&#x27;ll do alright so then from the moment you sign with us here&#x27;s how week by week looks like so first week up to the second week let&#x27;s talk about like the guarantee because at this point we&#x27;ll already start building stuff</p>
+          <h3>The Two-Week Walk-Away Guarantee</h3>
+          <p>So the first guarantee that we have is the two week walk away guarantee so we aim to build your entire funnel in 14 days if you don&#x27;t absolutely love the three day event engine that we have built then you can simply walk away with no strings attached so we&#x27;ll even sign a contract with this guarantee</p>
+          <p>So you have absolute control so in summary either we deliver well or this does not continue at all</p>
+          <h3>The Activation Fee, and How It Is Credited</h3>
+          <p>You know no questions asked so week 2 after that we have an activation fee so this is not margin for us it&#x27;s both side proving they&#x27;re serious like you&#x27;ve seen two weeks of real work by then we&#x27;d have given you the strategy and everything else and so we have bet two weeks of this on you</p>
+          <p>Now here&#x27;s the thing: you don&#x27;t have to pay this to us if we don&#x27;t end up making you money and here&#x27;s how this works so this means that you end if you end up making $100,000 with our launch our revenue share is 20 k since we do 20% if you remember and the $5,000</p>
+          <p>That you already paid comes off of that so after the launch finishes and all that you don&#x27;t have to pay us $20k you only pay us $15k because the $5K is already credited right so if we don&#x27;t end up hitting this floor we&#x27;ll refund the $5,000 to you completely so remember what I said</p>
+          <p>If we don&#x27;t end up making you money you don&#x27;t even have to technically pay us $5k because we&#x27;ll refund it to you right so we have this fee in general so we can hire great people and suffer without having to skimp on like the quality of the event alright so after that weeks 4 to 5 is the pre marketing push</p>
+          <p>So we start telling people that we have an event coming up I&#x27;m sure you&#x27;re already familiar with like that sort of marketing is the emails that will actually push live registrations for so people here will join the event sign up for the event and on week 8 is the actual event itself so you go live for three days</p>
+          <p>Typically sell on like the second day and then after that we have um like five days of postcard selling right so from there on we&#x27;re paid on results so 20% of what the launch collects is your email list is bigger than 25k subscribers subscribers then 25% if you&#x27;re below that but there are exceptions</p>
+          <p>We can talk about this if you if we want to change the revenue share here</p>
+          <h3>What You&#x27;re Guaranteed To Make</h3>
+          <p>Depending on your situation right now we can talk about that so here&#x27;s guarantee 2 and this is the big one so remember that risky is offering that I told you about at the start here&#x27;s what I meant so before we sign we model your lunch first so we model your list your offer</p>
+          <p>Your numbers and then after that we promise you a real number in writing like in a actual contract so the guarantee that we promise is half that number so if the lunch comes under it then you owe us nothing right you owe us no revenue share um we&#x27;ll refund you the 5,000 dollar fee earlier</p>
+          <p>No expenses nothing so if we don&#x27;t end up hitting the floor you make nothing I mean we make nothing so for example if we estimated that your launch size for this 3 day events around $200,000+ which is quite normal if you have around 30 to 40 k good people in your email list</p>
+          <p>And sell like a $1k/$2k offer then we guarantee that you&#x27;ll make at least 100 k with the launch so this is the absolute floor you know so if we don&#x27;t make $100k with the launch then we don&#x27;t end up making money ourselves so which means the money that we only really keep is the</p>
+          <p>Cut of the money that we made you so that&#x27;s why people tell us this is the riskiest part of our offer and we do agree this is a very risky offer but we are confident that this could work for you and that&#x27;s why we reached out to you if you&#x27;re watching this video</p>
+          <p>Or if you&#x27;re seeing this in the first place</p>
+          <h3>What We Build For You</h3>
+          <p>You do your part just follow the calendar review our work show up live in the floor holds so as for exactly what we&#x27;re building here&#x27;s what we&#x27;re going to handle so there&#x27;s a bunch of faces to this I won&#x27;t waste any of your time by like going through this individually but we help people with like offer strategy</p>
+          <p>Funnel creation helping people with the VSL&#x27;s marketing assets so we write like over 100 emails for some people maybe more and obviously we&#x27;re on the 3-day event live engine itself so all of the slides that you&#x27;ll need to present will write and design all of that stuff and if you were to hire people individually for this</p>
+          <p>You&#x27;ll need to spend upwards of like $22k yes we did the math so for us though the investment is $0 upfront so we only take 20% of what we make you again so afterwards if you like the results and see yourself running it again then we can you can continue running it quarterly</p>
+          <p>And we&#x27;ll help you out with that we can set up a system for you to run it quarterly and get the same results right with way less effort than you did on the first event because like I said um the first event takes time</p>
+          <h3>Get Your Free 3-Day Event Plan</h3>
+          <p>But after that doesn&#x27;t take as much time so that&#x27;s pretty much the whole thing now here&#x27;s what you can do next so whether you decide to work with us or not I wanted to leave you with something that you can take for free before you close this video so here&#x27;s what I wanted you to do</p>
+          <p>You can answer this application form below that you&#x27;ll see on this video and we&#x27;ll build you a mini version of this launch for your business for free on the other hand if you do want to work with us completely now without answering this application form or anything like that then you can simply alternatively</p>
+          <p>Click the link to book a call with us there and there you don&#x27;t need to answer the application form but if you still are not sure if this is for you or if you want us to actually build you a real plan that we&#x27;ll build ourselves you know of your actual business and stuff</p>
+          <p>Then you can answer the application form below and we&#x27;ll send you a plan straight to your email right and you can be completely anonymous if you don&#x27;t want to reveal yourself yet so just don&#x27;t put in your name there and then input your and give out your details and like your niche and past launches</p>
+          <p>So then after you answer the application form and we give you the plan a nd you like what you see then you can then book a call with us and we&#x27;ll talk about how we can move this forward alright so the application takes a few minutes realistically it takes like 3 minutes and I personally create</p>
+          <p>And strategize each plan myself so the worst case is you walk away with a plan that makes sense for a 3-day event and the best case is you walk away with a plan and we help you implement the actual plan and build everything for you so that&#x27;s pretty much the entire video if you have any questions</p>
+          <p>You can email me here but after that feel free to answer the application form and book a call if you want but that&#x27;s it for me and I&#x27;ll see you on the other side numbers and stuff so we could plan you out</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ VSL TRANSCRIPT ============
-       The whole pitch lives in a 20 minute video, which no crawler can watch and no
-       AI system can quote. Published here so the page has something to rank and cite. -->
-  <section class="tx" id="transcript" data-screen-label="04 Transcript">
-    <div class="wrap tx-inner">
-      <div class="icp"><span class="rule"></span> Full transcript <span class="rule"></span></div>
-      <h2>Everything in the video, in writing</h2>
-      <p class="tx-lead">The complete transcript of the video above, covering how 3-day virtual
-        events work, who they do and do not work for, what we build, what it costs, and both
-        guarantees. Prefer to read? Start here.</p>
-        <div class="tx-body" id="tx-body">
-        <h3>The Offer in 60 Seconds</h3>
-        <p>So if you&#x27;re watching this video so whether you watch the video on our email or not you can watch this video instead to learn exactly what it is we do (in detail) so your next launch is probably already half planned you know you have a bunch of stuff coming up you have launches coming up</p>
-        <p>You have course launches coming up you have plans for YouTube a bunch of stuff this is not for like replacing any of your existing stuff or like breaking any of that instead but your friends probably already are so in the next 60 seconds</p>
-        <h3>Why We Emailed You</h3>
-        <p>I&#x27;m going to tell you exactly 3 things so this is probably you right now but lately you&#x27;ve been seeing all of these other people run these 3-day events we run AfterHarvest to help you specifically with 3-day virtual events alright so usually you have a bunch of agencies who run these 3 day events</p>
-        <p>But on top of that they also run other stuff for their clients so we&#x27;re not that instead so in terms of like what we do I&#x27;m not going to bore you by like telling you every single thing here but we basically at a high level run all of these things you know we run the entire</p>
-        <p>3-day event infrastructure all of these things as you can see here and these are some of the actual work that we have generated for people when it comes to like the funnels and the slides and you know we don&#x27;t only work on that we also work on strategy and pretty much everything you know the live operation</p>
-        <p>All that jazz so for the pricing of our offer we charge $0 upfront yes you heard that right and at this point this probably sounds a little too good to be true how our pricing works is we only ask for a small revenue share after the launch that&#x27;s our offer and if you think about it logically</p>
-        <p>We also have two guarantees here that people have been telling us and at the end of this video I&#x27;ll basically reveal those two guarantees to you um nothing major is like broken or terrible from the looks of it from your funnels maybe you haven&#x27;t ran them yourself but you&#x27;ve for sure heard other people run them</p>
-        <p>So you&#x27;re not completely new to this concept in fact you&#x27;ve probably already considered running one so first if you&#x27;re watching this and want to find out if 3-day event is for you</p>
-        <h3>Why 3-Day Live Events Work</h3>
-        <p>Then this is for you that&#x27;s why we are here that&#x27;s why three day events work so well so they fix all of those problems you know it lets people watch you teach your most valuable content in like a concentrated 3 day format so they don&#x27;t have to spend weeks watching your content they can ask questions with you live</p>
-        <p>Directly on that event they can see objections answered because other people also ask questions live and they can in general see people buy and connect with you in real time and that&#x27;s something that you know like a normal YouTube video cannot replace here&#x27;s the thing a three day event doesn&#x27;t necessarily give you new leads</p>
-        <p>You know it just adds another way for the same audience to buy and often times you&#x27;ll find that you have a hidden gold mine sitting on top of what you have already built with your audience we just sold to the same audience using a different conversion mechanism which is a 3 day virtual event</p>
-        <p>We ran no cold ads and you know a 3 day event for her converted around 4x more which is um</p>
-        <h3>This Won&#x27;t Work If</h3>
-        <p>Quite insane if you think about it that said 3 day events are definitely not for everyone you know so here&#x27;s the three biggest reasons that make 3 day events fail especially if you&#x27;re the wrong type of person because I don&#x27;t want to keep selling you this if it will not work for you</p>
-        <p>In the first place so reason one on why</p>
-        <h3>Why Your List Isn&#x27;t Buying</h3>
-        <p>3 day events could fail is probably because your audience is no longer active and this is one of the biggest reasons on why they fail in general so a big list here doesn&#x27;t automatically mean that it&#x27;s valuable recent launches and buyer behavior matter you know like if your business is affiliate driven then that does</p>
-        <p>Not automatically mean that your own list can carry the event right so you need to have like a good audience in summary so a three day event can concentrate an active good audience relationship it cannot recreate one that is already gone alright so reason 2 on why</p>
-        <h3>Choosing the Right Topic and Offer</h3>
-        <p>It won&#x27;t probably work for you so it won&#x27;t work if the wrong topic or offer is chosen and I see so many people running these events who just think about like the small things like they keep running the tag they keep running like obsessing about the metrics which is good we also do that</p>
-        <p>But they end up missing the big picture which is like the topic you choose or the offer you choose because this is the most important thing if you want to make one perform well so we&#x27;re not one of those normal operators or like agencies who only brute force like the building part of an event</p>
-        <p>We also brute force and really think about hard the strategizing part of the event right we continuously study how other creators and like other operators in the space run these three day events because the strategizing bit you know thinking of the big picture is the most important thing and then follows the small picture stuff right</p>
-        <h3>Sending More Email Without Burning Your List</h3>
-        <p>So so no you know emails go out late you skip emails you don&#x27;t follow it because you&#x27;re scared to like promote more which is fine by the way but ideally for an event this big you need to go out of like your normal comfort zone when it comes to sending more emails and potentially do more now</p>
-        <p>If your objection is like you&#x27;re scared to burn out your audience here&#x27;s the thing we don&#x27;t overmarket we don&#x27;t spam bad emails instead we bump up the email frequency a little bit and then push that out and they&#x27;re actually good emails that we write you just have to send them out but if none of those</p>
-        <p>Sound like any of your problems or anything that you will come up like you have a good audience you&#x27;re open to marketing more and you&#x27;re open to having you know us strategize for you on a three day virtual event then you can then try out one of the fastest growing launch vehicles lately</p>
-        <p>Which is the 3-day virtual event and it helped one of our clients here Jay Clouse hit his biggest launch ever after 9 years with a 3-day virtual event this guy&#x27;s already doing well a 3-day event just helped him crack BIGGER months right if you&#x27;re already set on this entire thing you don&#x27;t need to finish this video</p>
-        <p>Because there&#x27;s a few minutes more of me yapping here so you can click the application below and answering it actually gets you a free launch plan we&#x27;ll build you out a</p>
-        <h3>A Quarterly Revenue Engine</h3>
-        <p>Free launch plan for the 3-day event so here&#x27;s the thing a 3 day event doesn&#x27;t aim to replace any of your existing launches it just plugs a hole that your business is potentially missing right what your business is missing is a big validated revenue engine that you run quarterly because you probably already run monthly launches</p>
-        <p>Maybe you run launches every two months but you&#x27;re missing something that you run quarterly like big events that you run recurring so this is what a 3-day event aims to give you so instead of doing like a normal massive waitlist for an offer with a very long build up only for you to like sell them with a normal sales page</p>
-        <p>A few promo emails maybe give them a few discounts a few bonuses instead of just doing that same old thing you can instead run the most validated format I just told you about a 3-day event and actually get people to join an actual event and actually get people to join an actual event</p>
-        <p>And not just you know a normal email promo because that it still works like the normal email promo it still works don&#x27;t get me wrong but it tends to dry up now for a bunch of creators because it&#x27;s kind of overused right and you can run them four times a year without burning out your audience</p>
-        <p>And I&#x27;m not going to tell you that it&#x27;s not a lot of work it is a lot of work but only the first launch because the third launch the fourth launch fifth launch and however many you wanna run this for it doesn&#x27;t take as much work because you&#x27;ve already built the engine on the first one</p>
-        <p>And that&#x27;s kind of why we&#x27;re here you know we&#x27;re giving you the stuff to run the first one so when you do want to run it again you don&#x27;t have to think about building stuff from scratch right so this quarterly machine might possibly become your biggest revenue channel con converts buyers that you&#x27;re now launching</p>
-        <p>Scant and needs really $0 in cold ads so it gets built to run and managed for you because we&#x27;re here see every time that you run a typical typical launch the amount of people that buy in contrast to your audience size kind of looks like this so machine one this is you running</p>
-        <p>A normal email promo and let&#x27;s say this entire thing is like your email list so when you run one you get these people which are buyers which is fine you get quite a lot of people there but on machine 2 which is a three day event if you run the event and get this much</p>
-        <p>People interested</p>
-        <h3>Client Results</h3>
-        <p>And can sell this much people with different offers one of our clients Bailey Vann had her BIGGEST MONTH ever with us after running a 3 day virtual event for your information before we continue her launches were already working before she came to us you know she made like 10 to 15 students per launch</p>
-        <p>Around $20k because it was high ticket and after coming to us and selling the same offer but using a different launch vehicle like a 3-day virtual event she was able to get these results which is $120,000+ this was the person that I told you about who um we converted like a quarter of our email list</p>
-        <p>To join the three day event alright so this wasn&#x27;t luck either we tried it again and broke through another $100,000+ launch on our second launch with her using a three day event because she wanted to test like the hypothesis and we kind of also did if this will burn out her audience on the second month</p>
-        <p>So it didn&#x27;t end up burning out her audience instead it generated another six figure launch for her and this was all without cold ads selling to the same audience as you can see here so now I&#x27;m going to say a bold statement with running 3-day virtual events now obviously I&#x27;m not going to go ahead and</p>
-        <p>Continue this by telling you you&#x27;ll also have your biggest launch ever because we cannot talk about the future like what it is but instead if this has been working so well then I am quite positive that if you are the right type of person within the right conditions then and you have a</p>
-        <p>Pretty good chance of having one of if not your biggest launches using a 3-day virtual event and no here&#x27;s the thing these summits</p>
-        <h3>Running Them Quarterly</h3>
-        <p>Or like 3-day events are not just one time cash grabs you know you can run them quarterly maybe you run them January and then April November whatever and have multiple offers with your current revenue running in the back end so it&#x27;s really not just a quarterly thing um if you run one of these</p>
-        <p>If you run one of these you sometimes have evergreen offers running month by month so it generates you income all throughout the year and if you run it that way you actually won&#x27;t burn out people because it all happens in the back end for people who sign up to the summit itself I know I&#x27;m getting ahead of myself here</p>
-        <p>But this just proves a point that in your calendar if you were to run this it fits throughout the entire year you don&#x27;t have to think of a perfect time to plug these summits in</p>
-        <h3>Why You Haven&#x27;t Run One Yet</h3>
-        <p>So now that we&#x27;ve established that these summits work let me ask you a question so honestly your reasons are probably already valid you know you might have simply never heard of these summits or if you&#x27;re like most you&#x27;re familiar with these summits but you know that they take a bunch load of time to do</p>
-        <p>Right they take a lot of effort time to build all of the funnel slides everything and on top of that you have to think about how to run money you have to strategize on like a bunch of those stuff right you have to think about content tech automation registration pages email and obviously</p>
-        <p>Run the live operation itself a bunch of things you know and it is a headache if you think about it and this is months of work for a system and this is months of work for a system that you still have to learn the task yourself from scratch because if you haven&#x27;t run a three day event yourself</p>
-        <p>Trust me it takes a lot of work for running your first one or instead of like you doing this yourself</p>
-        <h3>What We Do Versus What You Do</h3>
-        <p>You can instead hire someone else to do it for you and help you strategize the entire thing yourself so here&#x27;s a list of things that you&#x27;ll do versus what we will do in terms of running this 3-day event so I&#x27;m not going to say every single thing here but we basically build and strategize and finish up everything</p>
-        <p>And optimize everything and the tasks that you only have to do is approve the tasks that we do I&#x27;m review them record obviously and then teach people live and so how this works in terms of time investment is you&#x27;ll only spend one um 15 to 20 hours in the span of like six weeks</p>
-        <p>For the above and for us we&#x27;ll spend up to like because building this takes a lot of time so that&#x27;s the contrast on like</p>
-        <h3>What Happens After You Say Yes</h3>
-        <p>What we&#x27;ll do and like what you&#x27;ll do alright so then from the moment you sign with us here&#x27;s how week by week looks like so first week up to the second week let&#x27;s talk about like the guarantee because at this point we&#x27;ll already start building stuff</p>
-        <h3>The Two-Week Walk-Away Guarantee</h3>
-        <p>So the first guarantee that we have is the two week walk away guarantee so we aim to build your entire funnel in 14 days if you don&#x27;t absolutely love the three day event engine that we have built then you can simply walk away with no strings attached so we&#x27;ll even sign a contract with this guarantee</p>
-        <p>So you have absolute control so in summary either we deliver well or this does not continue at all</p>
-        <h3>The Activation Fee, and How It Is Credited</h3>
-        <p>You know no questions asked so week 2 after that we have an activation fee so this is not margin for us it&#x27;s both side proving they&#x27;re serious like you&#x27;ve seen two weeks of real work by then we&#x27;d have given you the strategy and everything else and so we have bet two weeks of this on you</p>
-        <p>Now here&#x27;s the thing: you don&#x27;t have to pay this to us if we don&#x27;t end up making you money and here&#x27;s how this works so this means that you end if you end up making $100,000 with our launch our revenue share is 20 k since we do 20% if you remember and the $5,000</p>
-        <p>That you already paid comes off of that so after the launch finishes and all that you don&#x27;t have to pay us $20k you only pay us $15k because the $5K is already credited right so if we don&#x27;t end up hitting this floor we&#x27;ll refund the $5,000 to you completely so remember what I said</p>
-        <p>If we don&#x27;t end up making you money you don&#x27;t even have to technically pay us $5k because we&#x27;ll refund it to you right so we have this fee in general so we can hire great people and suffer without having to skimp on like the quality of the event alright so after that weeks 4 to 5 is the pre marketing push</p>
-        <p>So we start telling people that we have an event coming up I&#x27;m sure you&#x27;re already familiar with like that sort of marketing is the emails that will actually push live registrations for so people here will join the event sign up for the event and on week 8 is the actual event itself so you go live for three days</p>
-        <p>Typically sell on like the second day and then after that we have um like five days of postcard selling right so from there on we&#x27;re paid on results so 20% of what the launch collects is your email list is bigger than 25k subscribers subscribers then 25% if you&#x27;re below that but there are exceptions</p>
-        <p>We can talk about this if you if we want to change the revenue share here</p>
-        <h3>What You&#x27;re Guaranteed To Make</h3>
-        <p>Depending on your situation right now we can talk about that so here&#x27;s guarantee 2 and this is the big one so remember that risky is offering that I told you about at the start here&#x27;s what I meant so before we sign we model your lunch first so we model your list your offer</p>
-        <p>Your numbers and then after that we promise you a real number in writing like in a actual contract so the guarantee that we promise is half that number so if the lunch comes under it then you owe us nothing right you owe us no revenue share um we&#x27;ll refund you the 5,000 dollar fee earlier</p>
-        <p>No expenses nothing so if we don&#x27;t end up hitting the floor you make nothing I mean we make nothing so for example if we estimated that your launch size for this 3 day events around $200,000+ which is quite normal if you have around 30 to 40 k good people in your email list</p>
-        <p>And sell like a $1k/$2k offer then we guarantee that you&#x27;ll make at least 100 k with the launch so this is the absolute floor you know so if we don&#x27;t make $100k with the launch then we don&#x27;t end up making money ourselves so which means the money that we only really keep is the</p>
-        <p>Cut of the money that we made you so that&#x27;s why people tell us this is the riskiest part of our offer and we do agree this is a very risky offer but we are confident that this could work for you and that&#x27;s why we reached out to you if you&#x27;re watching this video</p>
-        <p>Or if you&#x27;re seeing this in the first place</p>
-        <h3>What We Build For You</h3>
-        <p>You do your part just follow the calendar review our work show up live in the floor holds so as for exactly what we&#x27;re building here&#x27;s what we&#x27;re going to handle so there&#x27;s a bunch of faces to this I won&#x27;t waste any of your time by like going through this individually but we help people with like offer strategy</p>
-        <p>Funnel creation helping people with the VSL&#x27;s marketing assets so we write like over 100 emails for some people maybe more and obviously we&#x27;re on the 3-day event live engine itself so all of the slides that you&#x27;ll need to present will write and design all of that stuff and if you were to hire people individually for this</p>
-        <p>You&#x27;ll need to spend upwards of like $22k yes we did the math so for us though the investment is $0 upfront so we only take 20% of what we make you again so afterwards if you like the results and see yourself running it again then we can you can continue running it quarterly</p>
-        <p>And we&#x27;ll help you out with that we can set up a system for you to run it quarterly and get the same results right with way less effort than you did on the first event because like I said um the first event takes time</p>
-        <h3>Get Your Free 3-Day Event Plan</h3>
-        <p>But after that doesn&#x27;t take as much time so that&#x27;s pretty much the whole thing now here&#x27;s what you can do next so whether you decide to work with us or not I wanted to leave you with something that you can take for free before you close this video so here&#x27;s what I wanted you to do</p>
-        <p>You can answer this application form below that you&#x27;ll see on this video and we&#x27;ll build you a mini version of this launch for your business for free on the other hand if you do want to work with us completely now without answering this application form or anything like that then you can simply alternatively</p>
-        <p>Click the link to book a call with us there and there you don&#x27;t need to answer the application form but if you still are not sure if this is for you or if you want us to actually build you a real plan that we&#x27;ll build ourselves you know of your actual business and stuff</p>
-        <p>Then you can answer the application form below and we&#x27;ll send you a plan straight to your email right and you can be completely anonymous if you don&#x27;t want to reveal yourself yet so just don&#x27;t put in your name there and then input your and give out your details and like your niche and past launches</p>
-        <p>So then after you answer the application form and we give you the plan a nd you like what you see then you can then book a call with us and we&#x27;ll talk about how we can move this forward alright so the application takes a few minutes realistically it takes like 3 minutes and I personally create</p>
-        <p>And strategize each plan myself so the worst case is you walk away with a plan that makes sense for a 3-day event and the best case is you walk away with a plan and we help you implement the actual plan and build everything for you so that&#x27;s pretty much the entire video if you have any questions</p>
-        <p>You can email me here but after that feel free to answer the application form and book a call if you want but that&#x27;s it for me and I&#x27;ll see you on the other side numbers and stuff so we could plan you out</p>
-        </div>
-        <button class="tx-more" id="tx-more" type="button" aria-expanded="false" aria-controls="tx-body">
-          Read the full video transcript
-        </button>
-    </div>
-  </section>
 
   <!-- ============ refined closing footer ============ -->
   <footer class="foot" data-screen-label="03 Footer">
@@ -1346,7 +1671,9 @@ hr {
                srcset="assets/ah-lockup-2x.png 218w, assets/ah-lockup-4x.png 471w"
                sizes="152px" alt="AfterHarvest" width="471" height="108">
           <p class="tag">Done-for-you 3-day virtual events / webinars.</p>
+          <p class="tag founders">Founded by <b>Sean Canela</b> and <b>Theia Ahmadi</b>.</p>
         </div>
+
       </div>
       <div class="foot-meta">
         <span>© 2026 AfterHarvest</span>
@@ -1378,6 +1705,52 @@ hr {
     }
     var ccats = document.querySelector('.cats-wrap .cats-cv');
     if (ccats) AHStitch.crystal(ccats, { animate: false });
+    // The hero's crystal fills its facets with near-white, which is right on cream and
+    // useless on ink. Here the facets are drawn as lit EDGES over a near-black ground,
+    // which is what actually reads as cut glass in the dark.
+    (function(){
+      var cv = document.querySelector('.brief-crystal'); if (!cv) return;
+      function paint(){
+        var dpr = Math.min(2, window.devicePixelRatio || 1);
+        var r = cv.getBoundingClientRect();
+        if (r.width < 10) return;
+        cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+        var ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+        var seed = 7;
+        function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+        var cell = 96 * dpr;                          // small enough to read as texture
+        var cols = Math.max(8, Math.round(W / cell)), rows = Math.max(4, Math.round(H / cell));
+        var cw = W / cols, ch = H / rows, P = [], xi, yi;
+        for (yi = 0; yi <= rows; yi++) { P[yi] = [];
+          for (xi = 0; xi <= cols; xi++) {
+            var px = xi * cw, py = yi * ch;
+            if (xi > 0 && xi < cols) px += (rnd() - 0.5) * cw * 0.6;
+            if (yi > 0 && yi < rows) py += (rnd() - 0.5) * ch * 0.6;
+            P[yi][xi] = { x: px, y: py }; } }
+        ctx.clearRect(0, 0, W, H);
+        ctx.lineWidth = Math.max(1, dpr * 0.7);
+        for (yi = 0; yi < rows; yi++) for (xi = 0; xi < cols; xi++) {
+          var tl = P[yi][xi], tr = P[yi][xi+1], br = P[yi+1][xi+1], bl = P[yi+1][xi];
+          var set = rnd() < 0.5 ? [[tl,tr,br],[tl,br,bl]] : [[tl,tr,bl],[tr,br,bl]];
+          for (var t = 0; t < set.length; t++) {
+            var a = set[t];
+            ctx.beginPath();
+            ctx.moveTo(a[0].x, a[0].y); ctx.lineTo(a[1].x, a[1].y); ctx.lineTo(a[2].x, a[2].y);
+            ctx.closePath();
+            // planes barely differ, so no facet reads as a patch
+            ctx.fillStyle = 'rgba(255,247,231,' + (0.004 + rnd() * 0.014).toFixed(4) + ')';
+            ctx.fill();
+            // the edge is the thing you actually see
+            ctx.strokeStyle = 'rgba(255,246,228,' + (0.028 + rnd() * 0.05).toFixed(4) + ')';
+            ctx.stroke();
+          }
+        }
+      }
+      paint();
+      window.addEventListener('resize', function(){
+        clearTimeout(window.__bcT); window.__bcT = setTimeout(paint, 200);
+      });
+    })();
     document.querySelectorAll('.bloom').forEach(function (el) {
       if (el.querySelector('canvas')) return;
       var c = document.createElement('canvas'); el.appendChild(c);
@@ -1391,52 +1764,68 @@ hr {
   }
   if (document.fonts && document.fonts.ready) { document.fonts.ready.then(mountHero); } else { window.addEventListener('load', mountHero); }
 
-  // shape the floating nav into a soft, irregular organic bar
+  // shape the floating nav into a soft, irregular organic bar.
+  // The path is built ONCE in objectBoundingBox units, so the browser rescales it
+  // for free as the bar narrows. No per-frame JS, no forced layout, no re-clipping
+  // during the compression — that loop was the stutter.
   (function(){
-    function shapeNav(){
-      var nav = document.querySelector('.nav'); if(!nav) return;
-      var r = nav.getBoundingClientRect(), W = Math.round(r.width), H = Math.round(r.height);
-      if (W < 40 || H < 20) { nav.style.clipPath = 'none'; return; }
+    var built = false;
+    function buildNavClip(){
+      var nav = document.querySelector('.nav'); if (!nav) return;
+      var r = nav.getBoundingClientRect(), W = r.width, H = r.height;
+      if (W < 40 || H < 20) return;
       var cr = 13, ty = 2, by = H - 2, i, x;
-      function wave(v){ return Math.sin(v*0.017)*1.4; }
-      var steps = Math.max(10, Math.round(W / 48));
-      var d = 'M' + cr + ' ' + ty.toFixed(1);
-      for (i=1;i<=steps;i++){ x=cr+(W-2*cr)*(i/steps); d+=' L'+x.toFixed(1)+' '+(ty+wave(x)).toFixed(1); }
-      d += ' Q'+W+' '+ty+' '+W+' '+(ty+cr).toFixed(1) + ' L'+W+' '+(by-cr).toFixed(1);
-      d += ' Q'+W+' '+by+' '+(W-cr).toFixed(1)+' '+by;
-      for (i=1;i<=steps;i++){ x=(W-cr)-(W-2*cr)*(i/steps); d+=' L'+x.toFixed(1)+' '+(by-wave(x)).toFixed(1); }
-      d += ' Q0 '+by+' 0 '+(by-cr).toFixed(1) + ' L0 '+(ty+cr).toFixed(1);
-      d += ' Q0 '+ty+' '+cr+' '+ty.toFixed(1) + ' Z';
-      nav.style.webkitClipPath = "path('" + d + "')"; nav.style.clipPath = "path('" + d + "')";
-    }
-    function run(){ shapeNav(); }
-    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(run); } else { window.addEventListener('load', run); }
-    window.addEventListener('resize', function(){ clearTimeout(window.__navT); window.__navT = setTimeout(shapeNav, 150); });
+      function wave(v){ return Math.sin(v * 0.017) * 1.4; }
+      var steps = 20;
+      var X = function(px){ return (px / W).toFixed(5); };
+      var Y = function(px){ return (px / H).toFixed(5); };
+      var d = 'M' + X(cr) + ' ' + Y(ty);
+      for (i = 1; i <= steps; i++){ x = cr + (W - 2*cr) * (i/steps);
+        d += 'L' + X(x) + ' ' + Y(ty + wave(x)); }
+      d += 'Q' + X(W) + ' ' + Y(ty) + ' ' + X(W) + ' ' + Y(ty + cr);
+      d += 'L' + X(W) + ' ' + Y(by - cr);
+      d += 'Q' + X(W) + ' ' + Y(by) + ' ' + X(W - cr) + ' ' + Y(by);
+      for (i = 1; i <= steps; i++){ x = (W - cr) - (W - 2*cr) * (i/steps);
+        d += 'L' + X(x) + ' ' + Y(by - wave(x)); }
+      d += 'Q' + X(0) + ' ' + Y(by) + ' ' + X(0) + ' ' + Y(by - cr);
+      d += 'L' + X(0) + ' ' + Y(ty + cr);
+      d += 'Q' + X(0) + ' ' + Y(ty) + ' ' + X(cr) + ' ' + Y(ty) + 'Z';
 
-    // ---- compress on scroll. shapeNav reads the live rect, so re-running it every frame
-    //      through the transition keeps the stitched edge true while the bar narrows.
+      var svg = document.getElementById('nav-cut-svg');
+      if (!svg) {
+        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.id = 'nav-cut-svg';
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('width', '0'); svg.setAttribute('height', '0');
+        svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+        svg.innerHTML = '<defs><clipPath id="nav-cut" clipPathUnits="objectBoundingBox">'
+                      + '<path d=""/></clipPath></defs>';
+        document.body.appendChild(svg);
+      }
+      svg.querySelector('#nav-cut path').setAttribute('d', d);
+      nav.style.webkitClipPath = 'url(#nav-cut)';
+      nav.style.clipPath = 'url(#nav-cut)';
+      built = true;
+    }
+    function run(){ buildNavClip(); }
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(run); }
+    else { window.addEventListener('load', run); }
+    // only on resize, and only because the wave phase is tied to absolute width
+    window.addEventListener('resize', function(){
+      clearTimeout(window.__navT); window.__navT = setTimeout(buildNavClip, 180);
+    });
+
+    // ---- compress on scroll ----
     (function(){
       var wrap = document.querySelector('.nav-wrap'); if (!wrap) return;
-      var compact = false, queued = false, raf = null;
-      var nav = document.querySelector('.nav');
-      function reshapeFor(ms){
-        cancelAnimationFrame(raf);
-        var end = (window.performance ? performance.now() : Date.now()) + ms;
-        (function loop(){
-          shapeNav();
-          var now = window.performance ? performance.now() : Date.now();
-          if (now < end) raf = requestAnimationFrame(loop);
-        })();
-      }
+      var compact = false, queued = false;
       function check(){
         queued = false;
         var y = window.pageYOffset || document.documentElement.scrollTop || 0;
-        if (!compact && y > 90) { compact = true; }
-        else if (compact && y < 40) { compact = false; }   // hysteresis, so it cannot flutter
+        if (!compact && y > 90) compact = true;
+        else if (compact && y < 40) compact = false;   // hysteresis, so it cannot flutter
         else return;
         wrap.setAttribute('data-compact', compact ? '1' : '0');
-        if (REDUCE) { shapeNav(); return; }
-        reshapeFor(620);
       }
       window.addEventListener('scroll', function(){
         if (queued) return; queued = true; requestAnimationFrame(check);
@@ -1789,6 +2178,166 @@ hr {
 
     var state, at = 0, saveT = null, lastSent = '';
 
+    // ---- what they say ----
+    // One line tied to each question, plus a bank of nudges for when someone stalls.
+    var LINES = [
+      "Anonymous is fine. It just means I am guessing at your business instead of going and reading it.",
+      "It is me and a Google Sheet on this end. Nothing is going to happen to your email.",
+      "I have to call you something in the doc, and 'anonymous person' gets strange by page three.",
+      "Whatever you paste I will actually open. Including the one you forgot was still live.",
+      "Big or small does not decide whether this works. I have planned launches off 4,000 people and off 400,000.",
+      "Whatever it looks like on a good week. I will quietly adjust.",
+      "Tell me about the bad one. That is the one with the useful information in it.",
+      "Say it how you would say it to your mum. And the price from the checkout page, not the sales page.",
+      "Whatever a normal one does for you. If the answer is 'nothing yet', that is also an answer.",
+      "Everyone picks 'this quarter'. Almost nobody means it. Answer honestly, it changes the plan.",
+      "Give me the rude version. The polite version is never the real one."
+    ];
+    var NUDGES = [
+      "Someone once answered 'idk' to all eleven questions. I built them a plan anyway.",
+      "This form has a drop-off rate. Statistically you are about to leave. Prove me wrong.",
+      "You have read that question four times now. It is fine either way, I promise.",
+      "You could lie on this. You would just get a very good plan for a fake business.",
+      "Nobody reads these little boxes. If you are, hello.",
+      "I would tell you what percentage of people finish this, but you would feel worse.",
+      "The one in the hat does nothing, by the way. He is decorative.",
+      "The next question is easier. That is not a trick, it just is.",
+      "Whatever you are about to put, someone has already put worse.",
+      "About half of these turn into launches. The other half just take the plan and go. Both fine.",
+      "If you close the tab I will know. Not in a creepy way. In an analytics way.",
+      "There is no scoring. Nobody is being filtered out at the other end.",
+      "Not rushing you. Slightly rushing you."
+    ];
+
+    var slots = [].slice.call(document.querySelectorAll('.pk'));
+    function sayHost(el){ return document.querySelector('.pk-say[data-slot="' +
+                                 el.getAttribute('data-slot') + '"]'); }
+
+    // Every scheduled step carries the generation it was booked under. Anything from an
+    // older generation is ignored when it fires, which is what stops a stale hide from
+    // retracting the figure and leaving its bubble stranded on screen.
+    var slotAt = -1, nudgeAt = 0, gen = 0;
+    var showT = null, hideT = null, idleT = null, typeT = null;
+    var LEAD = 480, HOLD = 8000, STEP_HOLD = 5400, IDLE = 11000, FIRST = 1600;
+    var lastPeek = 0;
+
+    function bubble(host, line, my){
+      clearTimeout(typeT);
+      host.innerHTML = '';
+      var b = document.createElement('div');
+      b.className = 'say';
+      b.__gen = my;
+      b.innerHTML = '<span class="say-dots"><i></i><i></i><i></i></span>';
+      host.appendChild(b);
+      // rAF is suspended in a hidden tab, so it gets a timeout fallback; whichever
+      // fires first wins and the other is a no-op
+      var armed = false;
+      function arm(){ if (armed || my !== gen) return; armed = true; b.setAttribute('data-in','1'); }
+      requestAnimationFrame(arm); setTimeout(arm, 60);
+      typeT = setTimeout(function(){
+        if (my !== gen || !b.parentNode) return;
+        b.innerHTML = '<span class="say-txt"></span>';
+        b.firstChild.textContent = line;
+      }, 560);
+    }
+
+    function hideOne(idx){
+      if (idx < 0 || !slots[idx]) return;
+      var s = slots[idx], host = sayHost(s), b = host.querySelector('.say');
+      if (b) b.removeAttribute('data-in');
+      s.setAttribute('data-out','0');
+      // only sweep bubbles whose generation is dead, so a reveal that is mid-flight in
+      // a throttled tab can never be judged stale and wiped
+      setTimeout(function(){
+        var cur = host.querySelector('.say');
+        if (cur && cur.__gen !== gen) host.innerHTML = '';
+      }, 340);
+    }
+
+    function hideAll(){
+      gen++;
+      clearTimeout(showT); clearTimeout(hideT); clearTimeout(typeT);
+      for (var i = 0; i < slots.length; i++) hideOne(i);
+      slotAt = -1;
+    }
+
+    // Busy means mid-sentence, not merely focused. The form puts focus in a field the
+    // moment it draws, so treating focus as activity meant nothing ever appeared on a
+    // text screen. Only recent keystrokes count.
+    var lastType = 0;
+    function busy(){
+      var el = document.activeElement;
+      if (!el || !root.contains(el) || !/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return false;
+      return Date.now() - lastType < 4000;
+    }
+
+    // force is used on a step change: a question has just appeared, so they are reading
+    // it rather than typing, even if the field already has focus
+    function peek(line, hold, force){
+      if (!live || (busy() && !force)) return;
+      lastPeek = Date.now();
+      var my = ++gen;
+      clearTimeout(showT); clearTimeout(hideT);
+      var prev = slotAt;
+      if (prev >= 0) hideOne(prev);
+      slotAt = (prev + 1) % slots.length;
+      var lead = prev >= 0 ? LEAD : 0;
+      showT = setTimeout(function(){
+        if (my !== gen) return;
+        slots[slotAt].setAttribute('data-out','1');
+        bubble(sayHost(slots[slotAt]), line, my);
+      }, lead);
+      hideT = setTimeout(function(){
+        if (my !== gen) return;
+        hideOne(slotAt); slotAt = -1;
+        armIdle();                       // and then wait for them to go quiet again
+      }, lead + (hold || HOLD));
+    }
+
+    // ---- they only appear when nobody is doing anything ----
+    function armIdle(ms){
+      clearTimeout(idleT);
+      idleT = setTimeout(function(){
+        if (!live || busy()) { armIdle(); return; }
+        peek(NUDGES[nudgeAt++ % NUDGES.length]);
+      }, ms || IDLE);
+    }
+
+    // any sign of life clears them off the screen at once. focusin is deliberately not
+    // in this list: the form autofocuses on draw, which is not the user doing anything.
+    function active(e){
+      if (e && (e.type === 'input' || e.type === 'keydown')) lastType = Date.now();
+      if (slotAt >= 0) hideAll();
+      armIdle();
+    }
+    ['input','keydown','pointerdown'].forEach(function(ev){
+      root.addEventListener(ev, active, true);
+    });
+
+    var live = false;
+    (function(){
+      if (!slots.length) return;
+      if (!window.IntersectionObserver) { live = true; armIdle(FIRST); return; }
+      new IntersectionObserver(function(e){
+        var on = e[0].isIntersecting;
+        if (on === live) return;
+        live = on;
+        if (on) { clearTimeout(idleT);
+          idleT = setTimeout(function(){ peek(LINES[at] || NUDGES[0], STEP_HOLD, true); }, FIRST); }
+        else { hideAll(); clearTimeout(idleT); }
+      }, { rootMargin: '-10% 0px -15% 0px' }).observe(root);
+    })();
+
+    // A new question gets its own line, right away. Someone speed-running the form
+    // would otherwise get one firing every couple of seconds, so a peek less than 2.5s
+    // old means this one is skipped and we just go back to waiting.
+    function say(i){
+      if (!live) return;
+      clearTimeout(idleT);
+      if (Date.now() - lastPeek < 2500) { if (slotAt >= 0) hideAll(); armIdle(); return; }
+      peek(LINES[i] || NUDGES[nudgeAt++ % NUDGES.length], STEP_HOLD, true);
+    }
+
     function uid(){
       try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch(e){}
       return 'r-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,10);
@@ -1952,6 +2501,7 @@ hr {
     function draw(){
       var sc = SCREENS[at];
       bodyEl.innerHTML = '';
+      say(at);
       backEl.hidden = at === 0;
       var screen = el('div','pf-screen');
       screen.setAttribute('data-on','1');
@@ -2008,6 +2558,12 @@ hr {
       book.setAttribute('data-cal-namespace', '3-day-event');
       book.setAttribute('data-cal-link', 'team/afterharvest/3-day-event');
       book.setAttribute('data-cal-config', '{"layout":"month_view"}');
+      book.addEventListener('click', function(ev){
+        if (window.Cal && Cal.ns && Cal.ns['3-day-event']) {
+          try { Cal.ns['3-day-event']('modal', { calLink: 'team/afterharvest/3-day-event',
+                  config: { layout: 'month_view' } }); ev.preventDefault(); } catch(e){}
+        }
+      });
       d.appendChild(book);
       bodyEl.appendChild(d);
       if (window.AHStitch) {
@@ -2029,7 +2585,7 @@ hr {
     }
   })();
 
-  // transcript read-more (mobile only; the button is display:none above 760px)
+  // one control for the whole long-form section: the brief panels and the transcript
   (function(){
     var body = document.getElementById('tx-body'), btn = document.getElementById('tx-more');
     if (!body || !btn) return;
@@ -2037,8 +2593,23 @@ hr {
       var open = body.getAttribute('data-open') === 'true';
       body.setAttribute('data-open', open ? 'false' : 'true');
       btn.setAttribute('aria-expanded', open ? 'false' : 'true');
-      btn.textContent = open ? 'Read the full video transcript' : 'Hide transcript';
-      if (open) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var t = btn.querySelector('.tx-more-t');
+      if (t) t.textContent = open ? 'Read the full breakdown and transcript' : 'Hide the breakdown';
+      if (!open) return;
+      // Collapsing drops about 11,000px out of the document, so the browser clamps the
+      // scroll position and drops you partway down the band with the heading cut in
+      // half. Put the top of the section back under the header instead, and do it
+      // instantly: a smooth scroll across that distance is its own kind of broken.
+      var sec = document.getElementById('in-brief');
+      if (!sec) return;
+      var y = sec.getBoundingClientRect().top + (window.pageYOffset ||
+              document.documentElement.scrollTop || 0) - 84;
+      // html carries scroll-behavior: smooth, which would animate this too, so it is
+      // suspended for the one jump and put straight back
+      var root = document.documentElement, prev = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(0, Math.max(0, y));
+      root.style.scrollBehavior = prev;
     });
   })();
 
@@ -2072,4 +2643,314 @@ hr {
 
   Cal.ns["3-day-event"]("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"#B06A4A"},"dark":{"cal-brand":"#F7F3EA"}},"hideEventTypeDetails":false,"layout":"month_view"});
   </script>
+
+  <!-- ============ BOOKING DOCK ============
+       Layout follows the pattern Sean asked for: person, offer, day chips, one action.
+       Styling stays AfterHarvest. Chips are the next five days; each opens Cal on that
+       date. Real availability would need a Cal API key, which cannot live in a static page. -->
+  <aside class="dock" id="book-dock" aria-label="Book a call" hidden>
+    <button class="dock-x" id="dock-x" type="button" aria-label="Dismiss">
+      <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="dock-thread" aria-hidden="true"></div>
+
+    <div class="dock-who">
+      <span class="dock-av">
+        <img src="assets/sean-canela-v2.png" alt="" width="256" height="256">
+        <i aria-hidden="true"></i>
+      </span>
+      <span class="dock-id">
+        <b>Sean Canela</b>
+        <em>I take these calls myself</em>
+      </span>
+    </div>
+
+    <p class="dock-head">Rather just talk it through?</p>
+    <p class="dock-copy">Skip the form. We&#x27;ll go through your offer and your list on the
+      call, and I&#x27;ll give you the number we&#x27;d put in writing.</p>
+
+    <p class="dock-pick">What day suits you?</p>
+    <div class="dock-days" id="dock-days" role="group" aria-label="Pick a day"></div>
+
+    <a class="dock-cta" id="dock-cta" href="https://cal.com/team/afterharvest/3-day-event"
+       data-cal-namespace="3-day-event"
+       data-cal-link="team/afterharvest/3-day-event"
+       data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'><svg class="dock-cta-ico" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M7.1 2.9 4.9 4c-.8.4-1.15 1.35-.8 2.2a16 16 0 0 0 9.7 9.7c.85.35 1.8 0 2.2-.8l1.1-2.2c.3-.6.08-1.32-.5-1.64l-2.3-1.28a1.2 1.2 0 0 0-1.5.27l-.72.83a12 12 0 0 1-3.36-3.36l.83-.72a1.2 1.2 0 0 0 .27-1.5L8.74 3.4a1.2 1.2 0 0 0-1.64-.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"></path><path d="M13.5 2.5a5 5 0 0 1 4 4" stroke="var(--wheat)" stroke-width="1.4" stroke-linecap="round"></path><path d="M13 5.4a2.3 2.3 0 0 1 1.6 1.6" stroke="var(--wheat)" stroke-width="1.4" stroke-linecap="round"></path></svg><span>Book a call with me</span></a>
+  </aside>
+
+  <!-- booking dock logic, isolated from the Cal embed so one cannot break the other -->
+  <script type="text/javascript">
+  // booking dock: day chips, and Cal opened as a modal on the page rather than a new tab
+  (function(){
+    var dock = document.getElementById('book-dock');
+    var x = document.getElementById('dock-x');
+    var days = document.getElementById('dock-days');
+    var cta = document.getElementById('dock-cta');
+    if (!dock || !x || !days || !cta) return;
+    var LINK = 'team/afterharvest/3-day-event';
+    var KEY = 'ah_dock_dismissed';
+    // ?dock=1 forces it open and clears a previous dismissal, so it can be checked
+    // without hunting for the scroll threshold or clearing storage by hand
+    var force = /[?&]dock=1/.test(location.search);
+    if (force) { try { localStorage.removeItem(KEY); } catch(e){} }
+    else { try { if (localStorage.getItem(KEY) === '1') return; } catch(e){} }
+
+    var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    var picked = null;
+
+    // next five days, starting today
+    var base = new Date();
+    for (var i = 0; i < 5; i++) {
+      var d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+      var iso = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'dock-day';
+      b.setAttribute('data-date', iso);
+      b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+      b.innerHTML = '<span class="dow">' + DOW[d.getDay()] + '</span>' +
+                    '<span class="dom">' + d.getDate() + '</span>';
+      days.appendChild(b);
+      if (i === 0) picked = iso;
+    }
+
+    // opens over the page; returns false so the href can still act as a fallback
+    function openCal(iso){
+      if (!(window.Cal && Cal.ns && Cal.ns['3-day-event'])) return false;
+      var cfg = { layout: 'month_view', useSlotsViewOnSmallScreen: 'true' };
+      if (iso) { cfg.date = iso; cfg.month = iso.slice(0, 7); }
+      try { Cal.ns['3-day-event']('modal', { calLink: LINK, config: cfg }); return true; }
+      catch(e) { return false; }
+    }
+
+    days.addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('.dock-day') : null;
+      if (!b) return;
+      [].forEach.call(days.children, function(n){ n.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      picked = b.getAttribute('data-date');
+      openCal(picked);
+    });
+
+    cta.addEventListener('click', function(e){
+      if (openCal(picked)) e.preventDefault();
+      try { localStorage.setItem(KEY, '1'); } catch(err){}
+    });
+
+    var shown = false, queued = false;
+    function check(){
+      queued = false;
+      if (shown) return;
+      var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var span = (document.documentElement.scrollHeight - window.innerHeight) || 1;
+      if (!force && y / span < 0.42) return;   // past the video and the form
+      shown = true;
+      dock.hidden = false;
+      requestAnimationFrame(function(){ dock.setAttribute('data-in', '1'); });
+      window.removeEventListener('scroll', onScroll);
+    }
+    function onScroll(){ if (queued) return; queued = true; requestAnimationFrame(check); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    if (force) check();
+
+    // ---- dismiss: crack from the point of impact, then break apart ----
+    var REDUCE = window.matchMedia &&
+                 window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // deterministic jitter, so the break looks the same every time rather than random
+    var JIT = [0.42,-0.63,0.28,-0.35,0.71,-0.19,0.55,-0.48,0.13,-0.77,0.36,-0.24,
+               0.68,-0.41,0.22,-0.59,0.47,-0.31,0.75,-0.15];
+    var jn = 0;
+    function jit(){ return JIT[(jn++) % JIT.length]; }
+
+    // where the box edge is cut, clockwise from the top-left corner. Uneven on purpose.
+    var RIM = [[0,0],[44,0],[100,0],[100,38],[100,100],[61,100],[18,100],[0,63],[0,22]];
+
+    function shatter(){
+      var r = dock.getBoundingClientRect(), W = r.width, H = r.height;
+      var xb = x.getBoundingClientRect();
+      // the crack starts where the pointer actually landed
+      var ox = ((xb.left + xb.right) / 2 - r.left) / W * 100;
+      var oy = ((xb.top + xb.bottom) / 2 - r.top) / H * 100;
+
+      // 1. cracks race out from the impact point across the intact stone
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'dock-crack');
+      svg.setAttribute('viewBox', '0 0 100 100');
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('aria-hidden', 'true');
+      var picks = [1, 3, 5, 7];
+      for (var c = 0; c < picks.length; c++) {
+        var t = RIM[picks[c]], d = 'M' + ox + ' ' + oy, steps = 4, len = 0;
+        var px = ox, py = oy;
+        for (var k = 1; k <= steps; k++) {
+          var f = k / steps;
+          var nx = ox + (t[0] - ox) * f + (k < steps ? jit() * 9 : 0);
+          var ny = oy + (t[1] - oy) * f + (k < steps ? jit() * 9 : 0);
+          d += 'L' + nx.toFixed(2) + ' ' + ny.toFixed(2);
+          len += Math.sqrt((nx-px)*(nx-px) + (ny-py)*(ny-py)); px = nx; py = ny;
+        }
+        var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', d);
+        p.setAttribute('vector-effect', 'non-scaling-stroke');
+        p.style.setProperty('--len', len.toFixed(1));
+        p.style.setProperty('--cd', (c * 22) + 'ms');
+        svg.appendChild(p);
+      }
+      dock.appendChild(svg);
+      dock.setAttribute('data-shatter', '1');
+
+      // 2. once the cracks land, swap the stone for its pieces
+      setTimeout(function(){
+        var cs = getComputedStyle(dock);
+        var planes = getComputedStyle(dock, '::after').backgroundImage;
+        var faceBg = (planes && planes !== 'none' ? planes + ', ' : '') + cs.backgroundImage;
+        var gem = cs.clipPath;
+
+        var layer = document.createElement('div');
+        layer.className = 'dock-shatter';
+        layer.style.cssText = 'left:' + r.left + 'px;top:' + r.top + 'px;' +
+                              'width:' + W + 'px;height:' + H + 'px';
+
+        for (var i = 0; i < RIM.length; i++) {
+          var a = RIM[i], b = RIM[(i + 1) % RIM.length];
+          var cx = (ox + a[0] + b[0]) / 3, cy = (oy + a[1] + b[1]) / 3;
+          var dx = cx - ox, dy = cy - oy;
+          var m = Math.sqrt(dx*dx + dy*dy) || 1;
+          var throwPx = 74 + Math.abs(jit()) * 96;
+
+          var shard = document.createElement('div');
+          shard.className = 'shard';
+          shard.style.clipPath =
+            'polygon(' + ox + '% ' + oy + '%,' + a[0] + '% ' + a[1] + '%,' +
+                         b[0] + '% ' + b[1] + '%)';
+          shard.style.setProperty('--tx', (dx / m * throwPx).toFixed(1) + 'px');
+          shard.style.setProperty('--ty', (dy / m * throwPx + 26).toFixed(1) + 'px');
+          shard.style.setProperty('--rot', (jit() * 17).toFixed(1) + 'deg');
+          shard.style.setProperty('--delay', Math.round(Math.abs(jit()) * 70) + 'ms');
+
+          var face = document.createElement('div');
+          face.className = 'shard-face';
+          face.style.backgroundImage = faceBg;
+          face.style.webkitClipPath = gem;
+          face.style.clipPath = gem;
+          shard.appendChild(face);
+          layer.appendChild(shard);
+        }
+        document.body.appendChild(layer);
+        dock.style.visibility = 'hidden';
+
+        setTimeout(function(){
+          if (layer.parentNode) layer.parentNode.removeChild(layer);
+          dock.hidden = true;
+        }, 780);
+      }, 175);
+    }
+
+    x.addEventListener('click', function(){
+      try { localStorage.setItem(KEY, '1'); } catch(e){}
+      if (REDUCE) {
+        dock.setAttribute('data-in', '0');
+        setTimeout(function(){ dock.hidden = true; }, 320);
+        return;
+      }
+      shatter();
+    });
+  })();
+  </script>
+<script>
+  /* ---------- scroll smoothing ----------
+     Momentum, not a position lerp. A lerp chases a fixed target, so it either snaps or
+     drags; this gives each wheel delta an impulse and lets friction carry it out, which
+     is what flows. Fast flicks accumulate velocity, so the page keeps up with the hand.
+     Tune live: window.AHScroll.friction / .travel . */
+  (function(){
+    if (window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var root = document.scrollingElement || document.documentElement;
+    var pos = null, vel = 0, raf = null, lastT = 0, prevBehavior = '';
+
+    var PRESETS = {
+      native: 0.60,   // barely there, almost the browser's own step
+      crisp:  0.76,   // ~170ms. Responsive, minimal glide
+      just:   0.82,   // ~250ms. Moves instantly, lands soft. The default
+      flow:   0.87,   // ~360ms. Long glide, more obviously animated
+      heavy:  0.91    // ~550ms. What felt like too much
+    };
+    var cfg = window.AHScroll = {
+      friction: 0.85,  // per 60Hz frame. Higher glides longer.
+      kick: 0.13,      // fraction applied instantly, so a longer tail never costs
+                       // response. Without it, friction and start speed are the same
+                       // knob and you cannot have a long glide that still feels light.
+      travel: 1,       // distance per notch against native
+      presets: PRESETS,
+      preset: function(name){
+        if (PRESETS[name] == null) return Object.keys(PRESETS).join(', ');
+        cfg.friction = PRESETS[name];
+        return name + ' → friction ' + cfg.friction;
+      }
+    };
+
+    function maxY(){ return Math.max(0, root.scrollHeight - window.innerHeight); }
+    function y(){ return window.pageYOffset || root.scrollTop || 0; }
+
+    function release(){
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      if (pos !== null) { root.style.scrollBehavior = prevBehavior; pos = null; }
+      vel = 0;
+    }
+
+    function frame(now){
+      var dt = now - lastT; lastT = now;
+      if (!(dt > 0) || dt > 64) dt = 16.7;
+      var n = dt / 16.7;
+      var f = Math.pow(cfg.friction, n);
+      // distance covered over this frame is the integral of a decaying velocity,
+      // so the motion is identical at 60Hz and 120Hz
+      var move = vel * (1 - f) / (1 - cfg.friction);
+      var lim = maxY();
+      var next = pos + move;
+      if (next <= 0) { next = 0; vel = 0; }
+      else if (next >= lim) { next = lim; vel = 0; }
+      pos = next; vel *= f;
+      root.scrollTop = pos;
+      if (Math.abs(vel) < 0.35) { root.scrollTop = Math.round(pos); release(); return; }
+      raf = requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('wheel', function(e){
+      if (e.ctrlKey || e.defaultPrevented) return;          // pinch zoom, or already handled
+      var d = e.deltaY;
+      if (e.deltaMode === 1) d *= 33;                       // lines
+      else if (e.deltaMode === 2) d *= window.innerHeight;   // pages
+      d *= cfg.travel;
+      if (!d) return;
+
+      var cur = y(), lim = maxY();
+      if ((d < 0 && cur <= 0) || (d > 0 && cur >= lim)) return;   // pinned: let the browser have it
+      e.preventDefault();
+
+      if (pos === null) {
+        pos = cur;
+        // html carries scroll-behavior: smooth, which would re-animate every frame here
+        prevBehavior = root.style.scrollBehavior;
+        root.style.scrollBehavior = 'auto';
+        lastT = (window.performance ? performance.now() : Date.now());
+      }
+      // part of the delta lands on this frame, the rest glides out
+      var kick = d * cfg.kick;
+      pos = Math.max(0, Math.min(lim, pos + kick));
+      root.scrollTop = pos;
+      vel += (d - kick) * (1 - cfg.friction);
+      if (!raf) raf = requestAnimationFrame(frame);
+    }, { passive: false });
+
+    // any other input takes control straight back
+    ['keydown','mousedown','touchstart'].forEach(function(t){
+      window.addEventListener(t, release, { passive: true });
+    });
+  })();
+</script>
 </body></html>
