@@ -466,23 +466,29 @@ hr {
 
   /* ---------- VSL chapters — a stitched seam of the timeline, index one tap under it ----------
      No time gate: a flower opens at every chapter the playhead reaches, and you don't hide a reward. */
-  .ch { position: relative; z-index: 10; max-width: 1040px; margin: 10px auto 0;
-    background: var(--card); border: 1px solid var(--hairline); border-radius: var(--r-panel);
-    padding: 4px 18px; box-shadow: 0 14px 30px -22px rgba(38,33,25,0.5); }
-  .ch[hidden] { display: none; }
-  .ch-reveal { animation: chIn 460ms var(--ease-out) both; }
-  @keyframes chIn { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+  /* the seam is the player's bottom lip, not a panel on the page: flush, same width,
+     same dark ground, so nothing page-like sits between the video and the CTA */
+  .ch { position: relative; z-index: 10; margin: 0;
+    background: #241d15; border: 1px solid var(--hairline); border-top: 0;
+    border-radius: 0 0 var(--r-panel) var(--r-panel);
+    padding: 2px 20px 6px; box-shadow: 0 30px 60px -18px rgba(38,33,25,0.4); }
+  .ch[hidden], .ch[data-progress="none"] { display: none; }
+  .vsl.has-seam .vsl-frame { border-radius: var(--r-panel) var(--r-panel) 0 0; }
+  .vsl.has-seam .vsl-note { display: none; }   /* empty <p> was holding the lip 20px off the frame */
+  /* fade only: a slide would move the player's own lip, and `both` left it offset 9px */
+  .ch-reveal { animation: chIn 420ms var(--ease-out) both; }
+  @keyframes chIn { from { opacity: 0; } to { opacity: 1; } }
 
-  .ch-seam { position: relative; height: 42px; margin: 0 6px; }
+  .ch-seam { position: relative; height: 30px; margin: 0 4px; }
   .ch-track { position: absolute; left: 0; right: 0; top: 14px; height: 2px;
-    background: repeating-linear-gradient(90deg, rgba(110,101,84,0.32) 0 3px, transparent 3px 9px); }
+    background: repeating-linear-gradient(90deg, rgba(247,243,234,0.20) 0 3px, transparent 3px 9px); }
   .ch-done { position: absolute; left: 0; top: 0; height: 2px; width: 0;
     background: repeating-linear-gradient(90deg, var(--wheat) 0 7px, transparent 7px 12px);
     transition: width 700ms linear; }
   .ch-needle { position: absolute; top: 8px; left: 0; width: 2px; height: 14px; margin-left: -1px;
-    background: var(--ink); border-radius: 1px; transition: left 700ms linear; }
+    background: var(--eggshell); border-radius: 1px; transition: left 700ms linear; }
   .ch-needle::after { content: ""; position: absolute; left: -2.5px; top: -4px; width: 7px; height: 7px;
-    background: var(--ink); border-radius: 50%; }
+    background: var(--eggshell); border-radius: 50%; }
   .ch-knot { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column;
     align-items: center; padding: 0 11px; background: none; border: 0; cursor: default; }
   .knot-bloom { position: absolute; top: 15px; left: 50%; width: 19px; height: 19px;
@@ -491,15 +497,13 @@ hr {
     transition: opacity 400ms var(--ease-out), transform 520ms var(--ease-out); }
   .knot-bloom canvas { width: 100%; height: 100%; display: block; }
   .knot-dot { width: 9px; height: 9px; margin-top: 11px; border-radius: 50%; display: block;
-    background: var(--card); border: 1.5px solid rgba(110,101,84,0.42);
+    background: #241d15; border: 1.5px solid rgba(247,243,234,0.34);
     transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
-  .knot-n { margin-top: 7px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
-    color: rgba(110,101,84,0.62); transition: color var(--dur-fast) var(--ease-out); }
+  .knot-n { display: none; }   /* numerals made the strip read as a control panel */
   .ch-knot[data-passed="true"] { z-index: 2; }
   .ch-knot[data-passed="true"] .knot-bloom { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   .ch-knot[data-passed="true"] .knot-dot { opacity: 0; transform: scale(0.3); }
-  .ch-knot[data-passed="true"] .knot-n { color: var(--wheat); }
-  .ch[data-progress="none"] .ch-seam { display: none; }
+  .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { border-color: var(--eggshell); }
   .ch-index[data-progress="none"] .ch-toggle { border-top: 0; }
   .ch[data-state="unlocked"] .ch-knot { cursor: pointer; }
   .ch[data-state="unlocked"] .ch-knot:hover .knot-dot { transform: scale(1.45); border-color: var(--ink); }
@@ -720,8 +724,8 @@ hr {
     .plan-head h2 { font-size: 31px; -webkit-text-stroke: 1px currentColor; }
 
     /* knots sit too close to tap reliably at this width, so the index is the control */
-    .ch { margin-top: 26px; }
-    .ch-seam { margin: 0 12px; height: 38px; }
+    .ch { margin-top: -1px; padding: 2px 12px 5px; }
+    .ch-seam { margin: 0 4px; height: 26px; }
     .ch-knot { padding: 0 7px; pointer-events: none; }
     .knot-bloom { width: 16px; height: 16px; top: 13px; }
     .ch-track, .ch-done { top: 12px; }
@@ -800,19 +804,19 @@ hr {
           <script src="https://fast.wistia.com/embed/m3irf8jprp.js" async type="module"></script>
           <wistia-player media-id="m3irf8jprp" aspect="1.7777777777777777"></wistia-player>
         </div>
+      <!-- ============ VSL CHAPTERS ============
+             Visible from the moment the player is live. Each knot opens into its own
+             cross-stitch flower as the playhead passes it (chapterBloom in asset-6.js).
+             Titles/times mirror Wistia's chapterList and are re-read from it at runtime. -->
+        <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="1212" hidden>
+          <div class="ch-seam">
+            <div class="ch-track" aria-hidden="true"><div class="ch-done"></div></div>
+            <div class="ch-needle" aria-hidden="true"></div>
+          </div>
+        </nav>
         <p class="vsl-note" aria-hidden="true"></p>
       </div>
 
-      <!-- ============ VSL CHAPTERS ============
-           Visible from the moment the player is live. Each knot opens into its own
-           cross-stitch flower as the playhead passes it (chapterBloom in asset-6.js).
-           Titles/times mirror Wistia's chapterList and are re-read from it at runtime. -->
-      <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="1212" hidden>
-        <div class="ch-seam">
-          <div class="ch-track" aria-hidden="true"><div class="ch-done"></div></div>
-          <div class="ch-needle" aria-hidden="true"></div>
-        </div>
-      </nav>
 
       <!-- CTA — smooth-scrolls to the Fillout form section below -->
       <div class="cta-row">
@@ -1107,6 +1111,9 @@ hr {
       if (nav.getAttribute('data-state') === 'unlocked' && st !== 'unlocked') return;
       nav.setAttribute('data-state', st);
       if (nav.hidden) { nav.hidden = false; nav.classList.add('ch-reveal'); }
+      // square off the player's bottom corners only while the lip is actually showing
+      if (nav.getAttribute('data-progress') !== 'none') vsl.classList.add('has-seam');
+      else vsl.classList.remove('has-seam');
       if (index) {                       // the index lives below the CTA now, so mirror state to it
         index.setAttribute('data-state', st);
         index.setAttribute('data-progress', nav.getAttribute('data-progress') || '');
@@ -1190,6 +1197,7 @@ hr {
       setTimeout(function(){
         if (live) return;
         nav.setAttribute('data-progress', 'none');
+        vsl.classList.remove('has-seam');
         setState('unlocked');
       }, 8000);
 
