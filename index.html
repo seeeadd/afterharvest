@@ -881,7 +881,9 @@ hr {
 
   /* inline booking calendar: below the form, and framed so it reads as the alternative
      rather than a second primary CTA */
-  .plan-book { margin: 46px auto 0; max-width: 720px; }
+  /* Cal needs roughly 900px to lay out details-left / calendar-right. At 720 it
+     collapsed into one very tall column, so the container runs the full measure. */
+  .plan-book { margin: 52px auto 0; max-width: 100%; }
   .plan-book-head { display: flex; align-items: center; justify-content: center; gap: 12px;
     margin-bottom: 12px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
     letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
@@ -891,11 +893,11 @@ hr {
   .plan-book-frame { background: var(--card); border: 1px solid var(--hairline);
     border-radius: var(--r-panel); padding: 6px; overflow: hidden;
     box-shadow: 0 18px 38px -30px rgba(38,33,25,0.5); }
-  #cal-3-day-event { width: 100%; min-height: 560px; }
+  #cal-3-day-event { width: 100%; min-height: 640px; }
   @media (max-width: 760px){
     .plan-book { margin-top: 34px; }
     .plan-book-lead { font-size: 15px; }
-    #cal-3-day-event { min-height: 640px; }
+    #cal-3-day-event { min-height: 720px; }
   }
 
   /* booking link: deliberately quiet, it must not compete with the form above it */
@@ -1117,20 +1119,21 @@ hr {
              Set ENDPOINT there to your Apps Script URL. See FORM-BACKEND.md. -->
         <div class="pf" id="plan-form-app"></div>
 
+      </div>
+
         <!-- Inline calendar, deliberately below the form and visually subordinate to it.
-             The form is the primary path: it produces a plan, and the plan does the selling. -->
-        <div class="plan-book">
-          <div class="plan-book-head">
-            <span class="rule"></span>
-            <span>or skip the plan and just talk</span>
-            <span class="rule"></span>
-          </div>
-          <p class="plan-book-lead">Already sure a 3-day event is right for you? Pick a time and
-            we'll go through it live. Answering the form first means we arrive with a plan already
-            built for your offer.</p>
-          <div class="plan-book-frame">
-            <div id="cal-3-day-event"></div>
-          </div>
+           The form is the primary path: it produces a plan, and the plan does the selling. -->
+      <div class="plan-book">
+        <div class="plan-book-head">
+          <span class="rule"></span>
+          <span>or skip the plan and just talk</span>
+          <span class="rule"></span>
+        </div>
+        <p class="plan-book-lead">Already sure a 3-day event is right for you? Pick a time and
+          we'll go through it live. Answering the form first means we arrive with a plan already
+          built for your offer.</p>
+        <div class="plan-book-frame">
+          <div id="cal-3-day-event"></div>
         </div>
       </div>
     </div>
