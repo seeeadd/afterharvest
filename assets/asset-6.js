@@ -863,6 +863,64 @@
     }
   }
 
+
+  /* ---------- form step markers: literal, readable at 26px on a dark card ---------- */
+  function blockRect(G,x0,y0,x1,y1,tone){
+    for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++) put(G,x,y,tone);
+  }
+  function disc(G,cx,cy,r,tone,edge){
+    for(var y=-r;y<=r;y++)for(var x=-r;x<=r;x++){
+      var d=Math.hypot(x,y)/r; if(d>1.02) continue;
+      put(G,cx+x,cy+y, d>0.66? mix(tone,edge,0.5) : tone);
+    }
+  }
+  function figure(G,cx,topY,h,tone,shade2){
+    disc(G,cx,topY+1,1.4,tone,shade2);                 /* head */
+    for(var y=topY+3;y<=topY+h;y++){                   /* shoulders widening down */
+      var w=Math.min(2, 0.6+(y-(topY+3))*0.75);
+      for(var x=-w;x<=w;x++) put(G,cx+x,y, x<0?tone:mix(tone,shade2,0.35));
+    }
+  }
+  function stepMotif(G, kind, W,H, rnd){
+    var cx=Math.round(W*0.5);
+    switch(kind){
+      case 'ui-flag':                                   /* Start */
+        blockRect(G,3,2,3,11,P.olive);                  /* pole */
+        blockRect(G,4,2,9,3,P.rust);                    /* banner */
+        blockRect(G,4,4,8,5,mix(P.rust,P.poppyHot,0.5));
+        blockRect(G,4,6,6,6,mix(P.rust,P.creamSh,0.35));
+        blockRect(G,2,11,5,12,mix(P.olive,P.oliveDk,0.5));
+        break;
+      case 'ui-people':                                 /* Audience */
+        figure(G,3,4,5,mix(P.sage,P.sageLt,0.5),P.olive);
+        figure(G,10,4,5,mix(P.sage,P.sageLt,0.5),P.olive);
+        figure(G,6.5,2,7,P.creamLt,P.creamSh);          /* front and centre */
+        break;
+      case 'ui-medal':                                  /* Experience */
+        blockRect(G,4,1,5,5,mix(P.rust,P.rustDk,0.4));  /* ribbon tails */
+        blockRect(G,8,1,9,5,mix(P.rust,P.rustDk,0.15));
+        disc(G,cx,9,3.4,P.wheat,P.wheatDk);
+        disc(G,cx,9,1.5,P.yolk,P.gold);
+        break;
+      case 'ui-cart':                                   /* Offer */
+        blockRect(G,1,2,2,3,mix(P.olive,P.creamSh,0.4)); /* handle */
+        blockRect(G,3,4,3,7,mix(P.olive,P.creamSh,0.4));
+        blockRect(G,4,4,11,4,P.creamLt);                 /* basket rim */
+        for(var y=5;y<=8;y++) blockRect(G,4+(y-5)*0.5,y,11-(y-5)*0.5,y, y%2? P.wheat : mix(P.wheat,P.creamLt,0.45));
+        disc(G,5,11,1.3,P.creamSh,P.umber);              /* wheels */
+        disc(G,10,11,1.3,P.creamSh,P.umber);
+        break;
+      case 'ui-tick':                                    /* Finish */
+        for(var i=0;i<4;i++) put(G,3+i,7+i, i?P.creamLt:mix(P.creamLt,P.sage,0.4));
+        for(var j=0;j<6;j++) put(G,7+j,10-j, P.creamLt);
+        for(var i2=0;i2<4;i2++) put(G,3+i2,8+i2, mix(P.creamLt,P.sage,0.55));
+        for(var j2=0;j2<6;j2++) put(G,7+j2,11-j2, mix(P.creamLt,P.sage,0.55));
+        break;
+      default:
+        disc(G,cx,Math.round(H*0.5),3,P.creamLt,P.creamSh);
+    }
+  }
+
   function buildMotif(kind, cols, rows, seed){
     var G=mkGrid(cols,rows), rnd=rngFrom(seed), W=cols, H=rows, cx=W*0.5, cy=H*0.5;
     switch(kind){
@@ -909,6 +967,8 @@
       case 'rosebud':
         stem(G,cx,H*0.98,cx,cy,cx+1,cy+H*0.3,P.olive,0.8); leaf(G,cx+2,cy+H*0.2,4,2,0.6,P.sage,rnd);
         rose(G,cx,cy-H*0.1,Math.round(W*0.28),{dk:P.roseDk,lt:P.roseLt},rnd); break;
+      case 'ui-flag': case 'ui-people': case 'ui-medal': case 'ui-cart': case 'ui-tick':
+        stepMotif(G, kind, W, H, rnd); break;
       case 'cosmos': case 'thistle': case 'clover': case 'chamomile': case 'tulip':
       case 'sunflower': case 'bluebell': case 'flax': case 'marigold':
       case 'cornflower': case 'yarrow':
