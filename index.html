@@ -864,8 +864,8 @@ hr {
     line-height: 1.18; color: var(--ftx); margin: 22px 0 0; }
   .pf-start-p { font-size: 16.5px; line-height: 1.55; color: var(--fmu); margin: 12px auto 0; max-width: 46ch; }
 
-  .pf-plan { position: relative; width: 176px; margin: 0 auto; }
-  .pf-plan-glow { position: absolute; inset: -34% -60%; z-index: 0; pointer-events: none;
+  .pf-plan { position: relative; width: 174px; margin: 0 auto; }
+  .pf-plan-glow { position: absolute; inset: -30% -60%; z-index: 0; pointer-events: none;
     background: radial-gradient(closest-side, rgba(200,155,75,0.55), rgba(200,155,75,0.12) 58%, rgba(200,155,75,0) 100%);
     filter: blur(14px); opacity: 0.55;
     animation: pfp-breathe 5.6s ease-in-out infinite;
@@ -874,41 +874,36 @@ hr {
   .pf-start[data-hot="1"] .pf-plan-glow { opacity: 1; transform: scale(1.12);
     background: radial-gradient(closest-side, rgba(232,161,0,0.7), rgba(200,155,75,0.18) 58%, rgba(200,155,75,0) 100%); }
 
-  .pfp { position: relative; z-index: 1; display: block; width: 100%; height: auto; overflow: visible;
-    filter: drop-shadow(0 18px 26px rgba(0,0,0,0.42)) drop-shadow(0 2px 4px rgba(0,0,0,0.25));
-    /* pinned by a corner, catching air: a hang, not a bounce */
-    transform-origin: 50% 0; transform: rotate(-3.4deg);
+  /* the sheet: a window onto the top of the doc, framed in card cream */
+  .pf-doc { position: relative; z-index: 1; width: 100%; aspect-ratio: 174 / 214; overflow: hidden;
+    border-radius: 4px; background: #fff; border: 3px solid var(--card); box-sizing: border-box;
+    box-shadow: 0 18px 30px rgba(0,0,0,0.45), 0 2px 5px rgba(0,0,0,0.3);
+    transform-origin: 50% 0; transform: rotate(-3.2deg);
     animation: pfp-hang 7s ease-in-out infinite;
-    transition: transform 620ms cubic-bezier(0.22, 1.1, 0.36, 1); }
-  @keyframes pfp-hang { 0%,100% { transform: rotate(-3.4deg) translateY(0); } 50% { transform: rotate(-4.4deg) translateY(-3px); } }
-  .pf-start[data-hot="1"] .pfp { animation: none; transform: rotate(0deg) translateY(-8px); }
-
-  /* the lines: three write themselves in on arrival, the rest wait for the hand */
-  .pfp-lines line { opacity: 0.42; stroke-dashoffset: var(--l);
-    transition: stroke-dashoffset 520ms cubic-bezier(0.3, 0.9, 0.4, 1); }
-  .pf-start[data-init="1"] .pfp-lines line:nth-child(1) { stroke-dashoffset: 0; transition-delay: 120ms; }
-  .pf-start[data-init="1"] .pfp-lines line:nth-child(2) { stroke-dashoffset: 0; transition-delay: 260ms; }
-  .pf-start[data-init="1"] .pfp-lines line:nth-child(3) { stroke-dashoffset: 0; transition-delay: 400ms; }
-  .pf-start[data-built="1"] .pfp-lines line { stroke-dashoffset: 0; }
-  .pf-start[data-built="1"] .pfp-lines line:nth-child(4) { transition-delay: 0ms; }
-  .pf-start[data-built="1"] .pfp-lines line:nth-child(5) { transition-delay: 70ms; }
-  .pf-start[data-built="1"] .pfp-lines line:nth-child(6) { transition-delay: 140ms; }
-  .pf-start[data-built="1"] .pfp-lines line:nth-child(7) { transition-delay: 210ms; }
-  .pf-start[data-built="1"] .pfp-lines line:nth-child(8) { transition-delay: 280ms; }
-  .pf-start[data-built="1"] .pfp-lines line:nth-child(9) { transition-delay: 350ms; }
-  /* the numbers block fills in last */
-  .pfp-nums rect { fill: rgba(200,155,75,0); stroke: #D9CFBB; stroke-width: 1; transition: fill 400ms var(--ease-out) 420ms; }
-  .pfp-nums line { stroke: #C89B4B; stroke-width: 2.4; stroke-linecap: round; opacity: 0; transition: opacity 300ms var(--ease-out) 560ms; }
-  .pf-start[data-built="1"] .pfp-nums rect { fill: rgba(200,155,75,0.18); }
-  .pf-start[data-built="1"] .pfp-nums line { opacity: 0.85; }
-  /* and it gets stamped */
-  .pfp-seal { transform-box: fill-box; transform-origin: 50% 50%; transform: scale(0) rotate(-14deg);
-    transition: transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1) 640ms; }
-  .pf-start[data-built="1"] .pfp-seal { transform: scale(1) rotate(0deg); }
-  /* a light passes over the paper now and then */
-  .pfp-sweep { transform-box: view-box; transform: translateX(-140px);
+    transition: transform 620ms cubic-bezier(0.22, 1.1, 0.36, 1), box-shadow 620ms var(--ease-out); }
+  @keyframes pfp-hang { 0%,100% { transform: rotate(-3.2deg) translateY(0); } 50% { transform: rotate(-4.2deg) translateY(-3px); } }
+  .pf-start[data-hot="1"] .pf-doc { animation: none; transform: rotate(0deg) translateY(-8px);
+    box-shadow: 0 26px 40px rgba(0,0,0,0.5), 0 0 26px rgba(232,161,0,0.35); }
+  .pf-doc img { display: block; width: 100%; height: auto; user-select: none;
+    transform: translateY(0); transition: transform 2.4s cubic-bezier(0.3, 0.7, 0.2, 1); }
+  /* built: you get to read down through it */
+  .pf-start[data-built="1"] .pf-doc img { transform: translateY(-46%); }
+  .pf-start[data-hot="0"][data-built="1"] .pf-doc img { transform: translateY(-18%); transition-duration: 1.6s; }
+  /* the stitched border runs round as you reach for it */
+  @property --p { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+  .pf-doc-stitch { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none;
+    --p: 22%; transition: --p 900ms cubic-bezier(0.3, 0.9, 0.4, 1) 80ms;
+    -webkit-mask: conic-gradient(from -90deg at 50% 50%, #000 var(--p), transparent 0);
+            mask: conic-gradient(from -90deg at 50% 50%, #000 var(--p), transparent 0); }
+  .pf-doc-stitch rect { fill: none; stroke: var(--wheat); stroke-width: 2.4; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 3.2 2.1; stroke-linecap: round; }
+  .pf-start[data-built="1"] .pf-doc-stitch { --p: 100%; }
+  /* a light passes over the sheet now and then */
+  .pf-doc-sweep { position: absolute; top: -20%; bottom: -20%; left: -40%; width: 34%; pointer-events: none;
+    background: linear-gradient(100deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-12deg) translateX(0);
     animation: pfp-sweep 7.5s cubic-bezier(0.4, 0, 0.6, 1) 1.8s infinite; }
-  @keyframes pfp-sweep { 0%, 78% { transform: translateX(-140px); } 100% { transform: translateX(240px); } }
+  @keyframes pfp-sweep { 0%, 78% { transform: skewX(-12deg) translateX(0); } 100% { transform: skewX(-12deg) translateX(480%); } }
 
   /* the button: the page's crystal, cut in light so it sits on the dark card */
   .pf-go { position: relative; z-index: 0; margin-top: 26px; display: inline-flex; align-items: center; gap: 12px;
@@ -952,18 +947,77 @@ hr {
   .pf-go:focus-visible { outline: 2px solid var(--yolk); outline-offset: 4px; }
 
   @media (prefers-reduced-motion: reduce){
-    .pf-plan-glow, .pfp, .pfp-sweep { animation: none; }
-    .pfp { transform: rotate(-3deg); }
-    .pfp-lines line { stroke-dashoffset: 0; transition: none; }
-    .pfp-seal { transform: none; transition: none; }
-    .pfp-nums rect { fill: rgba(200,155,75,0.18); } .pfp-nums line { opacity: 0.85; }
+    .pf-plan-glow, .pf-doc, .pf-doc-sweep { animation: none; }
+    .pf-doc { transform: rotate(-3deg); }
+    .pf-doc img, .pf-doc-stitch { transition: none; }
+    .pf-doc-stitch { --p: 100%; }
     .pf-go:hover, .pf-start[data-hot="1"] .pf-go { transform: none; }
     .pf-go::after { animation: none !important; } }
   @media (max-width: 760px){
-    .pf-plan { width: 148px; }
+    .pf-plan { width: 146px; }
     .pf-start-h { font-size: 25px; margin-top: 18px; }
     .pf-start-p { font-size: 15.5px; }
     .pf-go { padding: 16px 32px 21px; font-size: 11.5px; } }
+
+  /* ---------- thank-you: the plan is laid out, stitched, and sent ---------- */
+  .pf-make { margin: 22px auto 24px; max-width: 360px; }
+  .pf-make-stage { position: relative; height: 262px; }
+  .pf-make-doc { position: absolute; left: 50%; top: 0; width: 150px; aspect-ratio: 150 / 186; overflow: hidden;
+    transform: translateX(-50%); transform-origin: 50% 100%; border-radius: 4px; background: #fff;
+    border: 3px solid var(--card); box-sizing: border-box;
+    box-shadow: 0 16px 28px rgba(0,0,0,0.42), 0 2px 5px rgba(0,0,0,0.3);
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1.5s cubic-bezier(0.4, 0, 0.3, 1), transform 900ms cubic-bezier(0.5, 0, 0.3, 1),
+                opacity 500ms linear 500ms, box-shadow 500ms var(--ease-out); }
+  .pf-make-doc img { display: block; width: 100%; height: auto; user-select: none; }
+  /* the cursor line rides the edge of the layout as it lands */
+  .pf-make-cursor { position: absolute; left: 0; right: 0; height: 2px; top: 0; z-index: 2;
+    background: var(--wheat); box-shadow: 0 0 10px rgba(232,161,0,0.9), 0 0 2px #fff;
+    opacity: 0; transition: top 1.5s cubic-bezier(0.4, 0, 0.3, 1), opacity 200ms linear; }
+  .pf-make-stitch { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none;
+    --p: 0%; transition: --p 800ms cubic-bezier(0.3, 0.9, 0.4, 1);
+    -webkit-mask: conic-gradient(from -90deg at 50% 50%, #000 var(--p), transparent 0);
+            mask: conic-gradient(from -90deg at 50% 50%, #000 var(--p), transparent 0); }
+  .pf-make-stitch rect { fill: none; stroke: var(--wheat); stroke-width: 2.4; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 3.2 2.1; stroke-linecap: round; }
+  /* the envelope, drawn thin-line in card cream with a stitched hem */
+  .pf-make-env { position: absolute; left: 50%; bottom: 0; width: 132px; height: 92px; transform: translateX(-50%);
+    overflow: visible; opacity: 0; transition: opacity 400ms linear; }
+  .pf-make-env .env-back { fill: var(--card); stroke: var(--hairline); stroke-width: 1.2; }
+  .pf-make-env .env-flap { fill: none; stroke: var(--hairline); stroke-width: 1.2; }
+  .pf-make-env .env-lid { fill: #F4EFE3; stroke: var(--hairline); stroke-width: 1.2;
+    transform-box: fill-box; transform-origin: 50% 0; transform: rotateX(180deg);
+    transition: transform 520ms cubic-bezier(0.4, 0, 0.3, 1) 420ms; }
+  .pf-make-env .env-stitch { fill: none; stroke: var(--wheat); stroke-width: 1.4; stroke-dasharray: 2.2 1.6; stroke-linecap: round; opacity: 0.9; }
+  .pf-make-cap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 12px; }
+  .pf-make-t { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(247,243,234,0.6); min-height: 1.4em; transition: color 300ms var(--ease-out); }
+  .pf-make-bar { width: 150px; height: 2px; background: rgba(247,243,234,0.14); border-radius: 1px; overflow: hidden; }
+  .pf-make-bar i { display: block; height: 100%; width: 100%; background: var(--wheat);
+    transform: scaleX(0); transform-origin: 0 50%; transition: transform 1.5s cubic-bezier(0.4, 0, 0.3, 1); }
+
+  .pf-make[data-phase="1"] .pf-make-doc, .pf-make[data-phase="2"] .pf-make-doc, .pf-make[data-phase="3"] .pf-make-doc { clip-path: inset(0 0 0 0); }
+  .pf-make[data-phase="1"] .pf-make-cursor { opacity: 1; top: calc(100% - 2px); }
+  .pf-make[data-phase="1"] .pf-make-bar i { transform: scaleX(0.6); }
+  .pf-make[data-phase="2"] .pf-make-cursor { opacity: 0; top: calc(100% - 2px); }
+  .pf-make[data-phase="2"] .pf-make-stitch, .pf-make[data-phase="3"] .pf-make-stitch, .pf-make[data-phase="4"] .pf-make-stitch { --p: 100%; }
+  .pf-make[data-phase="2"] .pf-make-bar i { transform: scaleX(0.85); transition-duration: 800ms; }
+  .pf-make[data-phase="3"] .pf-make-doc { transform: translateX(-50%) translateY(-6px) scale(1.04);
+    box-shadow: 0 24px 40px rgba(0,0,0,0.45), 0 0 28px rgba(232,161,0,0.45); transition-duration: 1.5s, 420ms, 500ms, 420ms; }
+  .pf-make[data-phase="3"] .pf-make-bar i { transform: scaleX(1); transition-duration: 500ms; }
+  .pf-make[data-phase="3"] .pf-make-t { color: var(--ftx); }
+  /* sent: the doc drops into the envelope, the lid closes, the address stays */
+  .pf-make[data-phase="4"] .pf-make-doc { clip-path: inset(0 0 0 0);
+    transform: translateX(-50%) translateY(118px) scale(0.42); opacity: 0;
+    transition: transform 900ms cubic-bezier(0.5, 0, 0.3, 1), opacity 320ms linear 620ms; }
+  .pf-make[data-phase="4"] .pf-make-cursor { opacity: 0; }
+  .pf-make[data-phase="3"] .pf-make-env, .pf-make[data-phase="4"] .pf-make-env { opacity: 1; }
+  .pf-make[data-phase="4"] .pf-make-env .env-lid { transform: rotateX(0deg); }
+  .pf-make[data-phase="4"] .pf-make-bar { opacity: 0; transition: opacity 400ms linear; }
+  .pf-make[data-phase="4"] .pf-make-t { color: var(--ftx); }
+  @media (prefers-reduced-motion: reduce){
+    .pf-make-doc, .pf-make-cursor, .pf-make-stitch, .pf-make-env, .pf-make-env .env-lid, .pf-make-bar i { transition: none; } }
+  @media (max-width: 760px){ .pf-make-stage { height: 236px; } .pf-make-doc { width: 132px; } }
 
   /* ---------- the Jay artifact, under the email field ---------- */
   .pf-proof { margin: 22px 0 0; padding: 12px 12px 13px; border-radius: 8px;
@@ -2293,8 +2347,8 @@ hr {
     // under these names and the block appears; until they exist it stays hidden.
     var JAY = {
       nameOk: true,
-      header: { src: 'assets/jay-plan-header.png', keep: 52, blur: 5 },   // keep = % from the top left sharp
-      mockup: { src: 'assets/jay-plan-mockup.png', keep: 0,  blur: 3 },
+      header: { src: 'assets/jay-plan-header.jpg', keep: 58, blur: 5 },   // keep = % from the top left sharp
+      mockup: { src: 'assets/jay-plan-mockup.jpg', keep: 0,  blur: 3 },
       capNamed: 'The plan we sent Jay Clouse. His next launch did $101K+ - his biggest ever.',
       capAnon:  'The plan we sent one client. His next launch did $101K+ - his biggest ever.'
     };
@@ -2726,41 +2780,19 @@ hr {
 
     // ---- the start screen. No inputs: the plan graphic, the promise, one button.
     //      Hovering the button (or the plan) writes the plan in and stamps it. ----
-    var PLAN_SVG = '<svg class="pfp" viewBox="0 0 200 250" aria-hidden="true">' +
-      '<defs>' +
-        '<linearGradient id="pfp-paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFDF8"/><stop offset="1" stop-color="#F2ECDE"/></linearGradient>' +
-        '<linearGradient id="pfp-sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".62"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
-        '<clipPath id="pfp-clip"><path d="M12 8H158L188 38V240a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4Z"/></clipPath>' +
-      '</defs>' +
-      '<rect class="pfp-b2" x="22" y="16" width="168" height="222" rx="4" fill="#DDD5C2" transform="rotate(3.5 106 127)"/>' +
-      '<rect class="pfp-b1" x="16" y="12" width="168" height="222" rx="4" fill="#EAE3D3" transform="rotate(-2 100 123)"/>' +
-      '<g class="pfp-sheet">' +
-        '<path d="M12 8H158L188 38V240a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4Z" fill="url(#pfp-paper)"/>' +
-        '<path d="M158 8V34a4 4 0 0 0 4 4H188Z" fill="#E1D9C6"/>' +
-        '<path d="M158 8L188 38" stroke="#D3CAB4" stroke-width="1"/>' +
-        '<text x="28" y="41" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="8.6" font-weight="600" letter-spacing="1.5" fill="#262119">3-DAY EVENT PLAN</text>' +
-        '<line x1="28" y1="49" x2="118" y2="49" stroke="#C89B4B" stroke-width="1.7" stroke-linecap="round"/>' +
-        '<g class="pfp-lines" stroke="#6E6554" stroke-width="2.6" stroke-linecap="round" fill="none">' +
-          [[68,150],[80,124],[92,158],[104,136],[122,112],[134,152],[146,96],[158,142],[170,84]].map(function(l,i){
-            var L = l[1]-28;
-            return '<line x1="28" y1="'+l[0]+'" x2="'+l[1]+'" y2="'+l[0]+'" style="--l:'+L+'" stroke-dasharray="'+L+'"/>';
-          }).join('') +
-        '</g>' +
-        '<g class="pfp-nums">' +
-          '<rect x="28" y="188" width="46" height="24" rx="3"/><rect x="82" y="188" width="46" height="24" rx="3"/>' +
-          '<line x1="36" y1="200" x2="66" y2="200"/><line x1="90" y1="200" x2="120" y2="200"/>' +
-        '</g>' +
-        '<g transform="translate(152 214)"><g class="pfp-seal">' +
-          '<circle r="17" fill="#B06A4A"/><circle r="12.6" fill="none" stroke="#F7E4C8" stroke-width="1.2" stroke-dasharray="2 2.6"/>' +
-          '<path d="M-6.5 0.5l4.2 4.2 8.6-9.4" stroke="#FBF6EA" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '</g></g>' +
-        '<rect class="pfp-sweep" x="0" y="0" width="120" height="250" fill="url(#pfp-sheen)" clip-path="url(#pfp-clip)"/>' +
-      '</g></svg>';
+    // the real thing: the plan we sent Jay, cropped to a sheet. Idle it hangs and
+    // catches light; reach for the button and it lifts, the stitched border runs the
+    // whole way round, and the page scrolls down through the plan.
+    var PLAN_DOC = '<div class="pf-doc" aria-hidden="true">' +
+      '<img src="assets/jay-plan.jpg" alt="" width="900" height="1843" decoding="async" draggable="false">' +
+      '<svg class="pf-doc-stitch" viewBox="0 0 100 100" preserveAspectRatio="none">' +
+        '<rect x="1.4" y="1.4" width="97.2" height="97.2" rx="1.2" pathLength="100"/></svg>' +
+      '<span class="pf-doc-sweep"></span></div>';
 
     function startScreen(screen){
       var st = el('div','pf-start');
       var art = el('div','pf-plan');
-      art.innerHTML = '<span class="pf-plan-glow" aria-hidden="true"></span>' + PLAN_SVG;
+      art.innerHTML = '<span class="pf-plan-glow" aria-hidden="true"></span>' + PLAN_DOC;
       st.appendChild(art);
       st.appendChild(el('h3','pf-start-h', 'Get my free 3-day event plan'));
       st.appendChild(el('p','pf-start-p', 'Quick questions, about 5 minutes. The plan lands in your inbox within 48 hours.'));
@@ -2861,6 +2893,47 @@ hr {
       var sprig = el('div','pf-sprig');
       d.appendChild(sprig);
       d.appendChild(el('h3', null, "That's everything."));
+
+      // the plan being made, then going out: laid out top to bottom with a cursor line,
+      // stitched round, a lift when it is done, then folded into the envelope that
+      // carries their address. All in the page's own materials: cream, hairline,
+      // wheat thread, mono labels.
+      var mk = el('div','pf-make');
+      mk.setAttribute('data-phase','0');
+      var email = String(state.answers.email || '').trim();
+      mk.innerHTML =
+        '<div class="pf-make-stage" aria-hidden="true">' +
+          '<div class="pf-make-doc">' +
+            '<img src="assets/jay-plan.jpg" alt="" width="900" height="1843" decoding="async" draggable="false">' +
+            '<span class="pf-make-cursor"></span>' +
+            '<svg class="pf-make-stitch" viewBox="0 0 100 100" preserveAspectRatio="none">' +
+              '<rect x="1.4" y="1.4" width="97.2" height="97.2" rx="1.2" pathLength="100"/></svg>' +
+          '</div>' +
+          '<svg class="pf-make-env" viewBox="0 0 132 92">' +
+            '<path class="env-back" d="M4 30 L66 4 L128 30 V84 a4 4 0 0 1 -4 4 H8 a4 4 0 0 1 -4 -4 Z"/>' +
+            '<path class="env-flap" d="M4 30 L66 68 L128 30"/>' +
+            '<path class="env-lid" d="M4 30 L66 4 L128 30 L66 56 Z"/>' +
+            '<path class="env-stitch" d="M11 36 V80 M121 36 V80 M12 82 H120" pathLength="100"/>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="pf-make-cap"><span class="pf-make-t">Laying out your plan</span>' +
+          '<span class="pf-make-bar"><i></i></span></div>';
+      d.appendChild(mk);
+      var mkT = mk.querySelector('.pf-make-t');
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function phase(n, label){
+        mk.setAttribute('data-phase', String(n));
+        if (label != null) mkT.textContent = label;
+      }
+      var toLabel = email ? 'On its way to ' + email : 'On its way to your inbox';
+      if (reduce) { phase(4, toLabel); }
+      else {
+        setTimeout(function(){ phase(1, 'Laying out your plan'); }, 350);
+        setTimeout(function(){ phase(2, 'Stitching it up'); }, 2050);
+        setTimeout(function(){ phase(3, 'Done'); }, 2950);
+        setTimeout(function(){ phase(4, toLabel); }, 3600);
+      }
+
       d.appendChild(el('p', null, 'The AfterHarvest team will send your plan in 24 to 48 hours. Check the inbox you gave us.'));
       var book = document.createElement('a');
       book.className = 'pf-book';
