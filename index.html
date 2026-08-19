@@ -829,7 +829,18 @@ hr {
   .pf-next:hover { transform: translateY(-1px); background: #fff; }
   .pf-next:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
   .pf-err { margin-top: 13px; font-size: 15px; color: #E9A78E; min-height: 1em; }
-  .pf-reset { display: block; margin: 20px auto 0; padding: 7px 4px; background: none; border: 0;
+  /* the foot row: a worded Back and Start over, side by side, both quiet */
+  .pf-foot { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: 20px; }
+  .pf-backtxt { padding: 7px 4px; background: none; border: 0; cursor: pointer;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(247,243,234,0.55); border-bottom: 1px solid transparent;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
+  .pf-backtxt span { display: inline-block; transition: transform var(--dur-fast) var(--ease-out); }
+  .pf-backtxt:hover { color: rgba(247,243,234,0.9); border-bottom-color: rgba(247,243,234,0.4); }
+  .pf-backtxt:hover span { transform: translateX(-3px); }
+  .pf-backtxt:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
+  .pf-backtxt[hidden] { display: none; }
+  .pf-reset { display: block; margin: 0; padding: 7px 4px; background: none; border: 0;
     font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
     color: rgba(247,243,234,0.42); cursor: pointer;
     border-bottom: 1px solid transparent;
@@ -842,10 +853,135 @@ hr {
   .pf-note { margin-top: 22px; text-align: center; font-family: var(--font-mono); font-size: 10px;
     letter-spacing: 0.09em; text-transform: uppercase; color: rgba(247,243,234,0.34); }
   .pf-done { text-align: center; padding: 26px 0 14px; }
-  .pf-done h3 { font-size: 30px; margin: 0 0 12px; }
+  .pf-done h3 { font-size: 30px; margin: 0 0 12px; color: var(--ftx); }
   .pf-done p { color: var(--fmu); font-size: 17px; margin: 0 auto; max-width: 46ch; line-height: 1.6; }
   .pf-sprig { width: 62px; height: 62px; margin: 0 auto 18px; }
   .pf-sprig canvas { width: 100%; height: 100%; display: block; }
+
+  /* ---------- start screen: the plan writes itself as you reach for it ---------- */
+  .pf-start { text-align: center; padding: 6px 0 4px; }
+  .pf-start-h { font-family: 'Literata', Georgia, serif; font-size: 31px; font-weight: 600;
+    line-height: 1.18; color: var(--ftx); margin: 22px 0 0; }
+  .pf-start-p { font-size: 16.5px; line-height: 1.55; color: var(--fmu); margin: 12px auto 0; max-width: 46ch; }
+
+  .pf-plan { position: relative; width: 176px; margin: 0 auto; }
+  .pf-plan-glow { position: absolute; inset: -34% -60%; z-index: 0; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(200,155,75,0.55), rgba(200,155,75,0.12) 58%, rgba(200,155,75,0) 100%);
+    filter: blur(14px); opacity: 0.55;
+    animation: pfp-breathe 5.6s ease-in-out infinite;
+    transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
+  @keyframes pfp-breathe { 0%,100% { opacity: 0.42; transform: scale(0.96); } 50% { opacity: 0.68; transform: scale(1.04); } }
+  .pf-start[data-hot="1"] .pf-plan-glow { opacity: 1; transform: scale(1.12);
+    background: radial-gradient(closest-side, rgba(232,161,0,0.7), rgba(200,155,75,0.18) 58%, rgba(200,155,75,0) 100%); }
+
+  .pfp { position: relative; z-index: 1; display: block; width: 100%; height: auto; overflow: visible;
+    filter: drop-shadow(0 18px 26px rgba(0,0,0,0.42)) drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+    /* pinned by a corner, catching air: a hang, not a bounce */
+    transform-origin: 50% 0; transform: rotate(-3.4deg);
+    animation: pfp-hang 7s ease-in-out infinite;
+    transition: transform 620ms cubic-bezier(0.22, 1.1, 0.36, 1); }
+  @keyframes pfp-hang { 0%,100% { transform: rotate(-3.4deg) translateY(0); } 50% { transform: rotate(-4.4deg) translateY(-3px); } }
+  .pf-start[data-hot="1"] .pfp { animation: none; transform: rotate(0deg) translateY(-8px); }
+
+  /* the lines: three write themselves in on arrival, the rest wait for the hand */
+  .pfp-lines line { opacity: 0.42; stroke-dashoffset: var(--l);
+    transition: stroke-dashoffset 520ms cubic-bezier(0.3, 0.9, 0.4, 1); }
+  .pf-start[data-init="1"] .pfp-lines line:nth-child(1) { stroke-dashoffset: 0; transition-delay: 120ms; }
+  .pf-start[data-init="1"] .pfp-lines line:nth-child(2) { stroke-dashoffset: 0; transition-delay: 260ms; }
+  .pf-start[data-init="1"] .pfp-lines line:nth-child(3) { stroke-dashoffset: 0; transition-delay: 400ms; }
+  .pf-start[data-built="1"] .pfp-lines line { stroke-dashoffset: 0; }
+  .pf-start[data-built="1"] .pfp-lines line:nth-child(4) { transition-delay: 0ms; }
+  .pf-start[data-built="1"] .pfp-lines line:nth-child(5) { transition-delay: 70ms; }
+  .pf-start[data-built="1"] .pfp-lines line:nth-child(6) { transition-delay: 140ms; }
+  .pf-start[data-built="1"] .pfp-lines line:nth-child(7) { transition-delay: 210ms; }
+  .pf-start[data-built="1"] .pfp-lines line:nth-child(8) { transition-delay: 280ms; }
+  .pf-start[data-built="1"] .pfp-lines line:nth-child(9) { transition-delay: 350ms; }
+  /* the numbers block fills in last */
+  .pfp-nums rect { fill: rgba(200,155,75,0); stroke: #D9CFBB; stroke-width: 1; transition: fill 400ms var(--ease-out) 420ms; }
+  .pfp-nums line { stroke: #C89B4B; stroke-width: 2.4; stroke-linecap: round; opacity: 0; transition: opacity 300ms var(--ease-out) 560ms; }
+  .pf-start[data-built="1"] .pfp-nums rect { fill: rgba(200,155,75,0.18); }
+  .pf-start[data-built="1"] .pfp-nums line { opacity: 0.85; }
+  /* and it gets stamped */
+  .pfp-seal { transform-box: fill-box; transform-origin: 50% 50%; transform: scale(0) rotate(-14deg);
+    transition: transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1) 640ms; }
+  .pf-start[data-built="1"] .pfp-seal { transform: scale(1) rotate(0deg); }
+  /* a light passes over the paper now and then */
+  .pfp-sweep { transform-box: view-box; transform: translateX(-140px);
+    animation: pfp-sweep 7.5s cubic-bezier(0.4, 0, 0.6, 1) 1.8s infinite; }
+  @keyframes pfp-sweep { 0%, 78% { transform: translateX(-140px); } 100% { transform: translateX(240px); } }
+
+  /* the button: the page's crystal, cut in light so it sits on the dark card */
+  .pf-go { position: relative; z-index: 0; margin-top: 26px; display: inline-flex; align-items: center; gap: 12px;
+    padding: 18px 40px 23px; border: 0; cursor: pointer; color: #1E1810;
+    font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; letter-spacing: 0.11em; text-transform: uppercase;
+    clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
+    background: linear-gradient(180deg, #FFFDF8, #EEE7D7);
+    filter: drop-shadow(0 14px 22px rgba(0,0,0,0.5)) drop-shadow(0 0 16px rgba(200,155,75,0.3));
+    transition: transform var(--dur-fast) var(--ease-out), filter 0.34s var(--ease-out), color 0.28s var(--ease-out); }
+  .pf-go::before { content: ""; position: absolute; inset: 0 0 7px 0; z-index: -1;
+    clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
+    background: conic-gradient(from 202deg at 50% 4%,
+      #F4EDDD 0deg 40deg, #FFFFFF 40deg 41.5deg, #E6DDC8 41.5deg 82deg, #FFFFFF 82deg 83.5deg,
+      #F0E8D6 83.5deg 124deg, #FFFFFF 124deg 125.5deg, #E2D8C1 125.5deg 166deg, #FFFFFF 166deg 167.5deg,
+      #F4EDDD 167.5deg 208deg, #FFFFFF 208deg 209.5deg, #E6DDC8 209.5deg 250deg, #FFFFFF 250deg 251.5deg,
+      #F0E8D6 251.5deg 292deg, #FFFFFF 292deg 293.5deg, #E2D8C1 293.5deg 334deg, #FFFFFF 334deg 335.5deg, #F4EDDD 335.5deg 360deg);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), inset 0 -3px 5px rgba(120,100,60,0.22);
+    transition: filter 0.3s var(--ease-out); }
+  .pf-go::after { content: ""; position: absolute; inset: 0 0 7px 0; z-index: -1; pointer-events: none;
+    clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
+    background:
+      linear-gradient(180deg, transparent calc(56% - 1px), rgba(255,255,255,0.7) 56%, transparent calc(56% + 1px)),
+      linear-gradient(180deg, transparent calc(76% - 1px), rgba(120,100,60,0.22) 76%, transparent calc(76% + 1px)),
+      linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0) 60%);
+    background-size: 100% 100%, 100% 100%, 240% 100%;
+    background-position: 0 0, 0 0, 140% 0;
+    background-repeat: no-repeat; }
+  .pf-go-a { color: var(--rust); font-family: var(--font-serif); font-size: 16px; line-height: 1;
+    transition: transform 0.3s var(--ease-out), color 0.3s var(--ease-out); }
+  /* the build bar: fills as you hold the hand there, the same way the plan fills */
+  .pf-go-bar { position: absolute; left: 14%; right: 14%; bottom: 10px; height: 2px; border-radius: 1px;
+    background: var(--wheat); transform: scaleX(0); transform-origin: 0 50%;
+    transition: transform 700ms cubic-bezier(0.3, 0.9, 0.4, 1); }
+  .pf-go:hover, .pf-start[data-hot="1"] .pf-go { transform: translateY(-2px); color: #120E08;
+    filter: drop-shadow(0 18px 28px rgba(0,0,0,0.42)) drop-shadow(0 0 30px rgba(232,161,0,0.72)) drop-shadow(0 0 12px rgba(255,251,240,0.7)); }
+  .pf-go:hover::before, .pf-start[data-hot="1"] .pf-go::before { filter: brightness(1.06); }
+  .pf-go:hover::after, .pf-start[data-hot="1"] .pf-go::after { animation: pfgo-sweep 0.9s cubic-bezier(0.4, 0, 0.3, 1) forwards; }
+  @keyframes pfgo-sweep { from { background-position: 0 0, 0 0, 140% 0; } to { background-position: 0 0, 0 0, -60% 0; } }
+  .pf-go:hover .pf-go-a, .pf-start[data-hot="1"] .pf-go-a { transform: translateX(5px); color: #8E4B2E; }
+  .pf-go:hover .pf-go-bar, .pf-start[data-hot="1"] .pf-go-bar { transform: scaleX(1); }
+  .pf-go:focus-visible { outline: 2px solid var(--yolk); outline-offset: 4px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .pf-plan-glow, .pfp, .pfp-sweep { animation: none; }
+    .pfp { transform: rotate(-3deg); }
+    .pfp-lines line { stroke-dashoffset: 0; transition: none; }
+    .pfp-seal { transform: none; transition: none; }
+    .pfp-nums rect { fill: rgba(200,155,75,0.18); } .pfp-nums line { opacity: 0.85; }
+    .pf-go:hover, .pf-start[data-hot="1"] .pf-go { transform: none; }
+    .pf-go::after { animation: none !important; } }
+  @media (max-width: 760px){
+    .pf-plan { width: 148px; }
+    .pf-start-h { font-size: 25px; margin-top: 18px; }
+    .pf-start-p { font-size: 15.5px; }
+    .pf-go { padding: 16px 32px 21px; font-size: 11.5px; } }
+
+  /* ---------- the Jay artifact, under the email field ---------- */
+  .pf-proof { margin: 22px 0 0; padding: 12px 12px 13px; border-radius: 8px;
+    background: rgba(251,250,246,0.055); border: 1px solid rgba(251,250,246,0.14); }
+  .pf-proof[hidden] { display: none; }
+  .pf-proof-shots { display: grid; grid-template-columns: 1.15fr 1fr; gap: 10px; align-items: start; }
+  .pf-proof-shot { position: relative; overflow: hidden; border-radius: 5px; background: #fff;
+    box-shadow: 0 10px 22px -12px rgba(0,0,0,0.6); }
+  .pf-proof-shot img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+  /* a blurred twin over the sharp one, masked so only the top --keep stays legible */
+  .pf-proof-blur { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    filter: blur(var(--blur, 4px)); transform: scale(1.03);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent var(--keep, 0%), #000 calc(var(--keep, 0%) + 7%));
+            mask-image: linear-gradient(180deg, transparent 0, transparent var(--keep, 0%), #000 calc(var(--keep, 0%) + 7%)); }
+  .pf-proof-cap { margin: 11px 2px 0; font-family: 'Literata', Georgia, serif; font-size: 13.5px;
+    line-height: 1.5; color: var(--fmu); }
+  .pf-proof-cap b { font-weight: 600; color: var(--ftx); }
+  @media (max-width: 640px){ .pf-proof-shots { grid-template-columns: 1fr; } }
 
   @media (max-width: 760px){
     .pf { padding: 26px 20px 24px; border-radius: var(--r-panel); }
@@ -1259,6 +1395,14 @@ hr {
   .foot-meta span, .foot-meta a { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--umber); text-decoration: none; }
   .foot-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--wheat); flex: none; }
   .foot-meta a:hover { color: var(--ink); }
+  .foot-tx { display: inline-flex; align-items: center; gap: 6px; }
+  .foot-tx .tx-more-c { color: var(--wheat); }
+  .foot .tx-body[data-open="true"] { margin-top: 44px; padding-top: 40px;
+    border-top: 2px solid transparent;
+    border-image: repeating-linear-gradient(90deg, rgba(110,101,84,0.34) 0 3px, transparent 3px 9px) 2; }
+  .foot .tx-h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 34px;
+    line-height: 1.06; margin: 0 0 6px; -webkit-text-stroke: 1px currentColor; color: var(--ink); }
+  .foot .kf-bands { margin-top: 34px; }
   .foot-top-link { display: inline-flex; align-items: center; gap: 7px; }
   .foot-top-link span { color: var(--wheat); }
   @media (max-width: 760px){ footer.foot { margin-top: 30px; padding: 38px 0 34px; } .foot-inner { align-items: flex-start; gap: 22px; } .foot-meta .dot { display: none; } }
@@ -1447,7 +1591,7 @@ hr {
             <span><span class="step-n">Step 02</span> &middot; Get your free plan</span>
             <span class="rule"></span></div>
           <h2>Want a free 3-day live event <em>plan</em>?</h2>
-          <p>Interested if 3-day virtual events / webinars will work for you specifically? We’ll make you a mockup plan around your own offer, numbers, and audience. Answer the questions below. Takes ~5 minutes, and <em>the AfterHarvest team will send you the plan in 24–48 hours</em>.</p>
+          <p>Wondering if a 3-day event would work for your offer specifically? We’ll make you a plan built around your own offer, numbers, and audience - the topic, the structure, and the numbers we’d project. Answer the questions below. Takes ~5 minutes, and <em>the AfterHarvest team will send you the plan in 24–48 hours</em>.</p>
         </div>
         <!-- ===== PLAN FORM (own build, replaces Fillout) =====
              Screens + copy live in the SCREENS array in the script at the end of this file.
@@ -1493,25 +1637,38 @@ hr {
        Its own band at full page width. Nested inside the transcript's 748px reading
        column the three panels were 223px each, which is what made it read as a strip
        rather than a section. -->
-  <section class="brief" id="in-brief" data-screen-label="04 In brief">
-    <canvas class="brief-crystal" aria-hidden="true"></canvas>
-    <div class="brief-sprig left" aria-hidden="true"></div>
-    <div class="brief-sprig right" aria-hidden="true"></div>
-    <div class="wrap">
-      <div class="kf">
-        <div class="icp"><span class="rule"></span> The short version <span class="rule"></span></div>
-        <h2>3-day virtual events, in brief</h2>
-        <p class="kf-lead">What it is, who it works for, what we build, and how we get paid.
-          The whole video is written out down there too, word for word.</p>
 
-        <div class="kf-more">
-          <button class="tx-more" id="tx-more" type="button" aria-expanded="false" aria-controls="tx-body">
-            <span class="tx-more-t">Read the full breakdown and transcript</span>
-            <svg class="tx-more-c" viewBox="0 0 12 8" width="11" height="7" fill="none" aria-hidden="true">
-              <path d="M1 1.5 6 6.5 11 1.5" stroke="currentColor" stroke-width="1.6"
-                    stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+
+  <!-- ============ refined closing footer ============ -->
+  <footer class="foot" data-screen-label="03 Footer">
+    <span class="foot-mark" aria-hidden="true"></span>
+    <div class="wrap foot-inner">
+      <div class="foot-id">
+        <div class="txt">
+          <img class="wm2" src="assets/ah-lockup-4x.png"
+               srcset="assets/ah-lockup-2x.png 218w, assets/ah-lockup-4x.png 471w"
+               sizes="152px" alt="AfterHarvest" width="471" height="108">
+          <p class="tag">Done-for-you 3-day virtual events / webinars.</p>
+          <p class="tag founders">Founded by <b>Sean Canela</b> and <b>Theia Ahmadi</b>.</p>
+        </div>
+
+      </div>
+      <div class="foot-meta">
+        <span>© 2026 AfterHarvest</span>
+        <span class="dot" aria-hidden="true"></span>
+        <a href="mailto:sean@theseancanela.com">sean@theseancanela.com</a>
+        <span class="dot" aria-hidden="true"></span>
+        <a class="foot-tx" id="tx-more" href="#tx-body" role="button" aria-expanded="false" aria-controls="tx-body">
+          <span class="tx-more-t">Full breakdown and transcript</span> <span class="tx-more-c" aria-hidden="true">↓</span></a>
+        <span class="dot" aria-hidden="true"></span>
+        <a class="foot-top-link" href="#top">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
+    </div>
+    <!-- The long-form content lives here, collapsed. It is in the DOM for search and for
+         anyone who wants it, but it is no longer a section of the page. -->
+    <div class="wrap foot-tx-wrap">
           <div class="tx-body" id="tx-body">
+            <h2 class="tx-h2">3-day virtual events, in brief</h2>
         <div class="kf-bands">
 
           <section class="kf-band">
@@ -1675,33 +1832,6 @@ hr {
           <p>And strategize each plan myself so the worst case is you walk away with a plan that makes sense for a 3-day event and the best case is you walk away with a plan and we help you implement the actual plan and build everything for you so that&#x27;s pretty much the entire video if you have any questions</p>
           <p>You can email me here but after that feel free to answer the application form and book a call if you want but that&#x27;s it for me and I&#x27;ll see you on the other side numbers and stuff so we could plan you out</p>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ============ refined closing footer ============ -->
-  <footer class="foot" data-screen-label="03 Footer">
-    <span class="foot-mark" aria-hidden="true"></span>
-    <div class="wrap foot-inner">
-      <div class="foot-id">
-        <div class="txt">
-          <img class="wm2" src="assets/ah-lockup-4x.png"
-               srcset="assets/ah-lockup-2x.png 218w, assets/ah-lockup-4x.png 471w"
-               sizes="152px" alt="AfterHarvest" width="471" height="108">
-          <p class="tag">Done-for-you 3-day virtual events / webinars.</p>
-          <p class="tag founders">Founded by <b>Sean Canela</b> and <b>Theia Ahmadi</b>.</p>
-        </div>
-
-      </div>
-      <div class="foot-meta">
-        <span>© 2026 AfterHarvest</span>
-        <span class="dot" aria-hidden="true"></span>
-        <a href="mailto:sean@theseancanela.com">sean@theseancanela.com</a>
-        <span class="dot" aria-hidden="true"></span>
-        <a class="foot-top-link" href="#top">Back to top <span aria-hidden="true">↑</span></a>
-      </div>
     </div>
   </footer>
 
@@ -2149,50 +2279,59 @@ hr {
     var ENDPOINT = 'https://script.google.com/macros/s/AKfycbztcj5_kEXms-yYJA1JPfGHyxKDl4TVzD2P3D8PyN3do93O6NryeY33ohHVILD5-3pKGQ/exec';
 
     var LS = 'ah_plan_form_v1';
-    var SECTIONS = ['Start', 'Audience', 'Experience', 'Offer', 'Finish'];
+    var SECTIONS = ['Start', 'Offer', 'Audience', 'Launches', 'Finish'];
     // a motif per section, drawn from the same stitch engine as the hero and the chapter seam
     // cross-stitch, drawn chunky: 10x10 at cell 3 so each stitch is a deliberate mark
     // rather than texture. Flat tones, since shading is what turned to mush at marker size.
-    var SECTION_MOTIF = { Start: 'ui-flag', Audience: 'ui-people', Experience: 'ui-medal',
-                          Offer: 'ui-cart', Finish: 'ui-tick' };
+    var SECTION_MOTIF = { Start: 'ui-flag', Offer: 'ui-cart', Audience: 'ui-people',
+                          Launches: 'ui-medal', Finish: 'ui-tick' };
+
+    // Jay Clouse plan artifact, shown under the email field. Static crops of the Notion
+    // doc as sent; body text and numbers are blurred in CSS so the title and the shape
+    // read but nothing is legible. Flip nameOk to false if Jay has not cleared his name:
+    // the title blurs too and the caption goes anonymous. Drop the two crops into assets/
+    // under these names and the block appears; until they exist it stays hidden.
+    var JAY = {
+      nameOk: true,
+      header: { src: 'assets/jay-plan-header.png', keep: 52, blur: 5 },   // keep = % from the top left sharp
+      mockup: { src: 'assets/jay-plan-mockup.png', keep: 0,  blur: 3 },
+      capNamed: 'The plan we sent Jay Clouse. His next launch did $101K+ - his biggest ever.',
+      capAnon:  'The plan we sent one client. His next launch did $101K+ - his biggest ever.'
+    };
 
     // Copy is verbatim from the Fillout build. Edit here to change a question.
     var SCREENS = [
-      { s:0, f:[{ k:'anonymous', t:'radio', q:'Prefer to stay anonymous?', req:true,
-        d:"Either way works, and the plan's the same. Skipping anonymity lets us research your business deeper, which sharpens your plan.",
-        o:["I'm fine being looked up", 'Keep me anonymous'] }] },
+      { s:0, intro:true, f:[] },
       { s:0, f:[{ k:'email', t:'email', q:'Where do we send the plan?', req:true,
-        d:"Any email works, even a burner (if you preferred to stay anonymous). Your details stay between us, and we won't use them for marketing.",
-        ph:'you@example.com' }] },
-      { s:1, f:[{ k:'name', t:'text', q:'What should we call you?', req:true }] },
-      { s:1, f:[{ k:'links', t:'textarea', q:'Drop your main links',
-        d:"Site, channel, newsletter, whatever shows your world. Paste as many as you like, we'll do the digging." }] },
-      { s:1, f:[{ k:'list_size', t:'text', q:'Email list size', req:true }] },
-      { s:1, f:[{ k:'open_rate', t:'radio', q:'Typical open rate on a normal email', req:true,
-        d:'Ballpark is fine.',
-        o:['Under 20%', '20-35%', '35-50%', 'Over 50%', 'Honestly not sure'] }] },
-      { s:2, f:[
-        { k:'ran_event', t:'radio', q:'Ever run a live event?', req:true,
-          o:["Never (that's why I'm here)", 'Webinars', 'A challenge', 'A multi-day summit'] },
-        { k:'event_result', t:'textarea', q:"How'd it go, roughly?",
-          d:'Registrants, show-up, sales, whatever you remember.' }] },
-      { s:3, f:[
+        d:'Any inbox works - a burner is fine.', ph:'you@example.com', proof:true }] },
+      { s:1, f:[
         { k:'what_you_sell', t:'text', q:'What do you sell?', req:true,
           d:"Keep it general, like 'a $997 cohort course for designers.' No need to name your brand or product. If you want to come up with a new offer to sell on the event, name it as well." },
         { k:'offer_price', t:'text', q:'Main offer price', req:true,
           d:"If nothing's built yet, put the price you'd charge. The plan can start there." },
         { k:'price_type', t:'radio', q:'Is that one-time or recurring?', req:true,
           o:['One-time', 'Recurring'] }] },
+      { s:2, f:[{ k:'list_size', t:'text', q:'Email list size', req:true }] },
+      { s:2, f:[{ k:'open_rate', t:'radio', q:'Typical open rate on a normal email', req:true,
+        d:'Ballpark is fine.',
+        o:['Under 20%', '20-35%', '35-50%', 'Over 50%', 'Honestly not sure'] }] },
+      { s:3, f:[
+        { k:'ran_event', t:'radio', q:'Ever run a live event?', req:true,
+          o:["Never (that's why I'm here)", 'Webinars', 'A challenge', 'A multi-day summit'] },
+        { k:'event_result', t:'textarea', q:"How'd it go, roughly?",
+          d:'Registrants, show-up, sales, whatever you remember.' }] },
       { s:3, f:[
         { k:'launch_style', t:'radio', q:'When you promote or launch, what does that usually look like?', req:true,
           o:['An email promo or cart open', 'A webinar', 'A challenge or live event',
              'Mostly evergreen, no big pushes', "Haven't really launched anything yet"] },
         { k:'launch_collect', t:'radio', q:'Roughly what does one usually collect?', req:true,
-          d:'Your average is fin ballpark range is enough for the plan.',
+          d:'A ballpark range is enough.',
           o:['Under $10K', '$10-25K', '$25-50K', '$50-100K', '$100-250K', '$250K+'] }] },
       { s:3, f:[{ k:'timing', t:'radio', q:'If the plan looks right, when would you want to run this?', req:true,
         o:['Within ~60 days', 'This quarter', 'Next quarter', 'Just exploring'] }] },
-      { s:4, f:[{ k:'objection', t:'textarea', q:"Last one. What's the one thing that would make you NOT do this?" }],
+      { s:4, f:[{ k:'handle', t:'text', q:'Your site or @handle (optional)',
+        d:'Leave it blank to stay anonymous. Fill it in and we build the plan around what you already have out there.',
+        ph:'yoursite.com or @you' }],
         submit:'get my plan' }
     ];
 
@@ -2201,20 +2340,18 @@ hr {
     // ---- what they say ----
     // One line tied to each question, plus a bank of nudges for when someone stalls.
     var LINES = [
-      "Anonymous is fine. It just means I am guessing at your business instead of going and reading it.",
+      "Nine questions. People finish this in the time it takes their coffee to go cold.",
       "It is me and a Google Sheet on this end. Nothing is going to happen to your email.",
-      "I have to call you something in the doc, and 'anonymous person' gets strange by page three.",
-      "Whatever you paste I will actually open. Including the one you forgot was still live.",
+      "Say it how you would say it to your mum. And the price from the checkout page, not the sales page.",
       "Big or small does not decide whether this works. I have planned launches off 4,000 people and off 400,000.",
       "Whatever it looks like on a good week. I will quietly adjust.",
       "Tell me about the bad one. That is the one with the useful information in it.",
-      "Say it how you would say it to your mum. And the price from the checkout page, not the sales page.",
       "Whatever a normal one does for you. If the answer is 'nothing yet', that is also an answer.",
       "Everyone picks 'this quarter'. Almost nobody means it. Answer honestly, it changes the plan.",
-      "Give me the rude version. The polite version is never the real one."
+      "Leave it blank and I plan from the numbers alone. Put it in and I go and read everything you have ever posted. Both are fine."
     ];
     var NUDGES = [
-      "Someone once answered 'idk' to all eleven questions. I built them a plan anyway.",
+      "Someone once answered 'idk' to every single question. I built them a plan anyway.",
       "This form has a drop-off rate. Statistically you are about to leave. Prove me wrong.",
       "You have read that question four times now. It is fine either way, I promise.",
       "You could lie on this. You would just get a very good plan for a fake business.",
@@ -2375,6 +2512,29 @@ hr {
     var prev = load();
     state = (prev && prev.rid) ? prev : { rid: uid(), answers: {}, started: new Date().toISOString(), done: false };
 
+    // ---- where they came from. Read once, kept with the rid, so a return visit still
+    // carries its origin. Each field takes the first non-empty value it ever sees.
+    function readSrc(){
+      var q = {};
+      try {
+        location.search.replace(/^\?/, '').split('&').forEach(function(kv){
+          if (!kv) return; var p = kv.split('=');
+          q[decodeURIComponent(p[0])] = decodeURIComponent((p[1] || '').replace(/\+/g, ' '));
+        });
+      } catch(e){}
+      return { utm_source: q.utm_source || '', utm_medium: q.utm_medium || '',
+               utm_campaign: q.utm_campaign || '', referrer: document.referrer || '' };
+    }
+    (function(){
+      var now = readSrc(), had = state.src || {}, out = {}, changed = false;
+      ['utm_source','utm_medium','utm_campaign','referrer'].forEach(function(k){
+        out[k] = had[k] || now[k] || '';
+        if (out[k] !== had[k]) changed = true;
+      });
+      state.src = out;
+      if (changed) persist();
+    })();
+
     // ---- send. Every save carries the same rid so the sheet updates one row per visitor
     // rather than appending a new row per keystroke.
     function payload(final){
@@ -2387,7 +2547,10 @@ hr {
         complete: !!final,
         answers: state.answers,
         page: location.href,
-        referrer: document.referrer || ''
+        utm_source: state.src.utm_source,
+        utm_medium: state.src.utm_medium,
+        utm_campaign: state.src.utm_campaign,
+        referrer: state.src.referrer
       };
     }
     function send(final, useBeacon){
@@ -2449,9 +2612,21 @@ hr {
       draw();
       root.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
+    // a second, worded Back next to Start over. Going back never posts anything on its
+    // own; the row only changes again when they answer something, and it is the same
+    // rid, so the sheet keeps one row per person no matter how much they wander.
+    var backTxt = el('button','pf-backtxt','<span aria-hidden="true">&larr;</span> Back');
+    backTxt.type = 'button';
+    backTxt.addEventListener('click', function(){
+      if (at <= 0) return;
+      at--; draw();
+      root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    var footEl = el('div','pf-foot');
+    footEl.appendChild(backTxt); footEl.appendChild(resetEl);
     var bodyEl = el('div','pf-body');
     root.appendChild(backEl); root.appendChild(stepsEl); root.appendChild(bodyEl);
-    root.appendChild(resetEl);
+    root.appendChild(footEl);
 
     function drawSteps(){
       stepsEl.innerHTML = '';
@@ -2513,18 +2688,134 @@ hr {
       }
       wrap.appendChild(box);
       wrap.appendChild(el('div','pf-err'));
+      if (f.proof) wrap.appendChild(proof());
       wrap._f = f;
       return wrap;
     }
+
+    // the Jay artifact: framed in our brand, the doc inside stays in his
+    function proof(){
+      var fig = el('figure','pf-proof');
+      fig.hidden = true;                                   // shows once a crop actually loads
+      var shots = el('div','pf-proof-shots');
+      var loaded = 0;
+      [['header', JAY.header], ['mockup', JAY.mockup]].forEach(function(pair){
+        var kind = pair[0], c = pair[1];
+        var shot = el('div','pf-proof-shot');
+        shot.setAttribute('data-kind', kind);
+        var keep = (kind === 'header' && !JAY.nameOk) ? 0 : c.keep;
+        shot.style.setProperty('--keep', keep + '%');
+        shot.style.setProperty('--blur', c.blur + 'px');
+        var img = document.createElement('img');
+        img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.draggable = false;
+        img.src = c.src;
+        var blur = img.cloneNode(); blur.className = 'pf-proof-blur'; blur.setAttribute('aria-hidden','true');
+        img.addEventListener('load', function(){ loaded++; fig.hidden = false; });
+        img.addEventListener('error', function(){ shot.remove(); });
+        shot.appendChild(img); shot.appendChild(blur);
+        shots.appendChild(shot);
+      });
+      fig.appendChild(shots);
+      var cap = el('figcaption','pf-proof-cap');
+      var txt = JAY.nameOk ? JAY.capNamed : JAY.capAnon;
+      cap.innerHTML = esc(txt).replace(/\$101K\+/, '<b>$101K+</b>');
+      fig.appendChild(cap);
+      return fig;
+    }
     function clearErr(wrap){ var e = wrap.querySelector('.pf-err'); if (e) e.textContent = ''; }
+
+    // ---- the start screen. No inputs: the plan graphic, the promise, one button.
+    //      Hovering the button (or the plan) writes the plan in and stamps it. ----
+    var PLAN_SVG = '<svg class="pfp" viewBox="0 0 200 250" aria-hidden="true">' +
+      '<defs>' +
+        '<linearGradient id="pfp-paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFDF8"/><stop offset="1" stop-color="#F2ECDE"/></linearGradient>' +
+        '<linearGradient id="pfp-sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".62"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+        '<clipPath id="pfp-clip"><path d="M12 8H158L188 38V240a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4Z"/></clipPath>' +
+      '</defs>' +
+      '<rect class="pfp-b2" x="22" y="16" width="168" height="222" rx="4" fill="#DDD5C2" transform="rotate(3.5 106 127)"/>' +
+      '<rect class="pfp-b1" x="16" y="12" width="168" height="222" rx="4" fill="#EAE3D3" transform="rotate(-2 100 123)"/>' +
+      '<g class="pfp-sheet">' +
+        '<path d="M12 8H158L188 38V240a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4Z" fill="url(#pfp-paper)"/>' +
+        '<path d="M158 8V34a4 4 0 0 0 4 4H188Z" fill="#E1D9C6"/>' +
+        '<path d="M158 8L188 38" stroke="#D3CAB4" stroke-width="1"/>' +
+        '<text x="28" y="41" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="8.6" font-weight="600" letter-spacing="1.5" fill="#262119">3-DAY EVENT PLAN</text>' +
+        '<line x1="28" y1="49" x2="118" y2="49" stroke="#C89B4B" stroke-width="1.7" stroke-linecap="round"/>' +
+        '<g class="pfp-lines" stroke="#6E6554" stroke-width="2.6" stroke-linecap="round" fill="none">' +
+          [[68,150],[80,124],[92,158],[104,136],[122,112],[134,152],[146,96],[158,142],[170,84]].map(function(l,i){
+            var L = l[1]-28;
+            return '<line x1="28" y1="'+l[0]+'" x2="'+l[1]+'" y2="'+l[0]+'" style="--l:'+L+'" stroke-dasharray="'+L+'"/>';
+          }).join('') +
+        '</g>' +
+        '<g class="pfp-nums">' +
+          '<rect x="28" y="188" width="46" height="24" rx="3"/><rect x="82" y="188" width="46" height="24" rx="3"/>' +
+          '<line x1="36" y1="200" x2="66" y2="200"/><line x1="90" y1="200" x2="120" y2="200"/>' +
+        '</g>' +
+        '<g transform="translate(152 214)"><g class="pfp-seal">' +
+          '<circle r="17" fill="#B06A4A"/><circle r="12.6" fill="none" stroke="#F7E4C8" stroke-width="1.2" stroke-dasharray="2 2.6"/>' +
+          '<path d="M-6.5 0.5l4.2 4.2 8.6-9.4" stroke="#FBF6EA" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</g></g>' +
+        '<rect class="pfp-sweep" x="0" y="0" width="120" height="250" fill="url(#pfp-sheen)" clip-path="url(#pfp-clip)"/>' +
+      '</g></svg>';
+
+    function startScreen(screen){
+      var st = el('div','pf-start');
+      var art = el('div','pf-plan');
+      art.innerHTML = '<span class="pf-plan-glow" aria-hidden="true"></span>' + PLAN_SVG;
+      st.appendChild(art);
+      st.appendChild(el('h3','pf-start-h', 'Get my free 3-day event plan'));
+      st.appendChild(el('p','pf-start-p', 'Quick questions, about 5 minutes. The plan lands in your inbox within 48 hours.'));
+      var go = el('button','pf-go',
+        '<span class="pf-go-l">Build my plan</span><span class="pf-go-a" aria-hidden="true">&rarr;</span><span class="pf-go-bar" aria-hidden="true"></span>');
+      go.type = 'button';
+      function hot(on){
+        st.setAttribute('data-hot', on ? '1' : '0');
+        if (on) st.setAttribute('data-built','1');       // once written, it stays written
+      }
+      ['mouseenter','focus'].forEach(function(ev){ go.addEventListener(ev, function(){ hot(true); }); });
+      ['mouseleave','blur'].forEach(function(ev){ go.addEventListener(ev, function(){ hot(false); }); });
+      art.addEventListener('mouseenter', function(){ hot(true); });
+      art.addEventListener('mouseleave', function(){ hot(false); });
+      go.addEventListener('click', function(){
+        hot(true);
+        at = 1;
+        persist(); clearTimeout(saveT); send(false, false);   // a started row, with its source
+        draw();
+        root.scrollIntoView({ behavior:'smooth', block:'start' });
+      });
+      st.appendChild(go);
+      screen.appendChild(st);
+      // the first three lines write themselves in as the screen appears; the rest wait
+      // for the hand. On touch there is no hover, so the whole plan writes on arrival.
+      // rAF is suspended in a background tab, so a timeout stands in for it; whichever
+      // fires first does the work and the other is a no-op
+      var armed = false;
+      function arm(){
+        if (armed) return; armed = true;
+        st.setAttribute('data-init','1');
+        if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
+          setTimeout(function(){ st.setAttribute('data-built','1'); }, 900);
+        }
+      }
+      requestAnimationFrame(function(){ requestAnimationFrame(arm); });
+      setTimeout(arm, 80);
+      return go;
+    }
 
     function draw(){
       var sc = SCREENS[at];
       bodyEl.innerHTML = '';
       say(at);
       backEl.hidden = at === 0;
+      backTxt.hidden = at === 0;
       var screen = el('div','pf-screen');
       screen.setAttribute('data-on','1');
+      if (sc.intro) {
+        startScreen(screen);
+        bodyEl.appendChild(screen);
+        drawSteps();
+        resetEl.hidden = true;
+        return;
+      }
       var qs = sc.f.map(function(f){ var w = field(f); screen.appendChild(w); return w; });
 
       var next = el('button','pf-next', esc(sc.submit || 'Next') +
@@ -2562,6 +2853,7 @@ hr {
       state.done = true;
       saveSoon(true);
       backEl.hidden = true;
+      backTxt.hidden = true;
       resetEl.hidden = false;
       stepsEl.innerHTML = '';
       bodyEl.innerHTML = '';
@@ -2593,12 +2885,14 @@ hr {
     }
 
     if (state.done) finish(); else {
-      // resume where they stopped
+      // resume where they stopped. The start screen has no inputs, so it only counts
+      // as passed once something after it has been answered.
       for (var i = 0; i < SCREENS.length; i++) {
+        if (SCREENS[i].intro) continue;
         var filled = SCREENS[i].f.some(function(f){
           var v = state.answers[f.k]; return v != null && String(v).trim() !== '';
         });
-        if (!filled) break;
+        if (!filled) { if (i > 1) at = i; break; }
         at = Math.min(i + 1, SCREENS.length - 1);
       }
       draw();
@@ -2609,18 +2903,21 @@ hr {
   (function(){
     var body = document.getElementById('tx-body'), btn = document.getElementById('tx-more');
     if (!body || !btn) return;
-    btn.addEventListener('click', function(){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
       var open = body.getAttribute('data-open') === 'true';
       body.setAttribute('data-open', open ? 'false' : 'true');
       btn.setAttribute('aria-expanded', open ? 'false' : 'true');
       var t = btn.querySelector('.tx-more-t');
-      if (t) t.textContent = open ? 'Read the full breakdown and transcript' : 'Hide the breakdown';
+      if (t) t.textContent = open ? 'Full breakdown and transcript' : 'Hide the breakdown';
+      var c = btn.querySelector('.tx-more-c');
+      if (c) c.textContent = open ? '↓' : '↑';
       if (!open) return;
       // Collapsing drops about 11,000px out of the document, so the browser clamps the
-      // scroll position and drops you partway down the band with the heading cut in
-      // half. Put the top of the section back under the header instead, and do it
-      // instantly: a smooth scroll across that distance is its own kind of broken.
-      var sec = document.getElementById('in-brief');
+      // scroll position and strands you mid-transcript. Put the footer back under the
+      // header instead, and do it instantly: a smooth scroll across that distance is its
+      // own kind of broken.
+      var sec = document.querySelector('footer.foot');
       if (!sec) return;
       var y = sec.getBoundingClientRect().top + (window.pageYOffset ||
               document.documentElement.scrollTop || 0) - 84;

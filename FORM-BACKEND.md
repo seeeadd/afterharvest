@@ -28,7 +28,12 @@ const COLS = [
   'name','email','anonymous','links','list_size','open_rate',
   'ran_event','event_result','what_you_sell','offer_price','price_type',
   'launch_style','launch_collect','timing','objection',
-  'page','referrer'
+  'page','referrer',
+  // added Aug 2026 with the reordered form. New keys go on the END so the
+  // existing sheet's header row stays aligned; type these four into the next
+  // empty header cells (X, Y, Z, AA) by hand, since the script only writes a
+  // header row when the tab is empty.
+  'handle','utm_source','utm_medium','utm_campaign'
 ];
 
 function sheet_() {
@@ -115,6 +120,9 @@ browser, but nothing is sent anywhere.
 | `step` / `of` | how far they got, e.g. `4` of `11` |
 | `complete` | `TRUE` only if they pressed **get my plan** |
 | everything else | one column per question |
+| `handle` | the optional site / @handle from the last screen; blank means they chose anonymous |
+| `utm_source` / `utm_medium` / `utm_campaign` | read from the URL on first load and kept with the rid, so a return visit still shows where they first came from |
+| `referrer` | `document.referrer` on first load, kept the same way, as a backup for untagged links |
 
 A row with `complete = FALSE` is someone who walked away. That is the point:
 you can follow up on a half-filled form because you already have their email
@@ -122,6 +130,9 @@ from screen two.
 
 ## Notes
 
+- The newsletter link is `theafterharvest.com/?utm_source=creatorscience&utm_medium=newsletter`.
+- The email is posted the moment the email screen is submitted, so an abandon on any
+  later screen still leaves a contactable row.
 - Saves fire on a short debounce while typing, on every step change, and again
   when the tab is hidden or closed (via `sendBeacon`), so a closed tab still lands.
 - The request is sent as `text/plain` on purpose. That keeps it a CORS simple
