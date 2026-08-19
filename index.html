@@ -2620,7 +2620,7 @@ hr {
     // Every scheduled step carries the generation it was booked under. Anything from an
     // older generation is ignored when it fires, which is what stops a stale hide from
     // retracting the figure and leaving its bubble stranded on screen.
-    var slotAt = -1, nudgeAt = 0, gen = 0;
+    var slotAt = -1, lastSlot = -1, nudgeAt = 0, gen = 0;
     var showT = null, hideT = null, idleT = null, typeT = null;
     var LEAD = 480, HOLD = 11000, STEP_HOLD = 8400, IDLE = 11000, FIRST = 1600;
     var lastPeek = 0;
@@ -2684,7 +2684,10 @@ hr {
       clearTimeout(showT); clearTimeout(hideT);
       var prev = slotAt;
       if (prev >= 0) hideOne(prev);
-      slotAt = (prev + 1) % slots.length;
+      // rotate through ALL the figures. slotAt resets to -1 every time one hides, so
+      // stepping from it always landed on the first scarecrow; lastSlot remembers.
+      slotAt = (lastSlot + 1) % slots.length;
+      lastSlot = slotAt;
       var lead = prev >= 0 ? LEAD : 0;
       showT = setTimeout(function(){
         if (my !== gen) return;
