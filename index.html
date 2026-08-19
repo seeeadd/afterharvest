@@ -961,7 +961,7 @@ hr {
 
   /* ---------- thank-you: the plan is laid out, stitched, and sent ---------- */
   .pf-make { margin: 22px auto 24px; max-width: 360px; }
-  .pf-make-stage { position: relative; height: 262px; }
+  .pf-make-stage { position: relative; height: 262px; transition: height 600ms cubic-bezier(0.4, 0, 0.3, 1) 950ms; }
   .pf-make-doc { position: absolute; left: 50%; top: 0; width: 150px; aspect-ratio: 150 / 186; overflow: hidden;
     transform: translateX(-50%); transform-origin: 50% 100%; border-radius: 4px; background: #fff;
     border: 3px solid var(--card); box-sizing: border-box;
@@ -1015,9 +1015,13 @@ hr {
   .pf-make[data-phase="4"] .pf-make-env .env-lid { transform: rotateX(0deg); }
   .pf-make[data-phase="4"] .pf-make-bar { opacity: 0; transition: opacity 400ms linear; }
   .pf-make[data-phase="4"] .pf-make-t { color: var(--ftx); }
+  /* once the doc is inside, the empty space above it goes: the stage closes down to
+     the envelope, which leaves it sitting centred between the heading and the copy */
+  .pf-make[data-phase="4"] .pf-make-stage { height: 100px; }
   @media (prefers-reduced-motion: reduce){
     .pf-make-doc, .pf-make-cursor, .pf-make-stitch, .pf-make-env, .pf-make-env .env-lid, .pf-make-bar i { transition: none; } }
-  @media (max-width: 760px){ .pf-make-stage { height: 236px; } .pf-make-doc { width: 132px; } }
+  @media (max-width: 760px){ .pf-make-stage { height: 236px; } .pf-make-doc { width: 132px; }
+    .pf-make[data-phase="4"] .pf-make-stage { height: 100px; } }
 
   /* ---------- the Jay artifact, under the email field ---------- */
   .pf-proof { margin: 22px 0 0; padding: 12px 12px 13px; border-radius: 8px;
