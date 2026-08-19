@@ -1157,6 +1157,29 @@ hr {
   .pf-make[data-phase="4"] .pf-make-env .env-lid { transform: rotateX(0deg); }
   .pf-make[data-phase="4"] .pf-make-bar { opacity: 0; transition: opacity 400ms linear; }
   .pf-make[data-phase="4"] .pf-make-t { color: var(--ftx); }
+  /* the live row: hidden until the plan is sent, then it keeps working */
+  .pf-build { display: flex; align-items: center; justify-content: center; gap: 9px; flex-wrap: nowrap; white-space: nowrap;
+    margin-top: 14px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(247,243,234,0.62); opacity: 0; transform: translateY(6px);
+    transition: opacity 400ms var(--ease-out) 1.3s, transform 500ms var(--ease-out) 1.3s; }
+  .pf-make[data-phase="4"] .pf-build { opacity: 1; transform: none; }
+  .pf-build-dot { width: 7px; height: 7px; border-radius: 50%; background: #E8A100; flex: none;
+    box-shadow: 0 0 0 0 rgba(232,161,0,0.6); animation: pfb-pulse 2s ease-out infinite; }
+  @keyframes pfb-pulse { 0% { box-shadow: 0 0 0 0 rgba(232,161,0,0.6); } 70% { box-shadow: 0 0 0 8px rgba(232,161,0,0); } 100% { box-shadow: 0 0 0 0 rgba(232,161,0,0); } }
+  .pf-build-t { color: var(--ftx); }
+  .pf-build-t::after { content: ''; display: inline-block; width: 1.2em; text-align: left; animation: pfb-dots 1.6s steps(4, end) infinite; }
+  @keyframes pfb-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+  .pf-build-seam { display: block; overflow: visible; flex: none; }
+  /* the thread sews in from the left and the needle rides its head; then it resets and
+     goes again, because the work is still going */
+  .pf-build-thread { stroke-dasharray: 100; stroke-dashoffset: 100; animation: pfb-sew 3.6s cubic-bezier(0.4, 0, 0.3, 1) infinite; }
+  @keyframes pfb-sew { 0% { stroke-dashoffset: 100; opacity: 1; } 72% { stroke-dashoffset: 0; opacity: 1; } 86% { opacity: 0; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 100; } }
+  .pf-build-needle { transform-box: view-box; animation: pfb-needle 3.6s cubic-bezier(0.4, 0, 0.3, 1) infinite; }
+  @keyframes pfb-needle { 0% { transform: translateX(0); opacity: 1; } 72% { transform: translateX(108px); opacity: 1; } 86% { opacity: 0; transform: translateX(108px); } 100% { opacity: 0; transform: translateX(0); } }
+  .pf-build-eta { color: rgba(247,243,234,0.45); }
+  @media (prefers-reduced-motion: reduce){
+    .pf-build-dot, .pf-build-t::after, .pf-build-thread, .pf-build-needle { animation: none; }
+    .pf-build-thread { stroke-dashoffset: 40; } .pf-build-needle { transform: translateX(66px); } }
   /* once the doc is inside, the empty space above it goes: the stage closes down to
      the envelope, which leaves it sitting centred between the heading and the copy */
   .pf-make[data-phase="4"] .pf-make-stage { height: 100px; }
@@ -3200,7 +3223,18 @@ hr {
           '</svg>' +
         '</div>' +
         '<div class="pf-make-cap"><span class="pf-make-t">Laying out your plan</span>' +
-          '<span class="pf-make-bar"><i></i></span></div>';
+          '<span class="pf-make-bar"><i></i></span></div>' +
+        // and then it stays live: the seam being sewn, the needle at the head, a pulse
+        '<div class="pf-build" aria-hidden="true">' +
+          '<span class="pf-build-dot"></span>' +
+          '<span class="pf-build-t">Building your plan</span>' +
+          '<svg class="pf-build-seam" viewBox="0 0 120 14" width="120" height="14">' +
+            '<line x1="2" y1="7" x2="118" y2="7" stroke="rgba(247,243,234,0.18)" stroke-width="1.2" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>' +
+            '<line class="pf-build-thread" x1="2" y1="7" x2="118" y2="7" stroke="#C89B4B" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round" pathLength="100"/>' +
+            '<g class="pf-build-needle"><path d="M0 7 L10 2.6 L9.2 7 L10 11.4 Z" fill="#F7F3EA"/><circle cx="7.6" cy="7" r="1.1" fill="#2C2820"/></g>' +
+          '</svg>' +
+          '<span class="pf-build-eta">24 to 48h</span>' +
+        '</div>';
       d.appendChild(mk);
       var mkT = mk.querySelector('.pf-make-t');
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
