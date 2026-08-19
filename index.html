@@ -852,8 +852,10 @@ hr {
   .pf-back:focus-visible { outline: 2px solid var(--yolk); outline-offset: 2px; }
   .pf-note { margin-top: 22px; text-align: center; font-family: var(--font-mono); font-size: 10px;
     letter-spacing: 0.09em; text-transform: uppercase; color: rgba(247,243,234,0.34); }
-  .pf-done { text-align: center; padding: 26px 0 14px; }
+  .pf-done { text-align: center; padding: 10px 0 14px; }
   .pf-done h3 { font-size: 30px; margin: 0 0 12px; color: var(--ftx); }
+  .pf-done-rule { display: block; width: 64px; height: 2px; margin: 0 auto 4px;
+    background: repeating-linear-gradient(90deg, var(--wheat) 0 6px, transparent 6px 10px); }
   .pf-done p { color: var(--fmu); font-size: 17px; margin: 0 auto; max-width: 46ch; line-height: 1.6; }
   .pf-sprig { width: 210px; height: 48px; margin: 0 auto 16px; display: flex; justify-content: center; }
   .pf-sprig canvas { display: block; }
@@ -1169,17 +1171,25 @@ hr {
   .pf-build-t { color: var(--ftx); }
   .pf-build-t::after { content: ''; display: inline-block; width: 1.2em; text-align: left; animation: pfb-dots 1.6s steps(4, end) infinite; }
   @keyframes pfb-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
-  .pf-build-seam { display: block; overflow: visible; flex: none; }
-  /* the thread sews in from the left and the needle rides its head; then it resets and
-     goes again, because the work is still going */
-  .pf-build-thread { stroke-dasharray: 100; stroke-dashoffset: 100; animation: pfb-sew 3.6s cubic-bezier(0.4, 0, 0.3, 1) infinite; }
-  @keyframes pfb-sew { 0% { stroke-dashoffset: 100; opacity: 1; } 72% { stroke-dashoffset: 0; opacity: 1; } 86% { opacity: 0; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 100; } }
-  .pf-build-needle { transform-box: view-box; animation: pfb-needle 3.6s cubic-bezier(0.4, 0, 0.3, 1) infinite; }
-  @keyframes pfb-needle { 0% { transform: translateX(0); opacity: 1; } 72% { transform: translateX(108px); opacity: 1; } 86% { opacity: 0; transform: translateX(108px); } 100% { opacity: 0; transform: translateX(0); } }
+  .pf-build-cx { display: block; overflow: visible; flex: none; }
+  .pf-build-cx * { transform-box: fill-box; }
+  .cx-frame { stroke-dasharray: 100; stroke-dashoffset: 100; animation: cx-frame 4.8s cubic-bezier(0.4,0,0.3,1) infinite; }
+  @keyframes cx-frame { 0% { stroke-dashoffset: 100; } 14% { stroke-dashoffset: 0; } 84% { stroke-dashoffset: 0; opacity: 1; } 90%, 100% { opacity: 0; stroke-dashoffset: 0; } }
+  .cx-bar { transform: translateX(-70px); animation: cx-bar 4.8s cubic-bezier(0.2,1,0.3,1) infinite; }
+  @keyframes cx-bar { 0%, 14% { transform: translateX(-70px); } 26% { transform: translateX(0); } 84% { transform: translateX(0); opacity: 1; } 90%, 100% { opacity: 0; transform: translateX(0); } }
+  .cx-img { transform: translateY(-40px); animation: cx-img 4.8s cubic-bezier(0.34,1.4,0.64,1) infinite; }
+  @keyframes cx-img { 0%, 24% { transform: translateY(-40px); } 38% { transform: translateY(0); } 84% { transform: translateY(0); opacity: 1; } 90%, 100% { opacity: 0; transform: translateY(0); } }
+  .cx-l1, .cx-l2, .cx-l3 { stroke-dasharray: 100; stroke-dashoffset: 100; animation: cx-line 4.8s cubic-bezier(0.4,0,0.3,1) infinite; }
+  .cx-l2 { animation-delay: .18s; } .cx-l3 { animation-delay: .36s; }
+  @keyframes cx-line { 0%, 36% { stroke-dashoffset: 100; } 48% { stroke-dashoffset: 0; } 84% { stroke-dashoffset: 0; opacity: 1; } 90%, 100% { opacity: 0; stroke-dashoffset: 0; } }
+  .cx-btn { transform-origin: 0 50%; transform: scaleX(0); animation: cx-btn 4.8s cubic-bezier(0.34,1.5,0.64,1) infinite; }
+  @keyframes cx-btn { 0%, 54% { transform: scaleX(0); } 66% { transform: scaleX(1); } 84% { transform: scaleX(1); opacity: 1; } 90%, 100% { opacity: 0; transform: scaleX(1); } }
+  .cx-cur { animation: cx-cur 4.8s steps(1,end) infinite; }
+  @keyframes cx-cur { 0%, 66% { opacity: 0; } 68% { opacity: 1; } 72% { opacity: 0; } 76% { opacity: 1; } 80% { opacity: 0; } 84%, 100% { opacity: 0; } }
   .pf-build-eta { color: rgba(247,243,234,0.45); }
   @media (prefers-reduced-motion: reduce){
-    .pf-build-dot, .pf-build-t::after, .pf-build-thread, .pf-build-needle { animation: none; }
-    .pf-build-thread { stroke-dashoffset: 40; } .pf-build-needle { transform: translateX(66px); } }
+    .pf-build-dot, .pf-build-t::after, .pf-build-cx * { animation: none; }
+    .cx-frame, .cx-l1, .cx-l2, .cx-l3 { stroke-dashoffset: 0; } .cx-bar, .cx-img, .cx-btn { transform: none; } .cx-cur { opacity: 0; } }
   /* once the doc is inside, the empty space above it goes: the stage closes down to
      the envelope, which leaves it sitting centred between the heading and the copy */
   .pf-make[data-phase="4"] .pf-make-stage { height: 100px; }
@@ -3193,9 +3203,8 @@ hr {
       stepsEl.innerHTML = '';
       bodyEl.innerHTML = '';
       var d = el('div','pf-done');
-      var sprig = el('div','pf-sprig');
-      d.appendChild(sprig);
       d.appendChild(el('h3', null, "That's everything."));
+      d.appendChild(el('span','pf-done-rule'));
 
       // the plan being made, then going out: laid out top to bottom with a cursor line,
       // stitched round, a lift when it is done, then folded into the envelope that
@@ -3228,10 +3237,18 @@ hr {
         '<div class="pf-build" aria-hidden="true">' +
           '<span class="pf-build-dot"></span>' +
           '<span class="pf-build-t">Building your plan</span>' +
-          '<svg class="pf-build-seam" viewBox="0 0 120 14" width="120" height="14">' +
-            '<line x1="2" y1="7" x2="118" y2="7" stroke="rgba(247,243,234,0.18)" stroke-width="1.2" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>' +
-            '<line class="pf-build-thread" x1="2" y1="7" x2="118" y2="7" stroke="#C89B4B" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round" pathLength="100"/>' +
-            '<g class="pf-build-needle"><path d="M0 7 L10 2.6 L9.2 7 L10 11.4 Z" fill="#F7F3EA"/><circle cx="7.6" cy="7" r="1.1" fill="#2C2820"/></g>' +
+          // the plan being put together, block by block, on a loop: the frame, the
+          // header bar slid in, the image block dropped, the lines drawn, the button
+          // snapped on, a cursor at the end; then cleared and built again
+          '<svg class="pf-build-cx" viewBox="0 0 64 48" width="64" height="48">' +
+            '<rect class="cx-frame" x="1" y="1" width="62" height="46" rx="2" fill="none" stroke="#F7F3EA" stroke-opacity=".45" stroke-width="1" pathLength="100"/>' +
+            '<rect class="cx-bar" x="4" y="4" width="56" height="5" rx="1" fill="#F7F3EA" fill-opacity=".75"/>' +
+            '<rect class="cx-img" x="4" y="13" width="22" height="18" rx="1" fill="#C89B4B" fill-opacity=".55"/>' +
+            '<path class="cx-l1" d="M30 16h30" stroke="#F7F3EA" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" pathLength="100"/>' +
+            '<path class="cx-l2" d="M30 22h24" stroke="#F7F3EA" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" pathLength="100"/>' +
+            '<path class="cx-l3" d="M30 28h28" stroke="#F7F3EA" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" pathLength="100"/>' +
+            '<rect class="cx-btn" x="4" y="35" width="26" height="8" rx="1.5" fill="#E8A100"/>' +
+            '<rect class="cx-cur" x="34" y="35" width="1.6" height="8" fill="#F7F3EA"/>' +
           '</svg>' +
           '<span class="pf-build-eta">24 to 48h</span>' +
         '</div>';
@@ -3281,11 +3298,7 @@ hr {
       });
       d.appendChild(book);
       bodyEl.appendChild(d);
-      if (window.AHStitch) {
-        // a garland across the top, stitched in as the screen arrives
-        var cv = document.createElement('canvas'); sprig.appendChild(cv);
-        AHStitch.mount(cv, { kind:'garland', cols:70, rows:16, cell:3, seed:23, twinkle:true, animate:!reduce });
-      }
+
     }
 
     if (state.done) finish(); else {
