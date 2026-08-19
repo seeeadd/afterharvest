@@ -1850,7 +1850,7 @@ hr {
           <img class="pk-fig" src="assets/ah-peek-2.svg" alt="" width="540" height="1008" loading="lazy">
         </div>
         <div class="pk" data-slot="c" data-out="0" aria-hidden="true">
-          <img class="pk-fig" src="assets/ah-peek-4.svg" alt="" width="540" height="1008" loading="lazy">
+          <img class="pk-fig" src="assets/ah-peek-6.svg" alt="" width="540" height="1008" loading="lazy">
         </div>
         <div class="pk-say" data-slot="a" aria-hidden="true"></div>
         <div class="pk-say" data-slot="b" aria-hidden="true"></div>
@@ -3428,11 +3428,16 @@ hr {
     if (!dock || !x || !days || !cta) return;
     var LINK = 'team/afterharvest/3-day-event';
     var KEY = 'ah_dock_dismissed';
+    // Dismissal is remembered for the SESSION, not forever. A permanent flag meant one
+    // X (or one click on the button) hid the dock on every visit after, including a
+    // plain refresh, which is not what anyone wants from a booking prompt.
+    var store = (function(){ try { return window.sessionStorage; } catch(e){ return null; } })();
+    try { localStorage.removeItem(KEY); } catch(e){}          // clear the old permanent flag
     // ?dock=1 forces it open and clears a previous dismissal, so it can be checked
     // without hunting for the scroll threshold or clearing storage by hand
     var force = /[?&]dock=1/.test(location.search);
-    if (force) { try { localStorage.removeItem(KEY); } catch(e){} }
-    else { try { if (localStorage.getItem(KEY) === '1') return; } catch(e){} }
+    if (force) { try { store && store.removeItem(KEY); } catch(e){} }
+    else { try { if (store && store.getItem(KEY) === '1') return; } catch(e){} }
 
     var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     function pad(n){ return (n < 10 ? '0' : '') + n; }
@@ -3473,7 +3478,7 @@ hr {
 
     cta.addEventListener('click', function(e){
       if (openCal(picked)) e.preventDefault();
-      try { localStorage.setItem(KEY, '1'); } catch(err){}
+      try { store && store.setItem(KEY, '1'); } catch(err){}
     });
 
     var shown = false, queued = false;
@@ -3587,7 +3592,7 @@ hr {
     }
 
     x.addEventListener('click', function(){
-      try { localStorage.setItem(KEY, '1'); } catch(e){}
+      try { store && store.setItem(KEY, '1'); } catch(e){}
       if (REDUCE) {
         dock.setAttribute('data-in', '0');
         setTimeout(function(){ dock.hidden = true; }, 320);
