@@ -1432,6 +1432,17 @@ hr {
     transition: transform var(--dur-fast) var(--ease-out); }
   .pf-book:hover { transform: translateY(-1px); }
   .pf-done .pf-book { margin-top: 26px; }
+  /* the handset rings every few seconds: a quick wobble, and the two arcs pulse out */
+  .pf-book-ico { width: 17px; height: 17px; flex: none; display: block; overflow: visible; }
+  .pf-book-ico .hs { transform-box: fill-box; transform-origin: 40% 60%; animation: pfb-ring 4.2s ease-in-out 1.2s infinite; }
+  @keyframes pfb-ring { 0%, 70%, 100% { transform: rotate(0); } 74% { transform: rotate(-14deg); } 78% { transform: rotate(12deg); }
+    82% { transform: rotate(-10deg); } 86% { transform: rotate(8deg); } 90% { transform: rotate(0); } }
+  .pf-book-ico .w1, .pf-book-ico .w2 { transform-box: fill-box; transform-origin: 0% 100%; opacity: .55;
+    animation: pfb-wave 4.2s ease-out 1.2s infinite; }
+  .pf-book-ico .w2 { animation-delay: 1.35s; }
+  @keyframes pfb-wave { 0%, 70% { opacity: .55; transform: scale(1); } 76% { opacity: 1; transform: scale(1.18); } 88%, 100% { opacity: .55; transform: scale(1); } }
+  .pf-book:hover .pf-book-ico .hs { animation: pfb-ring 0.9s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce){ .pf-book-ico .hs, .pf-book-ico .w1, .pf-book-ico .w2 { animation: none; } }
 
 
   /* ---------- booking dock: a cut stone, dark, sat on the cream page ---------- */
@@ -2513,7 +2524,8 @@ hr {
           d:"If nothing's built yet, put the price you'd charge. The plan can start there." },
         { k:'price_type', t:'radio', q:'Is that one-time or recurring?', req:true,
           o:['One-time', 'Recurring'] }] },
-      { s:2, f:[{ k:'list_size', t:'text', q:'Email list size', req:true }] },
+      { s:2, f:[{ k:'list_size', t:'text', q:'Email list size', req:true,
+        d:'The number you actually send to, not the all-time total. Roughly is fine.' }] },
       { s:2, f:[{ k:'open_rate', t:'radio', q:'Typical open rate on a normal email', req:true,
         d:'Ballpark is fine.',
         o:['Under 20%', '20-35%', '35-50%', 'Over 50%', 'Honestly not sure'] }] },
@@ -3218,7 +3230,11 @@ hr {
       var book = document.createElement('a');
       book.className = 'pf-book';
       book.href = 'https://cal.com/team/afterharvest/3-day-event';
-      book.textContent = 'Or book a call now';
+      book.innerHTML = '<svg class="pf-book-ico" viewBox="0 0 20 20" fill="none" aria-hidden="true">' +
+        '<path class="hs" d="M7.1 2.9 4.9 4c-.8.4-1.15 1.35-.8 2.2a16 16 0 0 0 9.7 9.7c.85.35 1.8 0 2.2-.8l1.1-2.2c.3-.6.08-1.32-.5-1.64l-2.3-1.28a1.2 1.2 0 0 0-1.5.27l-.72.83a12 12 0 0 1-3.36-3.36l.83-.72a1.2 1.2 0 0 0 .27-1.5L8.74 3.4a1.2 1.2 0 0 0-1.64-.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>' +
+        '<path class="w1" d="M13 5.4a2.3 2.3 0 0 1 1.6 1.6" stroke="#C89B4B" stroke-width="1.4" stroke-linecap="round"/>' +
+        '<path class="w2" d="M13.5 2.5a5 5 0 0 1 4 4" stroke="#C89B4B" stroke-width="1.4" stroke-linecap="round"/></svg>' +
+        '<span>Or book a call now</span>';
       // real href as well as the popup hooks, so it still works if the embed script fails
       book.setAttribute('data-cal-namespace', '3-day-event');
       book.setAttribute('data-cal-link', 'team/afterharvest/3-day-event');
