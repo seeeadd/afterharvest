@@ -832,7 +832,7 @@ hr {
   /* the foot row: a worded Back and Start over, side by side, both quiet */
   .pf-foot { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: 20px; }
   .pf-backtxt { padding: 7px 4px; background: none; border: 0; cursor: pointer;
-    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
     color: rgba(247,243,234,0.55); border-bottom: 1px solid transparent;
     transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
   .pf-backtxt span { display: inline-block; transition: transform var(--dur-fast) var(--ease-out); }
@@ -841,7 +841,7 @@ hr {
   .pf-backtxt:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
   .pf-backtxt[hidden] { display: none; }
   .pf-reset { display: block; margin: 0; padding: 7px 4px; background: none; border: 0;
-    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
     color: rgba(247,243,234,0.42); cursor: pointer;
     border-bottom: 1px solid transparent;
     transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out); }
@@ -1012,6 +1012,7 @@ hr {
     background-size: 100% 100%, 100% 100%, 240% 100%;
     background-position: 0 0, 0 0, 140% 0;
     background-repeat: no-repeat; }
+  .pf-go-ico { width: 17px; height: 17px; flex: none; display: block; margin-bottom: 1px; }
   .pf-go-a { color: var(--rust); font-family: var(--font-serif); font-size: 16px; line-height: 1;
     transition: transform 0.3s var(--ease-out), color 0.3s var(--ease-out);
     animation: pfgo-nudge 4.6s ease-in-out 2s infinite; }
@@ -2541,7 +2542,7 @@ hr {
     // ---- what they say ----
     // One line tied to each question, plus a bank of nudges for when someone stalls.
     var LINES = [
-      "Nine questions. People finish this in the time it takes their coffee to go cold.",
+      "Nine questions. The last person who said 'I will do it later' is still on the waitlist for a tool they do not use.",
       "It is me and a Google Sheet on this end. Nothing is going to happen to your email.",
       "Say it how you would say it to your mum. And the price from the checkout page, not the sales page.",
       "Big or small does not decide whether this works. I have planned launches off 4,000 people and off 400,000.",
@@ -3022,7 +3023,7 @@ hr {
             '<circle class="pfd-dot" cx="942" cy="236" r="3.2" fill="#E8A100" stroke="none"/>' +
             '<path d="M806 392v6M874 392v6" stroke-opacity=".4" pathLength="100"/>' +
             '<text class="pfd-t" x="806" y="408" text-anchor="middle">D2</text><text class="pfd-t" x="874" y="408" text-anchor="middle">D3</text>' +
-            '<text class="pfd-t pfd-w" x="704" y="312">THE FLOOR, IN WRITING</text>' +
+            '<text class="pfd-t pfd-w" x="704" y="312">REVENUE FLOOR</text>' +
             '<text class="pfd-t" x="704" y="216">WHAT THE LAUNCH COLLECTS</text>' +
           '</g>' +
 
@@ -3057,6 +3058,13 @@ hr {
       st.appendChild(el('p','pf-start-p', 'Quick questions, about 5 minutes. The plan lands in your inbox within 48 hours.'));
       var go = el('button','pf-go',
         '<span class="pf-go-ring" aria-hidden="true"></span>' +
+        '<svg class="pf-go-ico" viewBox="0 0 20 20" fill="none" aria-hidden="true">' +
+          '<rect x="3.5" y="2.5" width="13" height="15" rx="2" stroke="currentColor" stroke-width="1.4"/>' +
+          '<rect x="7" y="1" width="6" height="3" rx="1" fill="#C89B4B"/>' +
+          '<path d="M6 8.5l1.3 1.3 2-2.4" stroke="#C89B4B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '<path d="M6 13l1.3 1.3 2-2.4" stroke="#C89B4B" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '<line x1="11" y1="8.6" x2="14" y2="8.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' +
+          '<line x1="11" y1="13.1" x2="14" y2="13.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>' +
         '<span class="pf-go-l">Build my plan</span><span class="pf-go-a" aria-hidden="true">&rarr;</span><span class="pf-go-bar" aria-hidden="true"></span>');
       go.type = 'button';
       function hot(on){
