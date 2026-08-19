@@ -855,11 +855,43 @@ hr {
   .pf-done { text-align: center; padding: 26px 0 14px; }
   .pf-done h3 { font-size: 30px; margin: 0 0 12px; color: var(--ftx); }
   .pf-done p { color: var(--fmu); font-size: 17px; margin: 0 auto; max-width: 46ch; line-height: 1.6; }
-  .pf-sprig { width: 62px; height: 62px; margin: 0 auto 18px; }
-  .pf-sprig canvas { width: 100%; height: 100%; display: block; }
+  .pf-sprig { width: 210px; height: 48px; margin: 0 auto 16px; display: flex; justify-content: center; }
+  .pf-sprig canvas { display: block; }
 
   /* ---------- start screen: the plan writes itself as you reach for it ---------- */
-  .pf-start { text-align: center; padding: 6px 0 4px; }
+  .pf-start { position: relative; text-align: center; padding: 30px 18px 30px; border-radius: 12px; isolation: isolate; }
+  .pf-start > * { position: relative; z-index: 1; }
+  /* the page's own two textures, set moving: the facet mesh drifts, a light crosses it */
+  .pf-start-bg { position: absolute; inset: 0; z-index: 0; border-radius: inherit; overflow: hidden; pointer-events: none;
+    background-color: rgba(251,250,246,0.028);
+    background-image:
+      radial-gradient(60% 80% at var(--lx, 20%) var(--ly, 30%), rgba(232,161,0,0.16), rgba(232,161,0,0) 60%),
+      url("assets/asset-14.svg"), url("assets/asset-15.svg");
+    background-size: 100% 100%, 260px 260px, 30px 30px;
+    background-position: 0 0, 0 0, 0 0;
+    background-blend-mode: screen, normal, normal;
+    opacity: 0.9;
+    animation: pfs-drift 38s linear infinite, pfs-light 11s ease-in-out infinite alternate; }
+  .pf-start-bg::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(44,40,32,0) 0%, rgba(44,40,32,0.55) 100%); }
+  @property --lx { syntax: '<percentage>'; inherits: false; initial-value: 20%; }
+  @property --ly { syntax: '<percentage>'; inherits: false; initial-value: 30%; }
+  @keyframes pfs-drift { to { background-position: 0 0, 260px 130px, 30px 30px; } }
+  @keyframes pfs-light { from { --lx: 16%; --ly: 22%; } to { --lx: 84%; --ly: 70%; } }
+  /* a glass rim with a light running round it */
+  @property --rim { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  .pf-start-rim { position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none; padding: 1px;
+    background: conic-gradient(from var(--rim) at 50% 50%,
+      rgba(247,243,234,0.05) 0deg, rgba(247,243,234,0.05) 200deg,
+      rgba(232,161,0,0.55) 250deg, rgba(255,251,240,0.95) 268deg, rgba(232,161,0,0.55) 286deg,
+      rgba(247,243,234,0.05) 330deg, rgba(247,243,234,0.05) 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: pfs-rim 9s linear infinite; }
+  @keyframes pfs-rim { to { --rim: 360deg; } }
+  .pf-start-rim::after { content: ""; position: absolute; inset: 1px; border-radius: inherit;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 40px rgba(0,0,0,0.18); }
   .pf-start-h { font-family: 'Literata', Georgia, serif; font-size: 31px; font-weight: 600;
     line-height: 1.18; color: var(--ftx); margin: 22px 0 0; }
   .pf-start-p { font-size: 16.5px; line-height: 1.55; color: var(--fmu); margin: 12px auto 0; max-width: 46ch; }
@@ -932,7 +964,29 @@ hr {
     background-position: 0 0, 0 0, 140% 0;
     background-repeat: no-repeat; }
   .pf-go-a { color: var(--rust); font-family: var(--font-serif); font-size: 16px; line-height: 1;
-    transition: transform 0.3s var(--ease-out), color 0.3s var(--ease-out); }
+    transition: transform 0.3s var(--ease-out), color 0.3s var(--ease-out);
+    animation: pfgo-nudge 4.6s ease-in-out 2s infinite; }
+  @keyframes pfgo-nudge { 0%, 82%, 100% { transform: translateX(0); } 88% { transform: translateX(4px); } 94% { transform: translateX(0); } }
+  /* a light runs round the cut edge so the thing reads as live before any hand reaches it */
+  @property --ring { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  .pf-go-ring { position: absolute; inset: -3px -3px 4px -3px; z-index: -2; pointer-events: none;
+    clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
+    background: conic-gradient(from var(--ring) at 50% 50%,
+      rgba(200,155,75,0) 0deg, rgba(200,155,75,0) 250deg, rgba(232,161,0,0.9) 300deg,
+      rgba(255,251,240,1) 320deg, rgba(232,161,0,0.9) 340deg, rgba(200,155,75,0) 360deg);
+    animation: pfgo-ring 5.2s linear infinite; }
+  @keyframes pfgo-ring { to { --ring: 360deg; } }
+  /* the facet sweep passes on its own every few seconds, and the build bar breathes */
+  .pf-go::after { animation: pfgo-idle-sweep 6s cubic-bezier(0.4, 0, 0.3, 1) 1.4s infinite; }
+  @keyframes pfgo-idle-sweep { 0%, 76% { background-position: 0 0, 0 0, 140% 0; } 100% { background-position: 0 0, 0 0, -60% 0; } }
+  .pf-go-bar { animation: pfgo-bar-idle 6s cubic-bezier(0.4, 0, 0.3, 1) 1.4s infinite; }
+  @keyframes pfgo-bar-idle { 0%, 70% { transform: scaleX(0); } 86% { transform: scaleX(1); } 100% { transform: scaleX(1); opacity: 0; } }
+  .pf-go { animation: pfgo-breathe 6s ease-in-out 1.4s infinite; }
+  @keyframes pfgo-breathe { 0%, 72%, 100% { filter: drop-shadow(0 14px 22px rgba(0,0,0,0.5)) drop-shadow(0 0 16px rgba(200,155,75,0.3)); }
+    86% { filter: drop-shadow(0 16px 24px rgba(0,0,0,0.48)) drop-shadow(0 0 26px rgba(232,161,0,0.62)); } }
+  .pf-go:hover, .pf-start[data-hot="1"] .pf-go { animation: none; }
+  .pf-go:hover .pf-go-bar, .pf-start[data-hot="1"] .pf-go-bar { animation: none; }
+  .pf-go:hover .pf-go-a, .pf-start[data-hot="1"] .pf-go-a { animation: none; }
   /* the build bar: fills as you hold the hand there, the same way the plan fills */
   .pf-go-bar { position: absolute; left: 14%; right: 14%; bottom: 10px; height: 2px; border-radius: 1px;
     background: var(--wheat); transform: scaleX(0); transform-origin: 0 50%;
@@ -952,8 +1006,9 @@ hr {
     .pf-doc img, .pf-doc-stitch { transition: none; }
     .pf-doc-stitch { --p: 100%; }
     .pf-go:hover, .pf-start[data-hot="1"] .pf-go { transform: none; }
-    .pf-go::after { animation: none !important; } }
+    .pf-go, .pf-go::after, .pf-go-bar, .pf-go-a, .pf-go-ring, .pf-start-bg, .pf-start-rim { animation: none !important; } }
   @media (max-width: 760px){
+    .pf-start { padding: 22px 12px 24px; }
     .pf-plan { width: 146px; }
     .pf-start-h { font-size: 25px; margin-top: 18px; }
     .pf-start-p { font-size: 15.5px; }
@@ -989,6 +1044,40 @@ hr {
     transform-box: fill-box; transform-origin: 50% 0; transform: rotateX(180deg);
     transition: transform 520ms cubic-bezier(0.4, 0, 0.3, 1) 420ms; }
   .pf-make-env .env-stitch { fill: none; stroke: var(--wheat); stroke-width: 1.4; stroke-dasharray: 2.2 1.6; stroke-linecap: round; opacity: 0.9; }
+  /* the parts of the plan, floating round the doc while it is laid out, then going in */
+  .pf-chip { position: absolute; left: 50%; top: 50%; z-index: 3; display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 9px 5px 7px; border-radius: 5px; white-space: nowrap;
+    background: var(--card); border: 1px solid var(--hairline); color: var(--ink);
+    font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    box-shadow: 0 8px 18px -10px rgba(0,0,0,0.7);
+    --x: 0px; --y: 0px; --r: 0deg;
+    opacity: 0; transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r)) scale(0.8);
+    transition: opacity 360ms var(--ease-out), transform 700ms cubic-bezier(0.22, 1.08, 0.36, 1); }
+  .pf-chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--wheat); flex: none; }
+  .pf-chip[style*="--i:0"] { --x: -128px; --y: -70px; --r: -6deg; }
+  .pf-chip[style*="--i:1"] { --x: 124px;  --y: -52px; --r: 5deg; }
+  .pf-chip[style*="--i:2"] { --x: -142px; --y: 4px;   --r: 4deg; }
+  .pf-chip[style*="--i:3"] { --x: 132px;  --y: 18px;  --r: -4deg; }
+  .pf-chip[style*="--i:4"] { --x: -118px; --y: 76px;  --r: -3deg; }
+  .pf-chip[style*="--i:5"] { --x: 126px;  --y: 86px;  --r: 6deg; }
+  .pf-make[data-phase="1"] .pf-chip, .pf-make[data-phase="2"] .pf-chip { opacity: 1;
+    transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r)) scale(1);
+    animation: pf-chip-float 3.4s ease-in-out infinite; animation-delay: calc(var(--i) * -0.55s); }
+  @keyframes pf-chip-float { 0%,100% { margin-top: 0; } 50% { margin-top: -5px; } }
+  .pf-make[data-phase="1"] .pf-chip { transition-delay: calc(var(--i) * 110ms + 120ms); }
+  /* stitching it up: the parts go into the doc */
+  .pf-make[data-phase="2"] .pf-chip { opacity: 0; animation: none;
+    transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(0.3);
+    transition: opacity 300ms var(--ease-out) calc(var(--i) * 70ms + 200ms), transform 600ms cubic-bezier(0.5, 0, 0.3, 1) calc(var(--i) * 70ms); }
+  .pf-make[data-phase="3"] .pf-chip, .pf-make[data-phase="4"] .pf-chip { opacity: 0; transition: none; }
+  /* blooms stitch in either side when it is done */
+  .pf-make-bloom { position: absolute; top: 34px; width: 66px; height: 90px; z-index: 0; pointer-events: none;
+    opacity: 0; transform: translateY(10px); transition: opacity 500ms var(--ease-out), transform 700ms cubic-bezier(0.22, 1.1, 0.36, 1); }
+  .pf-make-bloom.left  { left: 50%; margin-left: -150px; }
+  .pf-make-bloom.right { left: 50%; margin-left: 84px; }
+  .pf-make-bloom canvas { display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35)); }
+  .pf-make[data-phase="3"] .pf-make-bloom, .pf-make[data-phase="4"] .pf-make-bloom { opacity: 1; transform: translateY(0); }
+  .pf-make[data-phase="4"] .pf-make-bloom { top: auto; bottom: 4px; transition: opacity 500ms var(--ease-out), transform 700ms, top 0s, bottom 0s; }
   .pf-make-cap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 12px; }
   .pf-make-t { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
     color: rgba(247,243,234,0.6); min-height: 1.4em; transition: color 300ms var(--ease-out); }
@@ -1019,7 +1108,9 @@ hr {
      the envelope, which leaves it sitting centred between the heading and the copy */
   .pf-make[data-phase="4"] .pf-make-stage { height: 100px; }
   @media (prefers-reduced-motion: reduce){
-    .pf-make-doc, .pf-make-cursor, .pf-make-stitch, .pf-make-env, .pf-make-env .env-lid, .pf-make-bar i { transition: none; } }
+    .pf-make-doc, .pf-make-cursor, .pf-make-stitch, .pf-make-env, .pf-make-env .env-lid, .pf-make-bar i, .pf-chip, .pf-make-bloom { transition: none; animation: none; } }
+  @media (max-width: 420px){ .pf-chip[style*="--i:0"], .pf-chip[style*="--i:2"], .pf-chip[style*="--i:4"] { --x: -96px; }
+    .pf-chip[style*="--i:1"], .pf-chip[style*="--i:3"], .pf-chip[style*="--i:5"] { --x: 94px; } }
   @media (max-width: 760px){ .pf-make-stage { height: 236px; } .pf-make-doc { width: 132px; }
     .pf-make[data-phase="4"] .pf-make-stage { height: 100px; } }
 
@@ -2433,7 +2524,7 @@ hr {
     // retracting the figure and leaving its bubble stranded on screen.
     var slotAt = -1, nudgeAt = 0, gen = 0;
     var showT = null, hideT = null, idleT = null, typeT = null;
-    var LEAD = 480, HOLD = 8000, STEP_HOLD = 5400, IDLE = 11000, FIRST = 1600;
+    var LEAD = 480, HOLD = 11000, STEP_HOLD = 8400, IDLE = 11000, FIRST = 1600;
     var lastPeek = 0;
 
     function bubble(host, line, my){
@@ -2795,12 +2886,14 @@ hr {
 
     function startScreen(screen){
       var st = el('div','pf-start');
+      st.innerHTML = '<span class="pf-start-bg" aria-hidden="true"></span><span class="pf-start-rim" aria-hidden="true"></span>';
       var art = el('div','pf-plan');
       art.innerHTML = '<span class="pf-plan-glow" aria-hidden="true"></span>' + PLAN_DOC;
       st.appendChild(art);
       st.appendChild(el('h3','pf-start-h', 'Get my free 3-day event plan'));
       st.appendChild(el('p','pf-start-p', 'Quick questions, about 5 minutes. The plan lands in your inbox within 48 hours.'));
       var go = el('button','pf-go',
+        '<span class="pf-go-ring" aria-hidden="true"></span>' +
         '<span class="pf-go-l">Build my plan</span><span class="pf-go-a" aria-hidden="true">&rarr;</span><span class="pf-go-bar" aria-hidden="true"></span>');
       go.type = 'button';
       function hot(on){
@@ -2913,6 +3006,9 @@ hr {
             '<svg class="pf-make-stitch" viewBox="0 0 100 100" preserveAspectRatio="none">' +
               '<rect x="1.4" y="1.4" width="97.2" height="97.2" rx="1.2" pathLength="100"/></svg>' +
           '</div>' +
+          '<span class="pf-make-bloom left"></span><span class="pf-make-bloom right"></span>' +
+          ['Topic','Offer','3-day structure','Emails','Slides','Revenue floor'].map(function(c, i){
+            return '<span class="pf-chip" style="--i:' + i + '"><i></i>' + c + '</span>'; }).join('') +
           '<svg class="pf-make-env" viewBox="0 0 132 92">' +
             '<path class="env-back" d="M4 30 L66 4 L128 30 V84 a4 4 0 0 1 -4 4 H8 a4 4 0 0 1 -4 -4 Z"/>' +
             '<path class="env-flap" d="M4 30 L66 68 L128 30"/>' +
@@ -2930,11 +3026,20 @@ hr {
         if (label != null) mkT.textContent = label;
       }
       var toLabel = email ? 'On its way to ' + email : 'On its way to your inbox';
-      if (reduce) { phase(4, toLabel); }
+      function bloom(){
+        if (!window.AHStitch) return;
+        [].forEach.call(mk.querySelectorAll('.pf-make-bloom'), function(host, i){
+          if (host.firstChild) return;
+          var c = document.createElement('canvas'); host.appendChild(c);
+          AHStitch.mount(c, { kind:'spray', cols:22, rows:30, cell:3, seed: 61 + i * 13,
+                              side: i ? 'right' : 'left', twinkle:true, animate:!reduce });
+        });
+      }
+      if (reduce) { phase(4, toLabel); bloom(); }
       else {
         setTimeout(function(){ phase(1, 'Laying out your plan'); }, 350);
         setTimeout(function(){ phase(2, 'Stitching it up'); }, 2050);
-        setTimeout(function(){ phase(3, 'Done'); }, 2950);
+        setTimeout(function(){ phase(3, 'Done'); bloom(); }, 2950);
         setTimeout(function(){ phase(4, toLabel); }, 3600);
       }
 
@@ -2956,8 +3061,9 @@ hr {
       d.appendChild(book);
       bodyEl.appendChild(d);
       if (window.AHStitch) {
+        // a garland across the top, stitched in as the screen arrives
         var cv = document.createElement('canvas'); sprig.appendChild(cv);
-        AHStitch.mount(cv, { kind:'wheat', cols:14, rows:22, cell:2.6, seed:41, twinkle:false, animate:false });
+        AHStitch.mount(cv, { kind:'garland', cols:70, rows:16, cell:3, seed:23, twinkle:true, animate:!reduce });
       }
     }
 
