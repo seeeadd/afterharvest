@@ -33,6 +33,7 @@
     cream:'#EBDFC6', creamLt:'#F6EFDD', creamSh:'#D6C7A8',
     rose:'#C77E82', roseDk:'#9E5563', roseLt:'#E0AEA9',
     dusk:'#B6AFC4', plum:'#6E6079', sand:'#E8E0CF',
+    stripe:'#635BFF', stripeDk:'#4A43CC', stripeLt:'#918CFF', stripeXl:'#C6C3FF',
     ink:'#161310', inkDk:'#0B0906', inkLt:'#2C2820'
   };
 
@@ -492,29 +493,34 @@
     var scy=Math.round((ib+H-6)/2); tH(G,W-18,W-10,scy,P.creamLt); put(G,W-11,scy-1,P.creamLt); put(G,W-11,scy+1,P.creamLt);
   }
   /* 03 — checkout: order summary, card fields, secure badge, CTA + cursor */
+  /* a band running bottom-left to top-right: constant x+y, so it never fragments */
+  function tDiag(G,x0,y0,x1,y1,k,wide,tone){
+    for(var y=y0;y<=y1;y++) for(var x=x0;x<=x1;x++){
+      var d=(x+y)-k; if(d>=0 && d<wide) put(G,x,y,tone);
+    }
+  }
+
   /* PAYMENT — a card seen face on, with the band running across it, a chip, the number
      and the charge cleared. Our own thread, not anyone else's mark. */
   function techPay(G,W,H,rnd){
     var x0=2, y0=Math.round(H*0.14), x1=W-3, y1=H-Math.round(H*0.16);
 
-    /* the card, with the top edge in the light and the bottom in shadow */
-    tRect(G,x0+1,y0+1,x1-1,y1-1,P.cream,null,1);
-    tH(G,x0+2,x1-2,y0+1,P.creamLt);
-    tH(G,x0+2,x1-2,y0+2,P.creamLt);
-    tH(G,x0+2,x1-2,y1-1,P.creamSh);
-    tBorder(G,x0,y0,x1,y1,P.umberDk);
-    /* corners knocked off, so it reads as a card and not a box */
-    [[x0,y0],[x1,y0],[x0,y1],[x1,y1]].forEach(function(c){ put(G,c[0],c[1],null); });
+    /* the card in Stripe indigo, top edge in the light, bottom in shadow */
+    tRect(G,x0+1,y0+1,x1-1,y1-1,P.stripe,null,1);
+    tH(G,x0+2,x1-2,y0+1,P.stripeLt);
+    tH(G,x0+2,x1-2,y0+2,P.stripeLt);
+    tH(G,x0+2,x1-2,y1-2,P.stripeDk);
+    tH(G,x0+2,x1-2,y1-1,P.stripeDk);
+    tBorder(G,x0,y0,x1,y1,P.stripeDk);
+    /* corners softened rather than punched out: a hole shows the page through as a speck */
+    [[x0,y0],[x1,y0],[x0,y1],[x1,y1]].forEach(function(c){ put(G,c[0],c[1],P.stripeDk); });
 
     /* the band: three diagonals climbing left to right, the middle one brightest */
-    var bands=[[P.wheatDk,0,2],[P.yolk,5,3],[P.gold,11,2]];
-    for(var b=0;b<bands.length;b++){
-      var tone=bands[b][0], off=bands[b][1], wide=bands[b][2];
-      for(var y=y0+1;y<=y1-7;y++){
-        var xs=Math.round(x1-8 + off - (y-y0)*1.5);
-        for(var w=0;w<wide;w++){ var xx=xs+w; if(xx>x0+1&&xx<x1-1) put(G,xx,y,tone); }
-      }
-    }
+    var bx0=x0+1, bx1=x1-1, by0=y0+1, by1=y1-7;
+    var kMid=Math.round((bx0+bx1+by0+by1)/2) + 4;
+    tDiag(G,bx0,by0,bx1,by1,kMid-9,2,P.creamLt);
+    tDiag(G,bx0,by0,bx1,by1,kMid-3,4,P.creamLt);
+    tDiag(G,bx0,by0,bx1,by1,kMid+5,2,P.creamLt);
 
     /* the chip */
     var cx0=x0+3, cy0=y0+3, cx1=cx0+6, cy1=cy0+5;
@@ -530,8 +536,8 @@
       for(var d=0;d<3;d++){
         var dx=gx+d*2;
         if(dx>=x1-2) break;
-        put(G,dx,ny,g===3?P.umberDk:P.umber);
-        put(G,dx,ny-1,g===3?P.umberDk:P.umber);
+        put(G,dx,ny,P.creamLt);
+        put(G,dx,ny-1,P.creamLt);
       }
     }
 
@@ -542,6 +548,26 @@
     /* two strokes, two cells thick, so it survives at marker size */
     [[-2,0],[-2,-1],[-1,1],[-1,0],[0,2],[0,1]].forEach(function(o){ put(G,tx+o[0],ty+o[1],P.creamLt); });
     [[1,0],[1,1],[2,-1],[2,0],[3,-2],[3,-1]].forEach(function(o){ put(G,tx+o[0],ty+o[1],P.creamLt); });
+  }
+
+  /* STRIPE — the payment badge: an indigo tile with the diagonal bars across it, in
+     our thread. Reads at marker size, which the wordmark never would. */
+  function techStripe(G,W,H,rnd){
+    var m=Math.min(W,H), x0=Math.round((W-m)/2)+1, y0=Math.round((H-m)/2)+1;
+    var x1=x0+m-3, y1=y0+m-3;
+    tRect(G,x0,y0,x1,y1,P.stripe,null,1);
+    tH(G,x0+1,x1-1,y0,P.stripeLt);
+    tH(G,x0+1,x1-1,y0+1,P.stripeLt);
+    tH(G,x0+1,x1-1,y1,P.stripeDk);
+    tBorder(G,x0,y0,x1,y1,P.stripeDk);
+    [[x0,y0],[x1,y0],[x0,y1],[x1,y1]].forEach(function(c){ put(G,c[0],c[1],P.stripeDk); });
+
+    /* three bars climbing left to right, the middle one brightest */
+    var p2=3, bx0=x0+p2, bx1=x1-p2, by0=y0+p2, by1=y1-p2;
+    var kc=Math.round((bx0+bx1+by0+by1)/2);
+    tDiag(G,bx0,by0,bx1,by1,kc-8,2,P.creamLt);
+    tDiag(G,bx0,by0,bx1,by1,kc-2,4,P.creamLt);
+    tDiag(G,bx0,by0,bx1,by1,kc+6,2,P.creamLt);
   }
 
   function techCheckout(G,W,H,rnd){
@@ -1004,7 +1030,8 @@
       case 'ui-agenda': techAgenda(G,W,H,rnd); break;
       case 'ui-chat': techChat(G,W,H,rnd); break;
       case 'ui-checkout': techCheckout(G,W,H,rnd); break;
-      case 'ui-pay': case 'ui-stripe': case 'ui-card': techPay(G,W,H,rnd); break;
+      case 'ui-pay': case 'ui-card': techPay(G,W,H,rnd); break;
+      case 'ui-stripe': techStripe(G,W,H,rnd); break;
       case 'launch': case 'ui-launch': case 'launch-day': techLaunch(G,W,H,rnd); break;
       case 'plan-week': samplerPlan(G,W,H,rnd); break;
       case 'doubts': samplerDoubts(G,W,H,rnd); break;
