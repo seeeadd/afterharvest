@@ -492,6 +492,58 @@
     var scy=Math.round((ib+H-6)/2); tH(G,W-18,W-10,scy,P.creamLt); put(G,W-11,scy-1,P.creamLt); put(G,W-11,scy+1,P.creamLt);
   }
   /* 03 — checkout: order summary, card fields, secure badge, CTA + cursor */
+  /* PAYMENT — a card seen face on, with the band running across it, a chip, the number
+     and the charge cleared. Our own thread, not anyone else's mark. */
+  function techPay(G,W,H,rnd){
+    var x0=2, y0=Math.round(H*0.14), x1=W-3, y1=H-Math.round(H*0.16);
+
+    /* the card, with the top edge in the light and the bottom in shadow */
+    tRect(G,x0+1,y0+1,x1-1,y1-1,P.cream,null,1);
+    tH(G,x0+2,x1-2,y0+1,P.creamLt);
+    tH(G,x0+2,x1-2,y0+2,P.creamLt);
+    tH(G,x0+2,x1-2,y1-1,P.creamSh);
+    tBorder(G,x0,y0,x1,y1,P.umberDk);
+    /* corners knocked off, so it reads as a card and not a box */
+    [[x0,y0],[x1,y0],[x0,y1],[x1,y1]].forEach(function(c){ put(G,c[0],c[1],null); });
+
+    /* the band: three diagonals climbing left to right, the middle one brightest */
+    var bands=[[P.wheatDk,0,2],[P.yolk,5,3],[P.gold,11,2]];
+    for(var b=0;b<bands.length;b++){
+      var tone=bands[b][0], off=bands[b][1], wide=bands[b][2];
+      for(var y=y0+1;y<=y1-7;y++){
+        var xs=Math.round(x1-8 + off - (y-y0)*1.5);
+        for(var w=0;w<wide;w++){ var xx=xs+w; if(xx>x0+1&&xx<x1-1) put(G,xx,y,tone); }
+      }
+    }
+
+    /* the chip */
+    var cx0=x0+3, cy0=y0+3, cx1=cx0+6, cy1=cy0+5;
+    tRect(G,cx0,cy0,cx1,cy1,P.gold,null,1);
+    tBorder(G,cx0,cy0,cx1,cy1,P.wheatDk);
+    tH(G,cx0+1,cx1-1,cy0+2,P.wheatDk);
+    tV(G,cx0+3,cy0+1,cy1-1,P.wheatDk);
+
+    /* the number: four groups, the way a card prints it */
+    var ny=y1-4;
+    for(var g=0;g<4;g++){
+      var gx=x0+3+g*6;
+      for(var d=0;d<3;d++){
+        var dx=gx+d*2;
+        if(dx>=x1-2) break;
+        put(G,dx,ny,g===3?P.umberDk:P.umber);
+        put(G,dx,ny-1,g===3?P.umberDk:P.umber);
+      }
+    }
+
+    /* cleared: a dark disc with a cream tick, riding over the band */
+    var tx=x1-6, ty=y0+Math.round((y1-y0)*0.40);
+    tDisc(G,tx,ty,5,P.oliveDk);
+    tDisc(G,tx,ty,4,P.sage);
+    /* two strokes, two cells thick, so it survives at marker size */
+    [[-2,0],[-2,-1],[-1,1],[-1,0],[0,2],[0,1]].forEach(function(o){ put(G,tx+o[0],ty+o[1],P.creamLt); });
+    [[1,0],[1,1],[2,-1],[2,0],[3,-2],[3,-1]].forEach(function(o){ put(G,tx+o[0],ty+o[1],P.creamLt); });
+  }
+
   function techCheckout(G,W,H,rnd){
     tBorder(G,2,2,W-3,H-3,P.umberDk);
     var tb=Math.round(H*0.12), ty=Math.round(tb/2), mid=Math.round(W*0.5);
@@ -952,6 +1004,7 @@
       case 'ui-agenda': techAgenda(G,W,H,rnd); break;
       case 'ui-chat': techChat(G,W,H,rnd); break;
       case 'ui-checkout': techCheckout(G,W,H,rnd); break;
+      case 'ui-pay': case 'ui-stripe': case 'ui-card': techPay(G,W,H,rnd); break;
       case 'launch': case 'ui-launch': case 'launch-day': techLaunch(G,W,H,rnd); break;
       case 'plan-week': samplerPlan(G,W,H,rnd); break;
       case 'doubts': samplerDoubts(G,W,H,rnd); break;
