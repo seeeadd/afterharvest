@@ -481,7 +481,7 @@ hr {
   .vsl-title { position: relative; z-index: 2; font-family: var(--font-display); font-style: italic; font-size: 27px; color: var(--eggshell); margin-top: 6px; }
   .vsl-cap { position: absolute; left: 18px; right: 18px; bottom: 14px; z-index: 2; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(244,239,228,0.82); }
   .vsl video, .vsl iframe, .vsl wistia-player { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; border: 0; display: block; }
-  .vsl wistia-player:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/m3irf8jprp/swatch'); filter: blur(5px); }
+  .vsl wistia-player:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/adn2k88nwh/swatch'); filter: blur(5px); }
   .vsl-note { text-align: center; margin-top: 12px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--umber); }
   .hero .cta-row { flex-direction: column; justify-content: center; align-items: center; gap: 16px; margin-top: 44px; }
 
@@ -1757,17 +1757,17 @@ hr {
       <div class="vsl" data-vsl-src="">
         <div class="vsl-frame">
           <script src="https://fast.wistia.com/player.js" async></script>
-          <script src="https://fast.wistia.com/embed/m3irf8jprp.js" async type="module"></script>
+          <script src="https://fast.wistia.com/embed/adn2k88nwh.js" async type="module"></script>
           <!-- autoplay off on purpose: Wistia's silentAutoPlay starts the video muted, and on
                mobile a tap maps to play/pause rather than unmute, so it never gains sound. -->
-          <wistia-player media-id="m3irf8jprp" aspect="1.7777777777777777"
+          <wistia-player media-id="adn2k88nwh" aspect="1.7777777777777777"
             autoplay="false" silent-autoplay="false" muted="false" playsinline="true"></wistia-player>
         </div>
       <!-- ============ VSL CHAPTERS ============
              Visible from the moment the player is live. Each knot opens into its own
              cross-stitch flower as the playhead passes it (chapterBloom in asset-6.js).
              Titles/times mirror Wistia's chapterList and are re-read from it at runtime. -->
-        <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="1212" hidden>
+        <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="812" hidden>
           <!-- the list opens upward over the video: attached to what it navigates,
                costs no page flow, and never sits between the video and the CTA -->
           <div class="ch-index" id="vsl-chapter-index" data-open="false">
@@ -2268,7 +2268,7 @@ hr {
     var thumb = rail && rail.querySelector('i');
     var toggle = document.querySelector('.ch-toggle');
     var list = document.getElementById('ch-list');
-    var duration = parseFloat(nav.getAttribute('data-duration')) || 1212;
+    var duration = parseFloat(nav.getAttribute('data-duration')) || 812;
     var stops = items.map(function(b){
       return { t: parseInt(b.getAttribute('data-t'), 10) || 0, label: b.querySelector('.ch-label').textContent };
     });
