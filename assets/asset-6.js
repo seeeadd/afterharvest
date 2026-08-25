@@ -991,6 +991,79 @@
     cutStone(G, pts, tones, [cx - R*0.34, cy - R*0.62], wedge);
   }
 
+  /* SEEDS.
+     The knots render at a 13x13 grid, about 19px on the page, so anything with thin
+     parts or fine faceting turns to porridge there. Seeds are the one subject that is
+     already a compact solid: a body, one shade, one highlight. They are also what the
+     company is literally about, they carry no gendered read, and the thread stays in
+     wheat / olive / umber / sand with no rose or plum anywhere. */
+  function seedBody(G, cx, cy, rx, ry, tilt, tone, dark, lit){
+    tilt = tilt || 0;
+    var ct=Math.cos(tilt), st=Math.sin(tilt), m=Math.ceil(Math.max(rx,ry))+1;
+    for(var y=-m;y<=m;y++) for(var x=-m;x<=m;x++){
+      var u=(x*ct+y*st)/rx, v=(-x*st+y*ct)/ry, d=u*u+v*v;
+      if(d>1.05) continue;
+      /* light from the upper left, shadow along the lower right rim */
+      var t = (u+v < -0.45) ? lit : (d > 0.62 && u+v > 0.25) ? dark : tone;
+      put(G, cx+x, cy+y, t);
+    }
+  }
+  function seedStripe(G, cx, cy, len, ang, tone){
+    for(var i=-len;i<=len;i++) put(G, cx+Math.cos(ang)*i, cy+Math.sin(ang)*i, tone);
+  }
+  function seedStalk(G, cx, cy, len, lean, tone){
+    for(var i=0;i<len;i++) put(G, cx+lean*(i/len)*2, cy-i, tone);
+  }
+
+  function chapterSeed(G, kind, W, H, rnd){
+    var cx=W*0.5, cy=H*0.52, R=Math.min(W,H)*0.5;
+    switch(kind){
+      case 'seed-grain':                       /* a single ear of wheat */
+        seedBody(G,cx,cy+R*0.05,R*0.30,R*0.72,0.10,P.wheat,P.wheatDk,P.gold);
+        seedStripe(G,cx,cy,R*0.60,1.57,P.wheatDk);
+        seedStalk(G,cx,cy+R*0.78,Math.round(R*0.5),0,P.olive); break;
+      case 'seed-sunflower':                   /* striped, wedge-shaped */
+        seedBody(G,cx,cy,R*0.40,R*0.70,0.16,P.umberDk,P.ink,P.umber);
+        seedStripe(G,cx-R*0.14,cy,R*0.50,1.45,P.sand);
+        seedStripe(G,cx+R*0.14,cy,R*0.44,1.45,P.sand); break;
+      case 'seed-acorn':
+        seedBody(G,cx,cy+R*0.18,R*0.52,R*0.58,0,P.wheat,P.wheatDk,P.gold);
+        seedBody(G,cx,cy-R*0.42,R*0.56,R*0.28,0,P.olive,P.oliveDk,P.sage);
+        seedStalk(G,cx,cy-R*0.62,Math.round(R*0.34),0,P.oliveDk); break;
+      case 'seed-pinecone':
+        seedBody(G,cx,cy,R*0.48,R*0.76,0,P.rust,P.rustDk,P.wheat);
+        for(var i=-2;i<=2;i++) seedStripe(G,cx,cy+i*R*0.28,R*0.44,0.45,P.rustDk); break;
+      case 'seed-bean':
+        seedBody(G,cx,cy,R*0.66,R*0.44,-0.32,P.sand,P.umber,P.creamLt);
+        seedStripe(G,cx+R*0.10,cy+R*0.14,R*0.22,-0.32,P.umberDk); break;
+      case 'seed-pod':                         /* a split pod, seeds showing */
+        seedBody(G,cx,cy,R*0.34,R*0.80,0.22,P.olive,P.oliveDk,P.sage);
+        tDisc(G,cx-R*0.04,cy-R*0.34,Math.max(1,R*0.13),P.sand);
+        tDisc(G,cx+R*0.02,cy+R*0.02,Math.max(1,R*0.13),P.sand);
+        tDisc(G,cx+R*0.06,cy+R*0.38,Math.max(1,R*0.13),P.sand); break;
+      case 'seed-poppy':                       /* the seed head, with its crown */
+        seedBody(G,cx,cy+R*0.10,R*0.58,R*0.54,0,P.sage,P.olive,P.sageLt);
+        for(var k=-2;k<=2;k++) put(G,cx+k*1.1,cy-R*0.52,P.oliveDk);
+        seedStalk(G,cx,cy+R*0.70,Math.round(R*0.4),0,P.olive); break;
+      case 'seed-burr':                        /* spiky, but a compact core */
+        tDisc(G,cx,cy,Math.max(2,R*0.44),P.umber);
+        tDisc(G,cx-R*0.12,cy-R*0.12,Math.max(1,R*0.24),P.sand);
+        for(var b=0;b<10;b++){ var a=b/10*6.2832;
+          put(G,cx+Math.cos(a)*R*0.70,cy+Math.sin(a)*R*0.70,P.umberDk); } break;
+      case 'seed-kernel':                      /* corn */
+        seedBody(G,cx,cy,R*0.52,R*0.62,0,P.gold,P.wheatDk,P.creamLt);
+        put(G,cx,cy+R*0.52,P.wheatDk); break;
+      case 'seed-chestnut':
+        seedBody(G,cx,cy+R*0.10,R*0.62,R*0.56,0,P.rust,P.rustDk,P.wheat);
+        seedStripe(G,cx,cy+R*0.42,R*0.30,0,P.sand); break;
+      case 'seed-husk':                        /* a seed still in its papery case */
+        seedBody(G,cx,cy,R*0.44,R*0.78,-0.18,P.sand,P.umber,P.creamLt);
+        seedBody(G,cx,cy+R*0.06,R*0.20,R*0.40,-0.18,P.wheatDk,P.umberDk,P.wheat); break;
+      default:
+        seedBody(G,cx,cy,R*0.55,R*0.68,0,P.wheat,P.wheatDk,P.gold);
+    }
+  }
+
   function chapterBloom(G, kind, W,H, rnd){
     var cx=W*0.5, cy=H*0.5, R=Math.max(3,Math.round(Math.min(W,H)*0.44));
     switch(kind){
@@ -1158,6 +1231,10 @@
       case 'cut-baguette': case 'cut-trillion': case 'cut-shard': case 'cut-kite':
       case 'cut-drop': case 'cut-step': case 'cut-raw':
         chapterStone(G, kind, W, H, rnd); break;
+      case 'seed-grain': case 'seed-sunflower': case 'seed-acorn': case 'seed-pinecone':
+      case 'seed-bean': case 'seed-pod': case 'seed-poppy': case 'seed-burr':
+      case 'seed-kernel': case 'seed-chestnut': case 'seed-husk':
+        chapterSeed(G, kind, W, H, rnd); break;
       case 'sunflower': case 'bluebell': case 'flax': case 'marigold':
       case 'cornflower': case 'yarrow':
         chapterBloom(G, kind, W, H, rnd); break;
