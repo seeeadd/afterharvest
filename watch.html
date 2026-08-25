@@ -1709,7 +1709,6 @@ hr {
   <!-- ============ floating irregular sticky header ============ -->
   <div class="nav-wrap">
     <div class="nav-shell">
-      <div class="nav-garland" aria-hidden="true"></div>
       <div class="nav">
         <div class="brand"><a class="lockup" href="#top" aria-label="AfterHarvest home"><img class="wm-mark" src="assets/ah-mark-nav.svg" alt="" aria-hidden="true"><img class="wm" src="assets/asset-1.svg" alt="AfterHarvest"></a></div>
         <span class="spacer"></span>
@@ -1722,16 +1721,6 @@ hr {
   <section class="hero" id="top" data-screen-label="01 Hero">
     <div class="hero-bg" aria-hidden="true"><canvas class="crystal-cv"></canvas><div class="halo"></div></div>
     <div class="blooms" aria-hidden="true">
-      <div class="bloom" style="left:2.5%;  top:150px" data-kind="spray" data-seed="5" data-cols="24" data-rows="34" data-cell="2"></div>
-      <div class="bloom" style="left:9%;    top:440px" data-kind="teasel" data-seed="18" data-cols="17" data-rows="24" data-cell="2"></div>
-      <div class="bloom" style="left:0.5%;  top:560px" data-kind="grasshead" data-seed="22" data-cols="18" data-rows="24" data-cell="2"></div>
-      <div class="bloom" style="left:14%;   top:70px" data-kind="twig" data-seed="33" data-cols="16" data-rows="24" data-cell="2"></div>
-      <div class="bloom" style="left:4.5%;  top:700px" data-kind="wheat" data-seed="41" data-cols="15" data-rows="28" data-cell="2"></div>
-      <div class="bloom" style="right:3%;   top:96px" data-kind="pine" data-seed="7" data-cols="14" data-rows="28" data-cell="2" data-side="right"></div>
-      <div class="bloom" style="right:11%;  top:370px" data-kind="berry" data-seed="15" data-cols="16" data-rows="22" data-cell="2" data-side="right"></div>
-      <div class="bloom" style="right:0.5%; top:520px" data-kind="olive" data-seed="27" data-cols="16" data-rows="26" data-cell="2" data-side="right"></div>
-      <div class="bloom" style="right:16%;  top:200px" data-kind="seedpod" data-seed="36" data-cols="15" data-rows="24" data-cell="2" data-side="right"></div>
-      <div class="bloom" style="right:6.5%; top:700px" data-kind="stalk" data-seed="48" data-cols="14" data-rows="28" data-cell="2" data-side="right"></div>
     </div>
     <div class="wrap">
       <div class="hero-inner">
@@ -2085,19 +2074,8 @@ hr {
   var REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function mountHero() {
     if (!window.AHStitch) return;
-    var gc = document.querySelector('.nav-garland');
-    if (gc && !gc.querySelector('canvas')) {
-      var gcv = document.createElement('canvas'); gc.appendChild(gcv);
-      var gw = gc.clientWidth || 1000, gcell = 3.5;
-      AHStitch.mount(gcv, { kind: 'garland', cols: Math.min(300, Math.round(gw / gcell)), rows: 38, cell: gcell, seed: 21, animate: false });
-    }
     var cc = document.querySelector('.hero-bg .crystal-cv');
     if (cc) AHStitch.crystal(cc, { animate: !REDUCE });
-    var fs = document.querySelector('.foot-sprig');
-    if (fs && !fs.querySelector('canvas')) {
-      var fsv = document.createElement('canvas'); fs.appendChild(fsv);
-      AHStitch.mount(fsv, { kind: 'wheat', cols: 12, rows: 19, cell: 2, seed: 41, twinkle: false, animate: false });
-    }
     var ccats = document.querySelector('.cats-wrap .cats-cv');
     if (ccats) AHStitch.crystal(ccats, { animate: false });
     // The hero's crystal fills its facets with near-white, which is right on cream and
@@ -2367,13 +2345,8 @@ hr {
     // one species per knot, in planting order — see chapterBloom() in assets/asset-6.js
     var SPECIES = ['seed-grain','seed-sunflower','seed-acorn','seed-pinecone','seed-bean',
                    'seed-pod','seed-poppy','seed-burr','seed-kernel','seed-chestnut','seed-husk'];
-    function bloomInto(host, i, cell){
-      if (!host || host.__planted || !window.AHStitch) return;
-      host.__planted = true;
-      var cv = document.createElement('canvas'); host.appendChild(cv);
-      AHStitch.mount(cv, { kind: SPECIES[i % SPECIES.length],
-        cols: 13, rows: 13, cell: cell, seed: 7 + i * 13, twinkle: false, animate: false });
-    }
+    // The knots are markers now, not ornament: no motif is planted in them.
+    function bloomInto(){}
     function plant(k, i){
       var small = nav.offsetWidth < 620;
       bloomInto(k.querySelector('.knot-bloom'), i, small ? 1.35 : 1.5);
@@ -3223,7 +3196,6 @@ hr {
             '<svg class="pf-make-stitch" viewBox="0 0 100 100" preserveAspectRatio="none">' +
               '<rect x="1.4" y="1.4" width="97.2" height="97.2" rx="1.2" pathLength="100"/></svg>' +
           '</div>' +
-          '<span class="pf-make-bloom left"></span><span class="pf-make-bloom right"></span>' +
           ['Topic','Offer','3-day structure','Emails','Slides','Revenue floor'].map(function(c, i){
             return '<span class="pf-chip" style="--i:' + i + '"><i></i>' + c + '</span>'; }).join('') +
           '<svg class="pf-make-env" viewBox="0 0 132 92">' +
@@ -3262,20 +3234,11 @@ hr {
         if (label != null) mkT.textContent = label;
       }
       var toLabel = email ? 'On its way to ' + email : 'On its way to your inbox';
-      function bloom(){
-        if (!window.AHStitch) return;
-        [].forEach.call(mk.querySelectorAll('.pf-make-bloom'), function(host, i){
-          if (host.firstChild) return;
-          var c = document.createElement('canvas'); host.appendChild(c);
-          AHStitch.mount(c, { kind:'spray', cols:22, rows:30, cell:3, seed: 61 + i * 13,
-                              side: i ? 'right' : 'left', twinkle:true, animate:!reduce });
-        });
-      }
-      if (reduce) { phase(4, toLabel); bloom(); }
+      if (reduce) { phase(4, toLabel); }
       else {
         setTimeout(function(){ phase(1, 'Laying out your plan'); }, 350);
         setTimeout(function(){ phase(2, 'Stitching it up'); }, 2050);
-        setTimeout(function(){ phase(3, 'Done'); bloom(); }, 2950);
+        setTimeout(function(){ phase(3, 'Done'); }, 2950);
         setTimeout(function(){ phase(4, toLabel); }, 3600);
       }
 
@@ -3349,16 +3312,6 @@ hr {
     });
   })();
 
-  // stitched motif at the head of each "in brief" panel
-  (function(){
-    if (!window.AHStitch) return;
-    document.querySelectorAll('.brief-sprig').forEach(function(host, i){
-      if (host.querySelector('canvas')) return;
-      var c = document.createElement('canvas'); host.appendChild(c);
-      AHStitch.mount(c, { kind: i ? 'lavender' : 'stalk', cols: 15, rows: 30, cell: 2.4,
-        seed: 31 + i * 17, twinkle: false, animate: false });
-    });
-  })();
 </script>
 
 
