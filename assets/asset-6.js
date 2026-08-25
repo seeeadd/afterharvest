@@ -142,6 +142,63 @@
     put(G, tx, ty-1, lighten(P.dusk,0.34));               // pale crown bud
     put(G, tx, ty,   mix(P.dusk,P.plum,0.3));
   }
+  /* A petal is the thing that reads decorative. These are the parts of a plant that
+     do not have any: needles, seed heads, husks, bare wood. Same stitch, same field,
+     none of the nursery. */
+  function pineSprig(G, cx,cy, len, ang, rnd){
+    var dx=Math.cos(ang), dy=Math.sin(ang);
+    for(var i=0;i<len;i++){
+      var x=cx+dx*i, y=cy+dy*i;
+      put(G, x, y, i<len*0.4? P.oliveDk : P.olive);
+      if(i%2) continue;
+      var nl = 2.6 + (1-i/len)*2.2;
+      for(var s2=-1;s2<=1;s2+=2){
+        var na = ang + s2*(0.95 + rnd()*0.18);
+        for(var k=1;k<=nl;k++)
+          put(G, x+Math.cos(na)*k, y+Math.sin(na)*k, (k>nl-1.4)? P.sageLt : (s2<0? P.sage : P.olive));
+      }
+    }
+  }
+  /* teasel: the dry architectural seed head. All spike, no bloom. */
+  function teasel(G, cx,cy, h, rnd){
+    var w=h*0.42;
+    for(var y=-h;y<=h;y++){
+      var t=(y+h)/(2*h), half=w*Math.sqrt(Math.max(0,1-(y/h)*(y/h)))*(0.75+t*0.35);
+      for(var x=-half;x<=half;x++){
+        var d=Math.abs(x)/Math.max(0.6,half);
+        put(G, cx+x, cy+y, d>0.72? P.umberDk : (x+y<-half*0.3? P.wheat : P.umber));
+      }
+    }
+    for(var i=0;i<26;i++){
+      var a=-Math.PI/2 + (rnd()-0.5)*3.0, L=w*(1.15+rnd()*0.5);
+      put(G, cx+Math.cos(a)*L, cy+Math.sin(a)*L*1.5, i%3? P.wheatDk : P.sand);
+    }
+    tV(G, cx, cy+h, cy+h*1.9, P.oliveDk);
+  }
+  /* a bare forked twig */
+  function twig(G, cx,cy, len, ang, rnd){
+    var dx=Math.cos(ang), dy=Math.sin(ang);
+    for(var i=0;i<len;i++) put(G, cx+dx*i, cy+dy*i, i%4? P.umber : P.umberDk);
+    for(var f=0;f<2;f++){
+      var at=len*(0.42+f*0.30), fa=ang + (f?1:-1)*(0.55+rnd()*0.2), fl=len*(0.38-f*0.10);
+      var bx=cx+dx*at, by=cy+dy*at;
+      for(var k=0;k<fl;k++) put(G, bx+Math.cos(fa)*k, by+Math.sin(fa)*k, P.umber);
+    }
+  }
+  /* a grass head, drooping with seed */
+  function grassHead(G, cx,cy, len, ang, tone, rnd){
+    var dx=Math.cos(ang), dy=Math.sin(ang);
+    for(var i=0;i<len;i++){
+      var t=i/len, droop=t*t*2.2;
+      var x=cx+dx*i, y=cy+dy*i+droop;
+      put(G, x, y, tone);
+      if(i>len*0.35 && i%2===0){
+        put(G, x+0.9, y-0.6, P.sand);
+        put(G, x-0.9, y+0.4, (rnd()<0.5? P.wheatDk : tone));
+      }
+    }
+  }
+
   function berries(G, cx,cy, n, tone, rnd){
     for(var i=0;i<n;i++){
       var a=rnd()*6.28, rr=rnd()*3.0, x=cx+Math.cos(a)*rr, y=cy+Math.sin(a)*rr;
@@ -267,11 +324,11 @@
     wheatSheaf(G, W*0.52,H*0.34, H*0.5, rnd);
     seedpod(G, W*0.30,H*0.5, H*0.34, rnd);
     seedpod(G, W*0.72,H*0.44, H*0.30, rnd);
-    poppy(G, W*0.34,H*0.30, Math.round(W*0.12), rnd);
-    daisy(G, W*0.68,H*0.62, Math.round(W*0.11), 12, P.creamLt, rnd);
+    teasel(G, W*0.34,H*0.30, Math.round(W*0.11), rnd);
+    pineSprig(G, W*0.68,H*0.66, Math.round(H*0.34), -1.25, rnd);
     oliveSprig(G, W*0.62,H*0.72, H*0.4, rnd);
     leaf(G, W*0.40,H*0.6, 6,3, -0.4, P.sage, rnd);
-    rose(G, W*0.24,H*0.66, Math.round(W*0.085), {dk:P.roseDk, lt:P.roseLt}, rnd); // small accent
+    twig(G, W*0.22,H*0.70, Math.round(H*0.30), -1.35, rnd);   // bare wood, no bloom
     berries(G, W*0.5,H*0.14, 5, P.rust, rnd);
     return collect(G, cols, rows, rnd);
   }
@@ -1188,6 +1245,16 @@
         stem(G,cx,H*0.98,cx,cy,cx+2,cy+H*0.3,P.olive,0.8); leaf(G,cx+2,cy+H*0.22,4,2,0.6,P.sageLt,rnd);
         daisy(G,cx,cy-H*0.1,Math.round(W*0.32),12,P.creamLt,rnd); break;
       case 'seedpod': seedpod(G,cx,cy,H*0.8,rnd); break;
+      case 'teasel':
+        stem(G,cx,H*0.98,cx,cy+H*0.18,cx-1,cy+H*0.5,P.oliveDk,0.8);
+        teasel(G,cx,cy-H*0.06,Math.round(H*0.24),rnd); break;
+      case 'pine':
+        pineSprig(G,cx,H*0.96,Math.round(H*0.82),-1.5708,rnd); break;
+      case 'twig':
+        twig(G,cx,H*0.96,Math.round(H*0.84),-1.5708,rnd); break;
+      case 'grasshead':
+        stem(G,cx,H*0.98,cx,cy,cx+1,cy+H*0.4,P.olive,0.8);
+        grassHead(G,cx,cy,Math.round(H*0.44),-1.35,P.wheat,rnd); break;
       case 'olive': oliveSprig(G,cx,cy,H*0.8,rnd); break;
       case 'berry':
         berrySprig(G,cx,cy,H*0.86,rnd); break;
@@ -1266,18 +1333,18 @@
               [0.038,0.6,2.3,-0.45],[0.11,0.48,2.2,1.0]];
       for(var q=0;q<lf.length;q++){ var L=lf[q];
         leaf(G, X(L[0]), H*L[1], L[2], L[2]*0.42, dir*L[3], (q%2?P.sage:P.sageLt), rnd); }
-      // upright sprigs rising just above the blooms (contained in frame)
-      lavenderSpike(G, X(0.036),H*0.48, X(0.022),H*0.08);
-      lavenderSpike(G, X(0.085),H*0.42, X(0.104),H*0.06);
+      // upright forms rising just above the heads (contained in frame)
+      twig(G, X(0.030), H*0.52, H*0.44, -1.42, rnd);
+      grassHead(G, X(0.092), H*0.44, H*0.40, dir>0?-1.16:-1.98, P.wheat, rnd);
       wheatSprig(G, X(0.128), H*0.4, H*0.36, rnd);
-      // blooms — layered, overlapping, largest at the outer corner
-      poppy(G, X(0.05),  H*0.44, Math.round(H*0.19), rnd);
-      rose (G, X(0.016), H*0.56, Math.round(H*0.135), {dk:P.roseDk,lt:P.roseLt}, rnd);
-      daisy(G, X(0.098), H*0.32, Math.round(H*0.16), 12, P.dusk, rnd);
-      rose (G, X(0.113), H*0.5, Math.round(H*0.095), {dk:P.wheatDk,lt:P.gold}, rnd);
-      // berry / seed filler tucked between blooms
-      berries(G, X(0.078), H*0.6, 6, P.rust,   rnd);
-      berries(G, X(0.006), H*0.4, 5, P.roseDk, rnd);
+      // the heads themselves: seed and needle, layered largest at the outer corner
+      teasel(G, X(0.050), H*0.42, Math.round(H*0.17), rnd);
+      pineSprig(G, X(0.012), H*0.62, Math.round(H*0.40), dir>0?-1.25:-1.89, rnd);
+      pineSprig(G, X(0.100), H*0.34, Math.round(H*0.30), dir>0?-0.85:-2.29, rnd);
+      seedpod(G, X(0.115), H*0.52, Math.round(H*0.22), rnd);
+      // berry / seed filler tucked between them
+      berries(G, X(0.078), H*0.6, 6, P.rust,  rnd);
+      berries(G, X(0.006), H*0.4, 5, P.olive, rnd);
       // trailing buds tapering toward the centre
       grain(G, X(0.148), H*0.5, dir, P.wheat);
       pod(G,   X(0.164),H*0.44, 3, rnd);
