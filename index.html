@@ -2365,9 +2365,11 @@ hr {
       if (st === 'unlocked') { try { localStorage.setItem(LS_KEY,'1'); } catch(e){} }
     }
 
-    // one species per knot, in planting order — see chapterBloom() in assets/asset-6.js
-    var SPECIES = ['cosmos','thistle','clover','chamomile','tulip','sunflower',
-                   'bluebell','flax','marigold','cornflower','yarrow'];
+    // one cut per knot, in the same faceted language as the CTA pill and the booking
+    // dock — see chapterStone() in assets/asset-6.js. The bloom species are still in
+    // the engine if this needs reverting.
+    var SPECIES = ['cut-brilliant','cut-emerald','cut-marquise','cut-rose','cut-baguette',
+                   'cut-trillion','cut-shard','cut-kite','cut-drop','cut-step','cut-raw'];
     function bloomInto(host, i, cell){
       if (!host || host.__planted || !window.AHStitch) return;
       host.__planted = true;

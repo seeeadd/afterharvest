@@ -33,6 +33,7 @@
     cream:'#EBDFC6', creamLt:'#F6EFDD', creamSh:'#D6C7A8',
     rose:'#C77E82', roseDk:'#9E5563', roseLt:'#E0AEA9',
     dusk:'#B6AFC4', plum:'#6E6079', sand:'#E8E0CF',
+    slate:'#7E8894', slateDk:'#5B6570', slateLt:'#AEB6BF', steel:'#C9CDD2',
     stripe:'#635BFF', stripeDk:'#4A43CC', stripeLt:'#918CFF', stripeXl:'#C6C3FF',
     ink:'#161310', inkDk:'#0B0906', inkLt:'#2C2820'
   };
@@ -891,130 +892,103 @@
       if(rnd()<0.5) put(G,x, y-0.9, lighten(tone,0.3));
     }
   }
-  /* CROWS.
-     The brand is named for a scarecrow, and a scarecrow exists because of crows, so
-     they are the one motif that is already the story rather than decoration. They also
-     stitch better than petals: hard silhouettes hold at marker size where a ring of
-     thin petals turns to mush. Ink and umber only, with wheat for beak and legs. */
-  function tEllipse(G, cx, cy, rx, ry, tone, tilt){
-    tilt = tilt || 0;
-    var ct=Math.cos(tilt), st=Math.sin(tilt), m=Math.ceil(Math.max(rx,ry))+1;
-    for(var y=-m;y<=m;y++) for(var x=-m;x<=m;x++){
-      var u=(x*ct+y*st)/rx, v=(-x*st+y*ct)/ry;
-      if(u*u+v*v<=1.03) put(G, cx+x, cy+y, tone);
+  /* CUT STONES.
+     The chapter markers, in the same language as the CTA pill and the booking dock:
+     a faceted silhouette with wedges of light across it, stitched. Geometry rather
+     than botany, so nothing about them reads decorative. One shape per chapter, cut
+     differently each time, all from the same slate/wheat/cream thread. */
+  var CUT_TONES = {
+    /* lit face, two mids, shadowed face. No rose or plum: those are the threads that
+       were reading decorative. Slate is the one cool note on an otherwise warm page. */
+    steel: [P.creamLt, P.steel,  P.slateLt, P.slate,   P.slateDk],
+    wheat: [P.creamLt, P.sand,   P.gold,    P.wheatDk, P.olive],
+    ink:   [P.sand,    P.umber,  P.slate,   P.umberDk, P.ink],
+    olive: [P.creamLt, P.sageLt, P.sage,    P.olive,   P.oliveDk],
+    mixed: [P.creamLt, P.steel,  P.gold,    P.slate,   P.umberDk]
+  };
+
+  /* fill the polygon, then cut it into wedges from an off-centre crown so each face
+     takes a different thread. The scanline test is what keeps the edges clean. */
+  function cutStone(G, pts, tones, crown, seams){
+    var minY=1e9, maxY=-1e9, minX=1e9, maxX=-1e9;
+    for(var i=0;i<pts.length;i++){
+      if(pts[i][1]<minY) minY=pts[i][1]; if(pts[i][1]>maxY) maxY=pts[i][1];
+      if(pts[i][0]<minX) minX=pts[i][0]; if(pts[i][0]>maxX) maxX=pts[i][0];
     }
-  }
-  /* a tapered bar from a point, at an angle: tail feathers and wings both */
-  function tQuill(G, cx, cy, len, ang, w0, w1, tone, dark){
-    var ca=Math.cos(ang), sa=Math.sin(ang);
-    for(var i=0;i<=len;i++){
-      var t=i/len, w=w0+(w1-w0)*t;
-      var x=cx+ca*i, y=cy+sa*i;
-      for(var k=-w;k<=w;k++) put(G, x - sa*k, y + ca*k, (k>w-1.2)? dark : tone);
+    function inside(x,y){
+      var c=false;
+      for(var i=0,j=pts.length-1;i<pts.length;j=i++){
+        var xi=pts[i][0],yi=pts[i][1],xj=pts[j][0],yj=pts[j][1];
+        if(((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi)) c=!c;
+      }
+      return c;
     }
-  }
-  function crowHead(G, cx, cy, r, dir, tone, dark, open){
-    tDisc(G, cx, cy, r, tone);
-    var bx=cx+dir*r, n=Math.max(2, Math.round(r*1.6));
-    for(var i=0;i<n;i++){
-      var t=i/n, taper=(1-t)*0.9;
-      for(var k=0;k<=taper;k++){
-        put(G, bx+dir*i, cy - (open? t*1.6 : 0) - k, i? P.wheatDk : P.gold);
-        if(open) put(G, bx+dir*i, cy + t*1.7 + k + 0.6, P.wheatDk);
+    for(var y=Math.floor(minY); y<=Math.ceil(maxY); y++){
+      for(var x=Math.floor(minX); x<=Math.ceil(maxX); x++){
+        if(!inside(x+0.5,y+0.5)) continue;
+        var a=Math.atan2(y-crown[1], x-crown[0]);           // which wedge this cell is in
+        var w=Math.floor(((a+Math.PI)/(Math.PI*2))*seams) % tones.length;
+        put(G, x, y, tones[w]);
       }
     }
-    put(G, cx+dir*r*0.28, cy-r*0.34, P.yolk);
-    put(G, cx-dir*r*0.55, cy+r*0.45, dark);
-  }
-  function crowLegs(G, cx, cy, h, dir){
-    tV(G, cx-1, cy, cy+h, P.wheatDk);
-    tV(G, cx+1, cy, cy+h, P.wheatDk);
-    tH(G, cx-2, cx,   cy+h, P.wheatDk);
-    tH(G, cx,   cx+2, cy+h, P.wheatDk);
+    /* the girdle: the outline in the shadow thread, so the silhouette holds at any
+       size without the heavy black outline that made these look rough */
+    var edge=tones[tones.length-2];
+    for(var e=0;e<pts.length;e++){
+      var p0=pts[e], p1=pts[(e+1)%pts.length];
+      var n=Math.max(2, Math.round(Math.hypot(p1[0]-p0[0], p1[1]-p0[1])*1.6));
+      for(var k=0;k<=n;k++) put(G, p0[0]+(p1[0]-p0[0])*k/n, p0[1]+(p1[1]-p0[1])*k/n, edge);
+    }
+    /* one bright seam running off the crown: the light catching a cut */
+    var ga=-1.05, gl=Math.max(2,(maxX-minX)*0.42);
+    for(var g=0;g<gl;g++){
+      var gx=crown[0]+Math.cos(ga)*g, gy=crown[1]+Math.sin(ga)*g;
+      if(inside(gx+0.5,gy+0.5)) put(G, gx, gy, P.creamLt);
+      var hx=crown[0]+Math.cos(ga+2.2)*g*0.8, hy=crown[1]+Math.sin(ga+2.2)*g*0.8;
+      if(inside(hx+0.5,hy+0.5)) put(G, hx, hy, tones[0]);
+    }
   }
 
-  /* one crow. dir 1 faces right. Silhouette first: slim body, tail clear of it, head
-     on a neck above and forward, wing marked ON the body rather than added beside it. */
-  function crow(G, cx, cy, R, pose, dir, rnd){
-    dir = dir || 1;
-    var tone=P.inkLt, dark=P.ink, r=Math.max(1.6, R*0.42);
-    function bodyAndTail(tilt, tailAng, tailLen){
-      tQuill(G, cx-dir*R*0.62, cy+R*0.18, tailLen, tailAng, 0.9, 2.1, tone, dark);
-      tEllipse(G, cx, cy, R*0.92, R*0.60, tone, dir*tilt);
-      tEllipse(G, cx-dir*R*0.30, cy+R*0.16, R*0.52, R*0.30, dark, dir*tilt);   // the wing, on the body
+  /* a stone of n sides, radius R, jittered so no two chapters are cut alike */
+  function stonePts(cx, cy, R, n, squash, rot, jag, rnd){
+    var pts=[];
+    for(var i=0;i<n;i++){
+      var a=rot + (i/n)*Math.PI*2;
+      var rr=R*(1 - jag*0.5 + jag*rnd());
+      pts.push([cx+Math.cos(a)*rr, cy+Math.sin(a)*rr*squash]);
     }
-    function neckHead(hx, hy, open, hdir){
-      tQuill(G, cx+dir*R*0.42, cy-R*0.18, Math.max(2,R*0.55), Math.atan2(hy-(cy-R*0.18), hx-(cx+dir*R*0.42)), 1.3, 1.1, tone, dark);
-      crowHead(G, hx, hy, r, hdir===undefined?dir:hdir, tone, dark, open);
-    }
-    switch(pose){
-      case 'perched':
-        bodyAndTail(0.16, dir>0?2.75:0.39, R*1.5);
-        neckHead(cx+dir*R*0.82, cy-R*0.86, false);
-        crowLegs(G, cx, cy+R*0.55, Math.max(2,R*0.5), dir);
-        break;
-      case 'calling':
-        bodyAndTail(0.24, dir>0?2.85:0.29, R*1.4);
-        neckHead(cx+dir*R*0.96, cy-R*1.06, true);
-        crowLegs(G, cx, cy+R*0.55, Math.max(2,R*0.5), dir);
-        break;
-      case 'looking':
-        bodyAndTail(0.16, dir>0?2.75:0.39, R*1.5);
-        neckHead(cx-dir*R*0.10, cy-R*0.98, false, -dir);
-        crowLegs(G, cx, cy+R*0.55, Math.max(2,R*0.5), dir);
-        break;
-      case 'seed':
-        bodyAndTail(0.16, dir>0?2.75:0.39, R*1.5);
-        neckHead(cx+dir*R*0.82, cy-R*0.86, false);
-        put(G, cx+dir*(R*1.62), cy-R*0.86, P.yolk);
-        put(G, cx+dir*(R*1.95), cy-R*0.78, P.wheat);
-        crowLegs(G, cx, cy+R*0.55, Math.max(2,R*0.5), dir);
-        break;
-      case 'post':
-        tRect(G, cx-1, cy+R*1.05, cx+1, cy+R*2.7, P.umber, null, 1);
-        tH(G, Math.round(cx-R*0.85), Math.round(cx+R*0.85), Math.round(cy+R*1.75), P.umberDk);
-        bodyAndTail(0.16, dir>0?2.75:0.39, R*1.4);
-        neckHead(cx+dir*R*0.82, cy-R*0.86, false);
-        crowLegs(G, cx, cy+R*0.55, Math.max(2,R*0.5), dir);
-        break;
-      case 'landing':
-        tQuill(G, cx-dir*R*0.55, cy+R*0.5, R*1.25, dir>0?2.5:0.64, 1.0, 2.3, tone, dark);
-        tEllipse(G, cx, cy+R*0.15, R*0.78, R*0.54, tone, dir*0.42);
-        tQuill(G, cx-dir*R*0.15, cy-R*0.15, R*1.8, dir>0?4.19:5.23, 1.9, 0.5, tone, dark);
-        tQuill(G, cx+dir*R*0.25, cy-R*0.25, R*1.55, dir>0?4.6:4.82, 1.7, 0.5, tone, dark);
-        neckHead(cx+dir*R*0.80, cy-R*0.52, true);
-        break;
-      case 'flying':
-        tQuill(G, cx-dir*R*0.85, cy+R*0.06, R*1.15, dir>0?3.05:6.19, 0.9, 2.0, tone, dark);
-        tEllipse(G, cx, cy, R*0.80, R*0.42, tone, dir*0.10);
-        tQuill(G, cx-dir*R*0.05, cy-R*0.10, R*1.9, dir>0?3.66:5.76, 1.9, 0.4, tone, dark);
-        tQuill(G, cx+dir*R*0.10, cy+R*0.10, R*1.75, dir>0?0.52:2.62, 1.8, 0.4, tone, dark);
-        crowHead(G, cx+dir*R*0.98, cy-R*0.16, Math.max(1.6,R*0.36), dir, tone, dark, false);
-        break;
-      case 'rising':
-        tQuill(G, cx-dir*R*0.45, cy+R*0.75, R*1.15, dir>0?2.36:0.79, 0.9, 1.9, tone, dark);
-        tEllipse(G, cx, cy+R*0.25, R*0.72, R*0.46, tone, dir*0.55);
-        tQuill(G, cx, cy-R*0.15, R*2.0, dir>0?4.45:4.97, 2.0, 0.4, tone, dark);
-        tQuill(G, cx, cy-R*0.05, R*1.35, dir>0?3.20:6.22, 1.6, 0.4, tone, dark);
-        neckHead(cx+dir*R*0.62, cy-R*0.72, true);
-        break;
-      case 'pair':
-        crow(G, cx-R*1.10, cy+R*0.30, R*0.66, 'perched', 1, rnd);
-        crow(G, cx+R*1.20, cy-R*0.15, R*0.60, 'looking', -1, rnd);
-        break;
-      case 'watch':
-        crow(G, cx, cy, R*0.92, 'calling', dir, rnd);
-        put(G, cx+dir*R*1.85, cy-R*1.55, P.wheat);
-        put(G, cx+dir*R*2.10, cy-R*1.35, P.wheatDk);
-        break;
-      case 'flock':
-        crow(G, cx-R*1.00, cy+R*0.55, R*0.40, 'flying', 1, rnd);
-        crow(G, cx+R*0.75, cy-R*0.40, R*0.52, 'flying', 1, rnd);
-        crow(G, cx+R*0.05, cy+R*1.30, R*0.32, 'flying', 1, rnd);
-        break;
-      default:
-        crow(G, cx, cy, R, 'perched', dir, rnd);
-    }
+    return pts;
+  }
+
+  function chapterStone(G, kind, W, H, rnd){
+    var cx=W*0.5, cy=H*0.5, R=Math.max(3, Math.min(W,H)*0.46);
+    var S = {
+      /* sides, squash, rotation, jaggedness, thread, wedges */
+      'cut-brilliant': [8,  0.96, -0.20, 0.04, 'steel', 12],
+      'cut-emerald':   [6,  0.78,  0.00, 0.02, 'wheat', 10],
+      'cut-marquise':  [7,  0.60,  0.10, 0.05, 'steel', 11],
+      'cut-rose':      [9,  0.92, -0.35, 0.06, 'mixed', 13],
+      'cut-baguette':  [4,  0.56,  0.16, 0.02, 'ink',    9],
+      'cut-trillion':  [3,  0.92, -1.57, 0.03, 'olive', 10],
+      'cut-shard':     [5,  0.84,  0.62, 0.10, 'steel',  9],
+      'cut-kite':      [4,  0.86, -0.79, 0.06, 'wheat', 10],
+      'cut-drop':      [7,  0.72, -1.20, 0.05, 'mixed', 11],
+      'cut-step':      [8,  0.68,  0.39, 0.02, 'ink',   12],
+      'cut-raw':       [10, 0.90,  0.25, 0.12, 'olive', 10]
+    }[kind] || [8, 0.94, -0.2, 0.05, 'steel', 12];
+
+    /* At chapter-marker size the grid is 13x13, and a dozen wedges there is mush.
+       Below that threshold the stone is cut into three or four broad faces with flat
+       thread instead, which is the same lesson the step motifs taught. */
+    var small = Math.min(W,H) <= 16;
+    var sides = small ? Math.min(S[0], 6) : S[0];
+    var jag   = small ? 0 : S[3];
+    var wedge = small ? 3 : S[5];
+    var tones = CUT_TONES[S[4]];
+    if (small) tones = [tones[0], tones[2], tones[3], tones[4]];   // drop the near-white mid
+    var pts = stonePts(cx, cy, R, sides, S[1], S[2], jag, rnd);
+    /* the crown sits high and off to one side, so the light has a direction */
+    cutStone(G, pts, tones, [cx - R*0.34, cy - R*0.62], wedge);
   }
 
   function chapterBloom(G, kind, W,H, rnd){
@@ -1180,17 +1154,10 @@
       case 'ui-flag': case 'ui-people': case 'ui-medal': case 'ui-cart': case 'ui-tick':
         stepMotif(G, kind, W, H, rnd); break;
       case 'cosmos': case 'thistle': case 'clover': case 'chamomile': case 'tulip':
-      case 'crow': case 'crow-perched': crow(G,cx,cy,Math.round(H*0.26),'perched',1,rnd); break;
-      case 'crow-calling': crow(G,cx,cy,Math.round(H*0.26),'calling',1,rnd); break;
-      case 'crow-landing': crow(G,cx,cy,Math.round(H*0.24),'landing',1,rnd); break;
-      case 'crow-flying':  crow(G,cx,cy,Math.round(H*0.24),'flying',1,rnd); break;
-      case 'crow-rising':  crow(G,cx,cy,Math.round(H*0.24),'rising',1,rnd); break;
-      case 'crow-seed':    crow(G,cx,cy,Math.round(H*0.25),'seed',1,rnd); break;
-      case 'crow-looking': crow(G,cx,cy,Math.round(H*0.26),'looking',1,rnd); break;
-      case 'crow-pair':    crow(G,cx,cy,Math.round(H*0.30),'pair',1,rnd); break;
-      case 'crow-post':    crow(G,cx,cy-H*0.12,Math.round(H*0.22),'post',1,rnd); break;
-      case 'crow-watch':   crow(G,cx,cy,Math.round(H*0.24),'watch',1,rnd); break;
-      case 'crow-flock':   crow(G,cx,cy,Math.round(H*0.30),'flock',1,rnd); break;
+      case 'cut-brilliant': case 'cut-emerald': case 'cut-marquise': case 'cut-rose':
+      case 'cut-baguette': case 'cut-trillion': case 'cut-shard': case 'cut-kite':
+      case 'cut-drop': case 'cut-step': case 'cut-raw':
+        chapterStone(G, kind, W, H, rnd); break;
       case 'sunflower': case 'bluebell': case 'flax': case 'marigold':
       case 'cornflower': case 'yarrow':
         chapterBloom(G, kind, W, H, rnd); break;
