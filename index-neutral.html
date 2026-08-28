@@ -1813,7 +1813,7 @@ hr {
      nothing well before it gets there — which is how it can be this size without
      ever competing with the copy. Shrinking it to dodge the text was the wrong
      trade; the mask does that job. */
-  .wallbranch { position: absolute; top: -70px; width: 620px; height: 540px;
+  .wallbranch { position: absolute; top: -132px; width: 620px; height: 540px;
     z-index: 2; pointer-events: none; }
   .wallbranch.left  { left: -132px; transform: scaleX(-1); opacity: 0.95; }
   .wallbranch.right { right: -132px; opacity: 0.92; }
@@ -1867,18 +1867,95 @@ hr {
   .flyer .pose { position: absolute; left: 0; top: 0; opacity: 0; }
   .flyer .pose.on { opacity: 1; }
   .flyer .inner { display: block; transform-origin: 50% 84%; }
-  @keyframes fl-hop  { 0%,100%{transform:translateY(0) rotate(0)} 34%{transform:translateY(-2px) rotate(-1.4deg)} 70%{transform:translateY(0)} }
-  @keyframes fl-peck { 0%,100%{transform:rotate(0)} 36%{transform:rotate(5deg) translateY(1px)} 74%{transform:rotate(0)} }
-  @keyframes fl-shrug{ 0%,100%{transform:scaleY(1)} 44%{transform:scaleY(1.035) translateY(-1px)} 76%{transform:scaleY(1)} }
-  @keyframes fl-squabble { 0%,100%{transform:translateX(0) rotate(0)} 18%{transform:translateX(3px) rotate(-7deg)}
-    34%{transform:translateX(-2px) rotate(5deg)} 52%{transform:translateX(3px) rotate(-6deg)} 70%{transform:translateX(-1px) rotate(3deg)} }
-  @keyframes fl-court { 0%,100%{transform:translateY(0) rotate(0)} 25%{transform:translateY(-3px) rotate(-3deg)}
-    50%{transform:translateY(0)} 75%{transform:translateY(-2px) rotate(-2deg)} }
-  .flyer[data-beat="hop"]      .inner { animation: fl-hop 1250ms cubic-bezier(.3,.1,.3,1); }
-  .flyer[data-beat="peck"]     .inner { animation: fl-peck 1350ms cubic-bezier(.3,.1,.3,1); }
-  .flyer[data-beat="shrug"]    .inner { animation: fl-shrug 1150ms cubic-bezier(.3,.1,.3,1); }
-  .flyer[data-beat="squabble"] .inner { animation: fl-squabble 900ms ease-in-out 2; }
-  .flyer[data-beat="court"]    .inner { animation: fl-court 1100ms ease-in-out 2; }
+  /* ---------- IDLE BEHAVIOUR ----------
+     Birds do NOT sway. They move in sharp discrete steps and then hold dead still,
+     which is the whole reason a smooth sine wave reads as fake. Every keyframe
+     below is built from fast transitions separated by plateaus — adjacent stops
+     with identical values are deliberate holds, and the easing is asymmetric so
+     the move out is quicker than the settle back. */
+
+  /* head-bob: the pigeon step. Snap forward, hold, drift back. */
+  @keyframes fl-bob {
+    0%,8%     { transform: translateX(0) rotate(0deg); }
+    16%       { transform: translateX(5px) rotate(-3deg); }
+    16.1%,34% { transform: translateX(5px) rotate(-3deg); }   /* hold */
+    44%       { transform: translateX(0) rotate(0deg); }
+    52%,60%   { transform: translateX(4px) rotate(-2deg); }   /* hold */
+    72%,100%  { transform: translateX(0) rotate(0deg); }
+  }
+  /* look-around: two fast head turns with a long stare between them */
+  @keyframes fl-look {
+    0%,10%    { transform: rotate(0deg) translateX(0); }
+    18%,40%   { transform: rotate(-22deg) translateX(-2px); }  /* snap left, stare */
+    48%       { transform: rotate(0deg) translateX(0); }
+    56%,80%   { transform: rotate(19deg) translateX(2px); }    /* snap right, stare */
+    90%,100%  { transform: rotate(0deg) translateX(0); }
+  }
+  /* preen: head buries into the flank, works there, comes back up */
+  @keyframes fl-preen {
+    0%,6%     { transform: rotate(0deg) translate(0,0); }
+    18%       { transform: rotate(38deg) translate(-3px,3px); }
+    22%,30%   { transform: rotate(34deg) translate(-3px,4px); }
+    34%,42%   { transform: rotate(41deg) translate(-4px,3px); }  /* working */
+    46%,54%   { transform: rotate(34deg) translate(-3px,4px); }
+    68%,100%  { transform: rotate(0deg) translate(0,0); }
+  }
+  /* tail-flick: almost instantaneous, then perfectly still */
+  @keyframes fl-flick {
+    0%,20%    { transform: rotate(0deg) translateY(0); }
+    26%       { transform: rotate(-9deg) translateY(-3px); }
+    32%,100%  { transform: rotate(0deg) translateY(0); }
+  }
+  /* fluff-and-settle: a fast shiver, then the feathers drop */
+  @keyframes fl-fluff {
+    0%,12%   { transform: scale(1,1) translateX(0); }
+    18%      { transform: scale(1.10,1.12) translateX(-1px); }
+    23%      { transform: scale(1.09,1.11) translateX(2px); }
+    28%      { transform: scale(1.11,1.12) translateX(-2px); }
+    33%      { transform: scale(1.09,1.11) translateX(1px); }
+    38%      { transform: scale(1.10,1.12) translateX(-1px); }
+    52%      { transform: scale(0.99,0.98) translateX(0); }
+    64%,100% { transform: scale(1,1) translateX(0); }
+  }
+  /* wing-stretch: one wing out, held open, folded away */
+  @keyframes fl-stretch {
+    0%,10%   { transform: rotate(0deg) scaleX(1) translateY(0); }
+    26%      { transform: rotate(-7deg) scaleX(1.16) translateY(-2px); }
+    30%,58%  { transform: rotate(-8deg) scaleX(1.18) translateY(-2px); }  /* hold open */
+    76%,100% { transform: rotate(0deg) scaleX(1) translateY(0); }
+  }
+  .flyer[data-beat="bob"]     .inner { animation: fl-bob 2200ms cubic-bezier(.2,.9,.2,1); }
+  .flyer[data-beat="look"]    .inner { animation: fl-look 2600ms cubic-bezier(.15,.95,.2,1); }
+  .flyer[data-beat="preen"]   .inner { animation: fl-preen 3000ms cubic-bezier(.3,.8,.3,1); }
+  .flyer[data-beat="flick"]   .inner { animation: fl-flick 1400ms cubic-bezier(.1,1,.3,1); }
+  .flyer[data-beat="fluff"]   .inner { animation: fl-fluff 1900ms cubic-bezier(.25,.9,.3,1); }
+  .flyer[data-beat="stretch"] .inner { animation: fl-stretch 2400ms cubic-bezier(.25,.9,.3,1); }
+
+  /* ---------- TWO-BIRD EXCHANGES ----------
+     Played as a SEQUENCE in JS, not as one keyframe on both birds at once —
+     simultaneous identical motion is what made the old squabble read as two
+     objects vibrating rather than two birds reacting to each other. */
+  @keyframes fl-lunge {
+    0%       { transform: translateX(0) rotate(0deg); }
+    22%      { transform: translateX(13px) rotate(-15deg); }
+    30%,38%  { transform: translateX(11px) rotate(-13deg); }
+    70%,100% { transform: translateX(0) rotate(0deg); }
+  }
+  @keyframes fl-recoil {
+    0%       { transform: translateX(0) rotate(0deg); }
+    18%      { transform: translateX(-9px) rotate(11deg); }
+    26%,40%  { transform: translateX(-8px) rotate(9deg); }
+    72%,100% { transform: translateX(0) rotate(0deg); }
+  }
+  @keyframes fl-offer {
+    0%,10%   { transform: rotate(0deg) translateY(0); }
+    30%      { transform: rotate(26deg) translateY(4px); }
+    36%,56%  { transform: rotate(24deg) translateY(4px); }   /* bow held */
+    80%,100% { transform: rotate(0deg) translateY(0); }
+  }
+  .flyer[data-beat="lunge"]  .inner { animation: fl-lunge 900ms cubic-bezier(.2,1,.3,1); }
+  .flyer[data-beat="recoil"] .inner { animation: fl-recoil 900ms cubic-bezier(.2,1,.3,1); }
+  .flyer[data-beat="offer"]  .inner { animation: fl-offer 1500ms cubic-bezier(.3,.9,.3,1); }
   /* ten tap acts */
   @keyframes em-spin   { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
   @keyframes em-bow    { 0%,100%{transform:rotate(0) translateY(0)} 40%{transform:rotate(24deg) translateY(4px)} }
@@ -1922,6 +1999,12 @@ hr {
   @media (prefers-reduced-motion: reduce){ .drift, .wb-bloom, .flock { display: none; } }
   @media (max-width: 1040px){ .drift { display: none; } }
   @media (max-width: 900px){ .flock { display: none; } }
+
+
+  /* the mark shows in the EXPANDED bar too, not only the compressed one.
+     It was set to height:0 / opacity:0 and only revealed at data-compact="1",
+     so the long bar carried the wordmark alone. */
+  .nav .wm-mark { height: 24px; width: 24px; opacity: 1; margin-right: 11px; }
 
 </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Done-for-you 3-day virtual launch events","serviceType":"3-day virtual event production and launch strategy","provider":{"@type":"Organization","name":"AfterHarvest","url":"https://www.theafterharvest.com/"},"areaServed":"Worldwide","audience":{"@type":"Audience","audienceType":"Course creators, coaches, educators and community builders with an existing email audience"},"description":"AfterHarvest plans, builds and runs the entire 3-day virtual event: offer strategy, funnels, registration pages, slides, email marketing and the live operation. $0 upfront, paid as a revenue share of what the launch collects.","offers":{"@type":"Offer","priceCurrency":"USD","price":"0","description":"$0 upfront. AfterHarvest is paid a revenue share of what the launch collects, with a revenue floor agreed in writing before the work begins."}}</script>
@@ -3963,7 +4046,7 @@ hr {
     var CAST=[{perch:['bd-wren',56,62],wing:'a',cell:0.78},
               {perch:['bd-robin',58,66],wing:'b',cell:0.74},
               {perch:['bd-crow',72,58],wing:'c',cell:0.70}];
-    var BEATS=['hop','peck','shrug'], PHASES=12, birds=[];
+    var BEATS=['bob','look','preen','flick','fluff','stretch'], PHASES=12, birds=[];
     var EMOTES=['spin','bow','flutter','tilt','puff','sing','startle','nod','wobble','jump'];
 
     function obstacles(){
@@ -4038,31 +4121,47 @@ hr {
       };
       b.anim.oncancel=function(){ flapStop(b); b.flying=false; };
     }
+    /* an exchange, played as turns. One acts, the other answers, with a beat of
+       stillness between — which is what makes it read as two birds reacting to
+       each other rather than two sprites vibrating in unison. */
+    function step(el,beat,ms){ el.dataset.beat=beat;
+      return new Promise(function(r){ setTimeout(function(){ el.dataset.beat=''; r(); }, ms); }); }
     function meet(b){
       birds.forEach(function(o){
-        if(o===b||o.flying||b.flying) return;
-        if(Math.hypot(o.at.x-b.at.x,o.at.y-b.at.y)>150) return;
-        var mood=Math.random()<0.5?'squabble':'court';
-        b.facing=(o.at.x>b.at.x)?1:-1; place(b);
-        o.facing=(b.at.x>o.at.x)?1:-1; place(o);
-        b.el.dataset.beat=mood; o.el.dataset.beat=mood;
-        setTimeout(function(){ b.el.dataset.beat=''; o.el.dataset.beat=''; },2400);
+        if(o===b||o.flying||b.flying||b.busy||o.busy) return;
+        if(Math.hypot(o.at.x-b.at.x,o.at.y-b.at.y)>170) return;
+        b.busy=o.busy=true;
+        /* they turn and face each other first — nothing happens until they do */
+        b.facing=(o.at.x>b.at.x)?-1:1; place(b);
+        o.facing=(b.at.x>o.at.x)?-1:1; place(o);
+        var scrap=Math.random()<0.55;
+        var seq = scrap
+          ? [[b,'lunge',900],[o,'recoil',900],[o,'lunge',900],[b,'recoil',900],
+             [b,'fluff',1500],[o,'flick',1100]]
+          : [[b,'offer',1500],[o,'look',1600],[o,'offer',1500],[b,'bob',1600],
+             [b,'preen',2200],[o,'preen',2200]];
+        (function run(i){
+          if(i>=seq.length || document.hidden){ b.busy=o.busy=false; return; }
+          step(seq[i][0].el, seq[i][1], seq[i][2]).then(function(){
+            setTimeout(function(){ run(i+1); }, 260);   /* the pause between turns */
+          });
+        })(0);
       });
     }
     function beatLoop(b){
       setTimeout(function(){
         if(!b.el.isConnected) return;
-        if(!document.hidden && !b.flying && !b.el.dataset.beat && !b.el.dataset.emote){
+        if(!document.hidden && !b.flying && !b.busy && !b.el.dataset.beat && !b.el.dataset.emote){
           b.el.dataset.beat=BEATS[(Math.random()*BEATS.length)|0];
-          setTimeout(function(){ b.el.dataset.beat=''; },1400);
+          setTimeout(function(){ b.el.dataset.beat=''; },3000);
         }
         beatLoop(b);
-      }, 9000+Math.random()*7000+b.idx*2600);
+      }, 6000+Math.random()*6000+b.idx*1900);
     }
     function flightLoop(b){
       setTimeout(function(){
         if(!b.el.isConnected) return;
-        if(!document.hidden && !b.flying){
+        if(!document.hidden && !b.flying && !b.busy){
           var target=null;
           if(Math.random()<0.34){
             var o=birds[(b.idx+1)%birds.length];
