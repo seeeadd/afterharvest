@@ -1802,6 +1802,101 @@ hr {
     font-family: 'Literata', Georgia, serif; font-size: 12.5px; }
   footer.foot { border-top: 3px solid var(--ink); }
 
+
+  /* ---------- WALL BRANCHES ----------
+     A limb reaching in from each edge, faded at BOTH ends: the thick outer end so
+     it reads as continuing off-frame, the thin inner tip so it dissolves before
+     reaching the text column. Wood is one static bitmap; leaves are four
+     rasterised frames cycled by opacity. */
+  .wallbranch { position: absolute; top: -214px; width: 540px; height: 420px;
+    z-index: 2; pointer-events: none; }
+  .wallbranch.left  { left: -150px; transform: scaleX(-1); opacity: 0.94; }
+  .wallbranch.right { right: -150px; opacity: 0.9; }
+  .wb-limb, .wb-leaves { position: absolute; right: 0; top: 0;
+    -webkit-mask-image:
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.45) 5%, #000 15%, #000 62%, rgba(0,0,0,0.35) 84%, transparent 97%),
+      linear-gradient(to bottom, #000 0 68%, rgba(0,0,0,0.4) 88%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.45) 5%, #000 15%, #000 62%, rgba(0,0,0,0.35) 84%, transparent 97%),
+      linear-gradient(to bottom, #000 0 68%, rgba(0,0,0,0.4) 88%, transparent 100%);
+    mask-composite: intersect; }
+  .wb-limb canvas { display: block; }
+  .wb-leaves canvas { position: absolute; right: 0; top: 0; display: block; opacity: 0; }
+  .wb-leaves canvas.on { opacity: 1; }
+  @media (max-width: 1240px){ .wallbranch.left { display: none; } }
+  @media (max-width: 1040px){ .wallbranch { display: none; } }
+
+  /* ---------- THE SEAM ---------- */
+  .seam { position: relative; z-index: 1; width: 100%; overflow: hidden; line-height: 0; opacity: 0.62; }
+  .seam canvas { display: block; }
+
+  /* ---------- THE FLOCK ----------
+     Page-level, so the birds range the whole document and follow you down it.
+     Each carries a perched pose plus twelve wing phases on separate canvases. */
+  .flock { position: absolute; left: 0; top: 0; width: 100%; z-index: 7; pointer-events: none; }
+  .flyer { position: absolute; left: 0; top: 0; will-change: transform; pointer-events: auto; cursor: pointer;
+    filter: drop-shadow(0 2px 3px rgba(122,96,64,0.18)); }
+  .flyer canvas { display: block; }
+  .flyer .pose { position: absolute; left: 0; top: 0; opacity: 0; }
+  .flyer .pose.on { opacity: 1; }
+  .flyer .inner { display: block; transform-origin: 50% 84%; }
+  @keyframes fl-hop  { 0%,100%{transform:translateY(0) rotate(0)} 34%{transform:translateY(-2px) rotate(-1.4deg)} 70%{transform:translateY(0)} }
+  @keyframes fl-peck { 0%,100%{transform:rotate(0)} 36%{transform:rotate(5deg) translateY(1px)} 74%{transform:rotate(0)} }
+  @keyframes fl-shrug{ 0%,100%{transform:scaleY(1)} 44%{transform:scaleY(1.035) translateY(-1px)} 76%{transform:scaleY(1)} }
+  @keyframes fl-squabble { 0%,100%{transform:translateX(0) rotate(0)} 18%{transform:translateX(3px) rotate(-7deg)}
+    34%{transform:translateX(-2px) rotate(5deg)} 52%{transform:translateX(3px) rotate(-6deg)} 70%{transform:translateX(-1px) rotate(3deg)} }
+  @keyframes fl-court { 0%,100%{transform:translateY(0) rotate(0)} 25%{transform:translateY(-3px) rotate(-3deg)}
+    50%{transform:translateY(0)} 75%{transform:translateY(-2px) rotate(-2deg)} }
+  .flyer[data-beat="hop"]      .inner { animation: fl-hop 1250ms cubic-bezier(.3,.1,.3,1); }
+  .flyer[data-beat="peck"]     .inner { animation: fl-peck 1350ms cubic-bezier(.3,.1,.3,1); }
+  .flyer[data-beat="shrug"]    .inner { animation: fl-shrug 1150ms cubic-bezier(.3,.1,.3,1); }
+  .flyer[data-beat="squabble"] .inner { animation: fl-squabble 900ms ease-in-out 2; }
+  .flyer[data-beat="court"]    .inner { animation: fl-court 1100ms ease-in-out 2; }
+  /* ten tap acts */
+  @keyframes em-spin   { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+  @keyframes em-bow    { 0%,100%{transform:rotate(0) translateY(0)} 40%{transform:rotate(24deg) translateY(4px)} }
+  @keyframes em-flutter{ 0%,100%{transform:translateY(0)} 20%{transform:translateY(-9px)} 45%{transform:translateY(-4px)} 70%{transform:translateY(-11px)} }
+  @keyframes em-tilt   { 0%,100%{transform:rotate(0)} 45%{transform:rotate(-19deg)} }
+  @keyframes em-puff   { 0%,100%{transform:scale(1)} 40%{transform:scale(1.24,1.16)} 70%{transform:scale(0.97,1.02)} }
+  @keyframes em-sing   { 0%,100%{transform:translateY(0) rotate(0)} 15%{transform:translateY(-3px) rotate(-6deg)}
+    35%{transform:translateY(0)} 55%{transform:translateY(-4px) rotate(-7deg)} 78%{transform:translateY(0)} }
+  @keyframes em-startle{ 0%{transform:translate(0,0) rotate(0)} 18%{transform:translate(9px,-13px) rotate(11deg)}
+    46%{transform:translate(-4px,-3px) rotate(-5deg)} 100%{transform:translate(0,0) rotate(0)} }
+  @keyframes em-nod    { 0%,100%{transform:rotate(0)} 25%{transform:rotate(13deg)} 50%{transform:rotate(0)} 75%{transform:rotate(11deg)} }
+  @keyframes em-wobble { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-11deg)} 45%{transform:rotate(9deg)} 70%{transform:rotate(-6deg)} }
+  @keyframes em-jump   { 0%,100%{transform:translateY(0) scaleY(1)} 25%{transform:translateY(-16px) scaleY(1.1)}
+    55%{transform:translateY(0) scaleY(0.9)} 75%{transform:translateY(-5px) scaleY(1.03)} }
+  .flyer[data-emote="spin"]    .inner { animation: em-spin 780ms cubic-bezier(.4,0,.3,1); }
+  .flyer[data-emote="bow"]     .inner { animation: em-bow 900ms ease-in-out; }
+  .flyer[data-emote="flutter"] .inner { animation: em-flutter 900ms ease-in-out; }
+  .flyer[data-emote="tilt"]    .inner { animation: em-tilt 820ms ease-in-out; }
+  .flyer[data-emote="puff"]    .inner { animation: em-puff 760ms cubic-bezier(.3,1.5,.4,1); }
+  .flyer[data-emote="sing"]    .inner { animation: em-sing 1150ms ease-in-out; }
+  .flyer[data-emote="startle"] .inner { animation: em-startle 820ms cubic-bezier(.25,1.4,.4,1); }
+  .flyer[data-emote="nod"]     .inner { animation: em-nod 900ms ease-in-out; }
+  .flyer[data-emote="wobble"]  .inner { animation: em-wobble 950ms ease-in-out; }
+  .flyer[data-emote="jump"]    .inner { animation: em-jump 820ms cubic-bezier(.3,1.3,.4,1); }
+
+  /* ---------- DRIFT + BLOOM ---------- */
+  .drift { position: fixed; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; }
+  .drift .leaf { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
+  .drift .leaf canvas { display: block; }
+  .wb-bloom { position: absolute; z-index: 3; pointer-events: none;
+    transform-origin: 50% 60%; opacity: 0; will-change: transform, opacity; }
+  .wb-bloom canvas { display: block; }
+  /* the pop overshoots and settles — an ease-out alone reads mechanical */
+  @keyframes bloom-in {
+    0%{opacity:0;transform:scale(0.1) rotate(-28deg)} 45%{opacity:1;transform:scale(1.18) rotate(7deg)}
+    68%{transform:scale(0.94) rotate(-3deg)} 85%{transform:scale(1.04) rotate(1.5deg)}
+    100%{opacity:1;transform:scale(1) rotate(0)} }
+  @keyframes bloom-out { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(0.72) rotate(9deg)} }
+  .wb-bloom[data-state="in"]  { animation: bloom-in 1100ms cubic-bezier(.22,.9,.28,1) forwards; }
+  .wb-bloom[data-state="out"] { animation: bloom-out 620ms cubic-bezier(.4,0,.7,.4) forwards; }
+  @media (prefers-reduced-motion: reduce){ .drift, .wb-bloom, .flock { display: none; } }
+  @media (max-width: 1040px){ .drift { display: none; } }
+  @media (max-width: 900px){ .flock { display: none; } }
+
 </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Done-for-you 3-day virtual launch events","serviceType":"3-day virtual event production and launch strategy","provider":{"@type":"Organization","name":"AfterHarvest","url":"https://www.theafterharvest.com/"},"areaServed":"Worldwide","audience":{"@type":"Audience","audienceType":"Course creators, coaches, educators and community builders with an existing email audience"},"description":"AfterHarvest plans, builds and runs the entire 3-day virtual event: offer strategy, funnels, registration pages, slides, email marketing and the live operation. $0 upfront, paid as a revenue share of what the launch collects.","offers":{"@type":"Offer","priceCurrency":"USD","price":"0","description":"$0 upfront. AfterHarvest is paid a revenue share of what the launch collects, with a revenue floor agreed in writing before the work begins."}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does a 3-day virtual event cost?","acceptedAnswer":{"@type":"Answer","text":"There is $0 upfront. AfterHarvest is paid a revenue share of what the launch collects. There is an activation fee in week two which is credited against that revenue share, and it is refunded if the launch does not reach the agreed floor."}},{"@type":"Question","name":"What happens if the launch does not work?","acceptedAnswer":{"@type":"Answer","text":"Before signing, AfterHarvest models your list, your offer and your numbers, and puts a revenue floor in writing. If the launch comes in under that floor you owe no revenue share and the activation fee is refunded."}},{"@type":"Question","name":"Who is a 3-day virtual event not right for?","acceptedAnswer":{"@type":"Answer","text":"It does not work if your audience is no longer active, since an event concentrates an existing audience relationship rather than creating one. It also fails when the wrong topic or offer is chosen, or when the owner is unwilling to increase email frequency during the launch window."}},{"@type":"Question","name":"How much of my time does it take?","acceptedAnswer":{"@type":"Answer","text":"Roughly 15 to 20 hours across about six weeks. AfterHarvest builds and strategises the event; you approve the work, review it, record what is needed and teach live during the three days."}},{"@type":"Question","name":"Who founded AfterHarvest?","acceptedAnswer":{"@type":"Answer","text":"AfterHarvest was co-founded by Theia Ahmadi and Sean Canela. Sean writes the launch plans himself and runs the strategy calls."}},{"@type":"Question","name":"Do I need cold ads or new leads?","acceptedAnswer":{"@type":"Answer","text":"No. A 3-day virtual event sells to the audience you already have using a different conversion mechanism, rather than buying new traffic."}},{"@type":"Question","name":"Can I run 3-day events more than once a year?","acceptedAnswer":{"@type":"Answer","text":"Yes. They are designed to run quarterly. The first event takes the most work because the engine is being built; subsequent events reuse that engine and take considerably less."}}]}</script>
@@ -1812,6 +1907,16 @@ hr {
   
 
   <!-- ============ floating irregular sticky header ============ -->
+  <div class="wallbranch left" aria-hidden="true">
+    <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.35"></div>
+    <div class="wb-leaves" data-form="a"></div>
+  </div>
+  <div class="wallbranch right" aria-hidden="true">
+    <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.55"></div>
+    <div class="wb-leaves" data-form="b"></div>
+  </div>
+  <div class="drift" aria-hidden="true"></div>
+  <div class="flock" aria-hidden="true"></div>
   <div class="nav-wrap">
     <div class="nav-shell">
       <div class="nav">
@@ -1979,6 +2084,7 @@ hr {
 
 
   <!-- ============ refined closing footer ============ -->
+  <div class="seam" aria-hidden="true" data-kind="seam-chevron" data-cell="1.7" data-rows="11"></div>
   <footer class="foot" data-screen-label="03 Footer">
     <span class="foot-mark" aria-hidden="true"></span>
     <div class="wrap foot-inner">
@@ -3751,5 +3857,328 @@ hr {
       window.addEventListener(t, release, { passive: true });
     });
   })();
+
+  /* ================= REBUILT ANIMATION SYSTEMS =============================
+     Three lessons are baked into all of these, each learned the hard way:
+       1. rAF and Web Animations are SUSPENDED in a hidden tab while setTimeout
+          keeps firing. Anything scheduled into a frozen timeline stacks up and
+          never completes, leaving elements stuck mid-animation forever.
+       2. A first paint can land before the viewport reports a usable width. Any
+          build that bails on a width check must retry, or it never runs at all.
+       3. Never swallow a mount error — an empty canvas with no message is the
+          most expensive kind of bug to find.
+     ======================================================================== */
+  (function(){
+    var REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- chunked build queue ---------- */
+    var queue=[], pumping=false;
+    function next(cb){ if(document.hidden) setTimeout(cb,8); else requestAnimationFrame(cb); }
+    function pump(){
+      if(pumping) return; pumping=true;
+      (function step(){
+        var job=queue.shift();
+        if(!job){ pumping=false; return; }
+        try { job(); } catch(e){ if(window.console) console.error('[ah-art]', e); }
+        next(step);
+      })();
+    }
+
+    /* ---------- the section seam ---------- */
+    function seams(){
+      document.querySelectorAll('.seam').forEach(function(el){
+        var cell=parseFloat(el.dataset.cell)||1.7;
+        var n=Math.ceil((window.innerWidth/cell)/8)*8+8;
+        if(el.__cols===n) return; el.__cols=n; el.innerHTML='';
+        var c=document.createElement('canvas'); el.appendChild(c);
+        AHStitch.mount(c,{kind:el.dataset.kind||'seam-chevron',cols:n,rows:+el.dataset.rows||11,
+          cell:cell,seed:7,twinkle:false,animate:false});
+      });
+    }
+
+    /* ---------- wall branches ---------- */
+    var FRB=4;
+    function branches(){
+      document.querySelectorAll('.wb-limb').forEach(function(el){
+        if(el.dataset.built) return; el.dataset.built='1';
+        queue.push(function(){
+          var c=document.createElement('canvas'); el.appendChild(c);
+          AHStitch.mount(c,{kind:el.dataset.kind,cols:+el.dataset.cols,rows:+el.dataset.rows,
+            cell:parseFloat(el.dataset.cell),seed:+el.dataset.seed,twinkle:false,animate:false});
+        });
+      });
+      document.querySelectorAll('.wb-leaves').forEach(function(el,i){
+        if(el.dataset.built) return; el.dataset.built='1';
+        var form=el.dataset.form;
+        var cell=parseFloat(el.parentElement.querySelector('.wb-limb').dataset.cell);
+        el.__i=i*2; el.__stride=1+(i%2);
+        for(var fr=0;fr<FRB;fr++)(function(fr){
+          queue.push(function(){
+            var cv=document.createElement('canvas');
+            if(fr===0) cv.className='on';
+            el.appendChild(cv);
+            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:210,rows:176,cell:cell,seed:3,twinkle:false,animate:false});
+          });
+        })(fr);
+      });
+      pump();
+    }
+    var btick=0;
+    setInterval(function(){
+      if(document.hidden) return;
+      btick++;
+      document.querySelectorAll('.wb-leaves').forEach(function(el){
+        var cs=el.children; if(cs.length<FRB) return;
+        var n=Math.floor((btick*(el.__stride||1)+(el.__i||0))/3) % FRB;
+        for(var k=0;k<cs.length;k++) cs[k].classList.toggle('on', k===n);
+      });
+    }, 190);
+
+    /* ---------- the flock ---------- */
+    var CAST=[{perch:['bd-wren',56,62],wing:'a',cell:0.78},
+              {perch:['bd-robin',58,66],wing:'b',cell:0.74},
+              {perch:['bd-crow',72,58],wing:'c',cell:0.70}];
+    var BEATS=['hop','peck','shrug'], PHASES=12, birds=[];
+    var EMOTES=['spin','bow','flutter','tilt','puff','sing','startle','nod','wobble','jump'];
+
+    function obstacles(){
+      var out=[], PAD=16;
+      'h1.headline,.hero .sub,.icp,.cats,.plan-head h2,.plan-head p'.split(',').forEach(function(sel){
+        document.querySelectorAll(sel).forEach(function(el){
+          var r=el.getBoundingClientRect(); if(r.bottom<-260||r.top>innerHeight+260) return;
+          var rng=document.createRange(); rng.selectNodeContents(el);
+          var list=rng.getClientRects();
+          for(var i=0;i<list.length;i++){ var x=list[i]; if(x.width<4) continue;
+            out.push({l:x.left,t:x.top+scrollY,r:x.right,b:x.bottom+scrollY}); }
+        });
+      });
+      /* NB: never list a full-bleed container (.flock, .drift, .wallbranch) — an
+         inset:0 layer makes every position illegal and all birds fall back to
+         their seed coordinates in a neat row. */
+      '.vsl,.cats-wrap,.cta-row,.pill,.nav-wrap,.dock,.vsl-step,.pf,.seam'.split(',').forEach(function(q){
+        document.querySelectorAll(q).forEach(function(el){
+          var x=el.getBoundingClientRect(); if(x.bottom<-260||x.top>innerHeight+260) return;
+          out.push({l:x.left-PAD,t:x.top+scrollY-PAD,r:x.right+PAD,b:x.bottom+scrollY+PAD});
+        });
+      });
+      return out;
+    }
+    function clear(c,list){ for(var i=0;i<list.length;i++){ var b=list[i];
+      if(c.l<b.r&&c.r>b.l&&c.t<b.b&&c.b>b.t) return false; } return true; }
+    function findPerch(w,h,avoid,near){
+      var blocked=obstacles(), top=scrollY+80, bot=scrollY+innerHeight-h-70;
+      if(bot<top) bot=top+40;
+      for(var t=0;t<220;t++){
+        var x,y;
+        if(near&&t<70){ x=near.x+(Math.random()-0.5)*190; y=near.y+(Math.random()-0.5)*90; }
+        else { x=22+Math.random()*(innerWidth-w-44); y=top+Math.random()*(bot-top); }
+        if(x<16||x>innerWidth-w-16) continue;
+        if(avoid&&Math.hypot(x-avoid.x,y-avoid.y)<170) continue;
+        if(clear({l:x,t:y,r:x+w,b:y+h},blocked)) return {x:x,y:y};
+      }
+      return null;
+    }
+    function place(b){ b.el.style.transform='translate('+b.at.x+'px,'+b.at.y+'px) scaleX('+b.facing+')'; }
+    function show(b,which){
+      b.perched.classList.toggle('on', which===-1);
+      for(var i=0;i<b.wings.length;i++) b.wings[i].classList.toggle('on', i===which);
+    }
+    function flapStart(b,dur){
+      var i=0, beat=Math.max(38, Math.min(72, 96-dur*0.012));
+      b.flapT=setInterval(function(){ show(b, i%PHASES); i++; }, beat);
+    }
+    function flapStop(b){ if(b.flapT){ clearInterval(b.flapT); b.flapT=null; } show(b,-1); }
+    function flyTo(b,dest){
+      if(!dest||b.flying) return;
+      b.flying=true; b.el.dataset.beat=''; b.el.dataset.emote='';
+      var dx=dest.x-b.at.x, dy=dest.y-b.at.y;
+      b.facing = dx>=0 ? -1 : 1;
+      var dist=Math.hypot(dx,dy), dur=620+dist*0.95, lift=Math.min(190,70+dist*0.30);
+      if(b.anim){ b.anim.cancel(); b.anim=null; }
+      flapStart(b,dur);
+      b.anim=b.el.animate([
+        {transform:'translate('+b.at.x+'px,'+b.at.y+'px) scaleX('+b.facing+') rotate(0deg)'},
+        {transform:'translate('+((b.at.x+dest.x)/2)+'px,'+(Math.min(b.at.y,dest.y)-lift)+'px) scaleX('+b.facing+') rotate('+(dx>=0?-8:8)+'deg)',offset:0.5},
+        {transform:'translate('+dest.x+'px,'+dest.y+'px) scaleX('+b.facing+') rotate(0deg)'}
+      ],{duration:dur,easing:'cubic-bezier(.30,.06,.26,1)',fill:'forwards'});
+      b.anim.onfinish=function(){
+        flapStop(b); b.at=dest; b.flying=false; place(b);
+        if(b.anim){ b.anim.cancel(); b.anim=null; }
+        meet(b);
+      };
+      b.anim.oncancel=function(){ flapStop(b); b.flying=false; };
+    }
+    function meet(b){
+      birds.forEach(function(o){
+        if(o===b||o.flying||b.flying) return;
+        if(Math.hypot(o.at.x-b.at.x,o.at.y-b.at.y)>150) return;
+        var mood=Math.random()<0.5?'squabble':'court';
+        b.facing=(o.at.x>b.at.x)?1:-1; place(b);
+        o.facing=(b.at.x>o.at.x)?1:-1; place(o);
+        b.el.dataset.beat=mood; o.el.dataset.beat=mood;
+        setTimeout(function(){ b.el.dataset.beat=''; o.el.dataset.beat=''; },2400);
+      });
+    }
+    function beatLoop(b){
+      setTimeout(function(){
+        if(!b.el.isConnected) return;
+        if(!document.hidden && !b.flying && !b.el.dataset.beat && !b.el.dataset.emote){
+          b.el.dataset.beat=BEATS[(Math.random()*BEATS.length)|0];
+          setTimeout(function(){ b.el.dataset.beat=''; },1400);
+        }
+        beatLoop(b);
+      }, 9000+Math.random()*7000+b.idx*2600);
+    }
+    function flightLoop(b){
+      setTimeout(function(){
+        if(!b.el.isConnected) return;
+        if(!document.hidden && !b.flying){
+          var target=null;
+          if(Math.random()<0.34){
+            var o=birds[(b.idx+1)%birds.length];
+            if(o&&o!==b&&!o.flying) target=findPerch(b.w,b.h,null,o.at);
+          }
+          flyTo(b, target || findPerch(b.w,b.h,b.at,null));
+        }
+        flightLoop(b);
+      }, 16000+Math.random()*12000+b.idx*5000);
+    }
+
+    var flockBuilt=false;
+    function flock(){
+      var host=document.querySelector('.flock');
+      if(!host||innerWidth<900||flockBuilt) return;
+      flockBuilt=true;
+      host.style.height=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)+'px';
+      CAST.forEach(function(spec,idx){
+        var el=document.createElement('div'); el.className='flyer';
+        var inner=document.createElement('span'); inner.className='inner'; el.appendChild(inner);
+        var w=spec.perch[1]*spec.cell, h=spec.perch[2]*spec.cell;
+        inner.style.width=w+'px'; inner.style.height=h+'px';
+        function pose(kind,cols,rows,on){
+          var wrap=document.createElement('span'); wrap.className='pose'+(on?' on':'');
+          var c=document.createElement('canvas'); wrap.appendChild(c); inner.appendChild(wrap);
+          queue.push(function(){
+            AHStitch.mount(c,{kind:kind,cols:cols,rows:rows,cell:spec.cell,seed:7+idx*13,twinkle:false,animate:false});
+          });
+          return wrap;
+        }
+        var perched=pose(spec.perch[0],spec.perch[1],spec.perch[2],true);
+        var wings=[]; for(var p=0;p<PHASES;p++) wings.push(pose('fw-'+spec.wing+'-'+p,76,54,false));
+        host.appendChild(el);
+        var b={el:el,inner:inner,perched:perched,wings:wings,w:w,h:h,facing:1,anim:null,flapT:null,flying:false,idx:idx};
+        b.at=findPerch(w,h,null,null)||{x:60+idx*160,y:scrollY+150};
+        place(b); birds.push(b);
+        var lastEmote=-1;
+        el.addEventListener('pointerdown',function(ev){
+          ev.preventDefault();
+          if(b.flying) return;
+          var pick; do{ pick=(Math.random()*EMOTES.length)|0; } while(pick===lastEmote);
+          lastEmote=pick;
+          el.dataset.beat=''; el.dataset.emote=''; void el.offsetWidth;
+          el.dataset.emote=EMOTES[pick];
+          if(/flutter|startle|jump/.test(EMOTES[pick])){ flapStart(b,300); setTimeout(function(){ flapStop(b); },900); }
+          setTimeout(function(){ if(el.dataset.emote===EMOTES[pick]) el.dataset.emote=''; },1300);
+        },{passive:false});
+        beatLoop(b); flightLoop(b);
+      });
+      pump();
+      var st;
+      window.addEventListener('scroll',function(){
+        clearTimeout(st);
+        st=setTimeout(function(){
+          if(document.hidden) return;
+          var top=scrollY, bot=top+innerHeight;
+          birds.forEach(function(b,i){
+            if(b.flying) return;
+            if(b.at.y+b.h<top+40 || b.at.y>bot-60)
+              setTimeout(function(){ flyTo(b, findPerch(b.w,b.h,b.at,null)); }, i*420);
+          });
+        },520);
+      },{passive:true});
+    }
+
+    /* ---------- drift + blooms ---------- */
+    var POOL=8, leaves=[], blooms=[], driftBuilt=false;
+    function fall(L,delay){
+      if(!L.el.isConnected) return;
+      var w=innerWidth,h=innerHeight;
+      var x0=Math.random()*w, drift=(Math.random()-0.5)*260, dur=9000+Math.random()*7000;
+      var spin=(Math.random()<0.5?-1:1)*(220+Math.random()*320), sway=60+Math.random()*90;
+      if(L.anim){ L.anim.cancel(); L.anim=null; }
+      L.anim=L.el.animate([
+        {transform:'translate('+x0+'px,-60px) rotate(0deg)',opacity:0},
+        {transform:'translate('+(x0+sway)+'px,'+(h*0.22)+'px) rotate('+(spin*0.25)+'deg)',opacity:0.85,offset:0.22},
+        {transform:'translate('+(x0-sway*0.6+drift*0.5)+'px,'+(h*0.55)+'px) rotate('+(spin*0.6)+'deg)',opacity:0.9,offset:0.55},
+        {transform:'translate('+(x0+drift)+'px,'+(h+70)+'px) rotate('+spin+'deg)',opacity:0}
+      ],{duration:dur,delay:delay||0,easing:'cubic-bezier(.42,.05,.55,.98)',fill:'forwards'});
+      L.anim.onfinish=function(){ sched(L); };
+    }
+    function sched(L){
+      clearTimeout(L.t);
+      L.t=setTimeout(function(){ if(document.hidden){ sched(L); return; } fall(L,0); }, 400+Math.random()*5200);
+    }
+    var SPOTS=[{s:'.wallbranch.left',x:0.32,y:0.58},{s:'.wallbranch.left',x:0.54,y:0.47},
+               {s:'.wallbranch.left',x:0.70,y:0.66},{s:'.wallbranch.right',x:0.30,y:0.52},
+               {s:'.wallbranch.right',x:0.50,y:0.66},{s:'.wallbranch.right',x:0.68,y:0.48}];
+    var FLOWERS=['fb-daisy','fb-aster','fb-rose','fb-bell','fb-pom'], lastBloom=-1;
+    function driftBloom(){
+      if(driftBuilt||innerWidth<1040) return;
+      var host=document.querySelector('.drift'); if(!host) return;
+      driftBuilt=true;
+      for(var i=0;i<POOL;i++)(function(i){
+        var el=document.createElement('div'); el.className='leaf';
+        var c=document.createElement('canvas'); el.appendChild(c); host.appendChild(el);
+        queue.push(function(){ AHStitch.mount(c,{kind:'dl-'+(i%5),cols:24,rows:20,cell:0.95,seed:3+i,twinkle:false,animate:false}); });
+        leaves.push({el:el,anim:null,t:null});
+      })(i);
+      SPOTS.forEach(function(sp,i){
+        var h2=document.querySelector(sp.s); if(!h2) return;
+        var el=document.createElement('div'); el.className='wb-bloom';
+        el.style.left=(sp.x*100).toFixed(1)+'%'; el.style.top=(sp.y*100).toFixed(1)+'%';
+        var c=document.createElement('canvas'); el.appendChild(c); h2.appendChild(el);
+        queue.push(function(){ AHStitch.mount(c,{kind:FLOWERS[i%FLOWERS.length],cols:30,rows:30,cell:0.92,seed:5+i,twinkle:false,animate:false}); });
+        blooms.push(el);
+      });
+      pump();
+      leaves.forEach(function(L,i){ L.t=setTimeout(function(){ fall(L,0); }, i*900+Math.random()*1200); });
+      setInterval(function(){
+        if(document.hidden||!blooms.length) return;
+        var pick; do{ pick=(Math.random()*blooms.length)|0; } while(blooms.length>1&&pick===lastBloom);
+        lastBloom=pick;
+        var el=blooms[pick]; if(el.dataset.state==='in') return;
+        el.dataset.state='in';
+        setTimeout(function(){
+          if(el.dataset.state==='in') el.dataset.state='out';
+          setTimeout(function(){ if(el.dataset.state==='out') el.dataset.state=''; },700);
+        }, 4200+Math.random()*1800);
+      }, 5000);
+    }
+
+    document.addEventListener('visibilitychange',function(){
+      if(document.hidden) return;
+      birds.forEach(function(b){
+        b.el.getAnimations().forEach(function(a){ a.cancel(); });
+        flapStop(b); b.flying=false; b.el.dataset.beat=''; b.el.dataset.emote=''; place(b);
+      });
+      leaves.forEach(function(L){ if(L.anim && L.anim.playState!=='running') sched(L); });
+    });
+
+    function build(){
+      if(!window.AHStitch) return;
+      seams(); branches();
+      if(!REDUCE){ flock(); driftBloom(); }
+    }
+    /* retry: a first paint can land before the viewport has a usable width */
+    function boot(n){
+      build();
+      if((!flockBuilt||!driftBuilt) && (n||0)<24) setTimeout(function(){ boot((n||0)+1); },400);
+    }
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ boot(0); });
+    else window.addEventListener('load',function(){ boot(0); });
+    var rt; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ seams(); build(); },320); });
+    window.__ah=function(){ return {birds:birds.length,leaves:leaves.length,blooms:blooms.length}; };
+  })();
+
 </script>
 </body></html>
