@@ -1467,6 +1467,104 @@
     }
   }
 
+  /* ================= PERCHED POSES ==========================================
+     Seven drawn poses per plumage. This exists because no amount of transform on
+     a single sprite reads as behaviour: rotating a rigid bird is a rigid bird,
+     tilted. A preen has to actually bury the head in the flank; an alert has to
+     actually extend the neck. So the body, head, wing and tail are placed from
+     pose parameters and redrawn, and the page swaps sprites instead of skewing one.
+
+     bp-<plumage>-<pose>   plumage a|b|c, pose 0..6
+       0 rest     head forward, neutral
+       1 alert    neck extended, head high and back
+       2 look     head turned back over the shoulder
+       3 preen    head buried down into the flank
+       4 peck     head down to the perch
+       5 fluff    feathers out, head pulled in, rounder
+       6 stretch  one wing extended and held open  */
+  function perchPose(G, kind, W, H, rnd){
+    function mu(t){ return mix(t, P.umber, 0.10); }
+    function dk(t){ return darken(t, 0.22); }
+    var kp=kind.split('-'), sp=kp[1], pose=parseInt(kp[2],10)||0;
+    var PLS={
+      a:{lit:mix(mu(P.robin),P.creamLt,0.42),body:mu(P.robin),dark:mu(P.robinDk),bill:mu(P.awn),foot:mu(P.awn),accent:mix(mu(P.robin),P.creamLt,0.62)},
+      b:{lit:mix(mu(P.breast),P.creamLt,0.34),body:mu(P.breast),dark:mu(P.breastDk),bill:P.umberDk,foot:mu(P.awn),accent:mu(P.olive)},
+      c:{lit:mu(P.crowLt),body:mu(P.crow),dark:mu(P.crowDk),bill:P.crowDk,foot:P.umberDk,accent:mu(P.crowSheen)}
+    };
+    var PL=PLS[sp]||PLS.a, cr=P.creamLt;
+
+    /* pose parameters: [headDX, headDY, headTilt, puff, neck, wingOut, tailUp] */
+    var POSE=[
+      [ 0.00,  0.00,  0.00, 1.00, 1.00, 0.00, 0.00],  /* rest    */
+      [-0.02, -0.09, -0.16, 0.94, 1.34, 0.00, 0.06],  /* alert   */
+      [ 0.13, -0.02,  0.95, 1.00, 0.92, 0.00, 0.02],  /* look    */
+      [ 0.10,  0.13,  1.75, 1.04, 0.62, 0.10, 0.04],  /* preen   */
+      [-0.06,  0.17,  0.70, 0.98, 0.88, 0.00,-0.05],  /* peck    */
+      [-0.01, -0.02,  0.00, 1.22, 0.72, 0.05, 0.10],  /* fluff   */
+      [ 0.00, -0.02, -0.06, 1.00, 1.06, 1.00, 0.14]   /* stretch */
+    ][Math.max(0,Math.min(6,pose))];
+    var hdx=POSE[0], hdy=POSE[1], tilt=POSE[2], puff=POSE[3], neck=POSE[4], wingOut=POSE[5], tailUp=POSE[6];
+
+    function mass(x,y,rx,ry,rot,lit,body,shade){
+      var ct=Math.cos(rot||0), st=Math.sin(rot||0), m=Math.ceil(Math.max(rx,ry))+2;
+      for(var j=-m;j<=m;j++) for(var i=-m;i<=m;i++){
+        var u=(i*ct+j*st)/rx, v=(j*ct-i*st)/ry, d=u*u+v*v;
+        if(d>1) continue;
+        var l=(-u*0.62-v*0.78);
+        put(G,x+i,y+j, d>0.86? shade : (l>0.46? lit : (l>-0.05? body : shade)));
+      }
+    }
+    var cx=W*0.52, by=H*0.58;
+
+    /* legs and perch first, so the body sits on them */
+    var px0=W*0.18, px1=W*0.86, perchY=H*0.90;
+    sbar(G,px0,perchY,px1,perchY,2.0,mu(P.bark));
+    sbar(G,cx-W*0.05,by+H*0.15,cx-W*0.06,perchY-1,1.5,PL.foot);
+    sbar(G,cx+W*0.04,by+H*0.15,cx+W*0.05,perchY-1,1.5,PL.foot);
+    [[-0.06],[0.05]].forEach(function(o){
+      var fx=cx+W*o[0];
+      sbar(G,fx,perchY-1,fx-3,perchY+2,1.1,PL.foot);
+      sbar(G,fx,perchY-1,fx+3.4,perchY+1.6,1.1,PL.foot);
+    });
+
+    /* body — puff scales it, which is the whole of the fluff pose */
+    mass(cx, by, W*0.25*puff, H*0.19*puff, 0.06, PL.lit, PL.body, PL.dark);
+
+    /* the extended wing, drawn before the head so the head overlaps it */
+    if(wingOut>0.5){
+      sspike(G, cx+W*0.06, by-H*0.02, cx+W*0.46, by-H*0.16, 9.0, 2.0, PL.body);
+      sspike(G, cx+W*0.06, by-H*0.04, cx+W*0.42, by-H*0.15, 4.0, 1.2, PL.lit);
+      for(var q=0;q<4;q++)
+        sbar(G, cx+W*0.20, by-H*0.06+q*1.6, cx+W*0.48, by-H*0.20+q*2.6, 1.3, q%2?PL.dark:PL.body);
+    } else {
+      /* folded wing on the flank */
+      var wy=by+H*0.01;
+      for(var f=0;f<5;f++)
+        sarc(G, cx+W*0.06, wy, H*0.11+f*1.2, 0.30+wingOut, 1.15+wingOut, 1.5, f%2?PL.dark:PL.body);
+    }
+
+    /* neck + head, placed by the pose */
+    var hx=cx-W*0.19+W*hdx, hy=by-H*0.13*neck+H*hdy;
+    sbar(G, cx-W*0.06, by-H*0.06, hx+W*0.05, hy+H*0.05, W*0.14*puff, PL.body, PL.dark);
+    mass(hx, hy, W*0.115*puff, H*0.088*puff, tilt, PL.lit, PL.body, PL.dark);
+
+    /* bill, eye — both ride the head tilt */
+    var ba=3.05+tilt;
+    sspike(G, hx-W*0.09*Math.cos(tilt), hy-H*0.01+W*0.09*Math.sin(tilt),
+              hx-W*0.09*Math.cos(tilt)+Math.cos(ba)*W*0.11,
+              hy-H*0.01+W*0.09*Math.sin(tilt)+Math.sin(ba)*W*0.11, 2.0, 0.7, PL.bill);
+    var ex=hx-W*0.035*Math.cos(tilt)+W*0.01*Math.sin(tilt);
+    var ey=hy-H*0.03*Math.cos(tilt)-W*0.035*Math.sin(tilt);
+    mass(ex,ey,1.5,1.5,0,P.umberDk,P.umberDk,P.umberDk);
+    put(G,ex-0.6,ey-0.6,cr);
+    if(sp!=='c'){ for(var t=0;t<4;t++) put(G,hx-W*0.02+t*1.2, hy+H*0.05, PL.accent); }
+
+    /* tail */
+    for(var tf=-1;tf<=1;tf++)
+      sbar(G, cx+W*0.19, by+H*0.05,
+              cx+W*0.40+tf*W*0.02, by+H*0.05+tf*H*0.09 - H*tailUp*1.4, 2.0, tf?PL.dark:PL.body);
+  }
+
   /* ================= WINGS — twelve phases ==================================
      Five held poses read as a slideshow; twelve at ~40-70ms fuse into motion.
      The attitude is a continuous function of phase, and deliberately asymmetric:
@@ -1811,6 +1909,10 @@
       case 'sunflower': case 'bluebell': case 'flax': case 'marigold':
       case 'cornflower': case 'yarrow':
         chapterBloom(G, kind, W, H, rnd); break;
+      case 'bp-a-0': case 'bp-a-1': case 'bp-a-2': case 'bp-a-3': case 'bp-a-4': case 'bp-a-5': case 'bp-a-6':
+      case 'bp-b-0': case 'bp-b-1': case 'bp-b-2': case 'bp-b-3': case 'bp-b-4': case 'bp-b-5': case 'bp-b-6':
+      case 'bp-c-0': case 'bp-c-1': case 'bp-c-2': case 'bp-c-3': case 'bp-c-4': case 'bp-c-5': case 'bp-c-6':
+        perchPose(G, kind, W, H, rnd); break;
       case 'bd-crow': case 'bd-owl': case 'bd-wren': case 'bd-robin': case 'bd-heron':
         bird(G, kind, W, H, rnd); break;
       case 'fw-a-0': case 'fw-a-1': case 'fw-a-2': case 'fw-a-3': case 'fw-a-4': case 'fw-a-5':

@@ -2006,6 +2006,45 @@ hr {
      so the long bar carried the wordmark alone. */
   .nav .wm-mark { height: 24px; width: 24px; opacity: 1; margin-right: 11px; }
 
+
+  /* ======================================================================
+     MOBILE. The desktop pass raised the body to 20px on a 66ch measure and the
+     headline to 66px; none of that was re-scaled down, so on a phone the
+     sub-copy ran at desktop size and the nav CTA overflowed its bar.
+     ====================================================================== */
+  @media (max-width: 760px){
+    h1.headline { font-size: 32px; line-height: 1.12; letter-spacing: 0.014em;
+      word-spacing: 0.03em; -webkit-text-stroke: 1.1px currentColor; margin-top: 14px; }
+    h1.headline .hword { -webkit-text-stroke: 0.9px #2A2419; letter-spacing: 0.016em; }
+    .hero .sub { font-size: 16px; line-height: 1.58; letter-spacing: 0.006em;
+      word-spacing: 0.02em; max-width: 100%; padding: 0 4px; }
+    .cats { font-size: 13px; letter-spacing: 0.03em; gap: 6px; }
+    .icp { font-size: 10px; letter-spacing: 0.07em; }
+    .plan-head h2 { font-size: 26px; letter-spacing: 0.014em; }
+    .plan-head p { font-size: 15.5px; line-height: 1.55; }
+    .vsl-step { font-size: 9.5px; letter-spacing: 0.09em; gap: 8px; }
+    .vsl-step .rule { width: 26px; }
+    .vsl-step .step-n { font-size: 12px; }
+    /* the bar: the mark plus the full sentence does not fit a phone, so the
+       filler words go and the mark holds the brand */
+    .nav { padding: 7px 8px 7px 12px; gap: 10px; }
+    .nav .wm { height: 20px; }
+    .nav .wm-mark { height: 19px; width: 19px; margin-right: 7px; }
+    .nav .pill { font-size: 9px; letter-spacing: 0.07em; padding: 9px 12px 11px; }
+    .nav .pill .pw { display: none; }
+    .nav .pill .pill-ico { width: 12px; height: 12px; }
+    /* every decorative layer is off on a phone: they cost paint and there is no
+       margin to put them in */
+    .wallbranch, .flock, .weeptree, .navtree { display: none !important; }
+    .seam { opacity: 0.5; }
+  }
+  @media (max-width: 430px){
+    h1.headline { font-size: 27px; letter-spacing: 0.010em; }
+    .hero .sub { font-size: 15.5px; }
+    .cats { font-size: 11.5px; gap: 4px; }
+    .nav .pill { font-size: 8.5px; padding: 8px 10px 10px; }
+  }
+
 </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Done-for-you 3-day virtual launch events","serviceType":"3-day virtual event production and launch strategy","provider":{"@type":"Organization","name":"AfterHarvest","url":"https://www.theafterharvest.com/"},"areaServed":"Worldwide","audience":{"@type":"Audience","audienceType":"Course creators, coaches, educators and community builders with an existing email audience"},"description":"AfterHarvest plans, builds and runs the entire 3-day virtual event: offer strategy, funnels, registration pages, slides, email marketing and the live operation. $0 upfront, paid as a revenue share of what the launch collects.","offers":{"@type":"Offer","priceCurrency":"USD","price":"0","description":"$0 upfront. AfterHarvest is paid a revenue share of what the launch collects, with a revenue floor agreed in writing before the work begins."}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does a 3-day virtual event cost?","acceptedAnswer":{"@type":"Answer","text":"There is $0 upfront. AfterHarvest is paid a revenue share of what the launch collects. There is an activation fee in week two which is credited against that revenue share, and it is refunded if the launch does not reach the agreed floor."}},{"@type":"Question","name":"What happens if the launch does not work?","acceptedAnswer":{"@type":"Answer","text":"Before signing, AfterHarvest models your list, your offer and your numbers, and puts a revenue floor in writing. If the launch comes in under that floor you owe no revenue share and the activation fee is refunded."}},{"@type":"Question","name":"Who is a 3-day virtual event not right for?","acceptedAnswer":{"@type":"Answer","text":"It does not work if your audience is no longer active, since an event concentrates an existing audience relationship rather than creating one. It also fails when the wrong topic or offer is chosen, or when the owner is unwilling to increase email frequency during the launch window."}},{"@type":"Question","name":"How much of my time does it take?","acceptedAnswer":{"@type":"Answer","text":"Roughly 15 to 20 hours across about six weeks. AfterHarvest builds and strategises the event; you approve the work, review it, record what is needed and teach live during the three days."}},{"@type":"Question","name":"Who founded AfterHarvest?","acceptedAnswer":{"@type":"Answer","text":"AfterHarvest was co-founded by Theia Ahmadi and Sean Canela. Sean writes the launch plans himself and runs the strategy calls."}},{"@type":"Question","name":"Do I need cold ads or new leads?","acceptedAnswer":{"@type":"Answer","text":"No. A 3-day virtual event sells to the audience you already have using a different conversion mechanism, rather than buying new traffic."}},{"@type":"Question","name":"Can I run 3-day events more than once a year?","acceptedAnswer":{"@type":"Answer","text":"Yes. They are designed to run quarterly. The first event takes the most work because the engine is being built; subsequent events reuse that engine and take considerably less."}}]}</script>
@@ -4093,8 +4132,26 @@ hr {
     }
     function place(b){ b.el.style.transform='translate('+b.at.x+'px,'+b.at.y+'px) scaleX('+b.facing+')'; }
     function show(b,which){
-      b.perched.classList.toggle('on', which===-1);
       for(var i=0;i<b.wings.length;i++) b.wings[i].classList.toggle('on', i===which);
+      if(which===-1) setPose(b, b.poseIdx||0);
+      else for(var j=0;j<b.poses.length;j++) b.poses[j].classList.remove('on');
+    }
+    function setPose(b,n){
+      b.poseIdx=n;
+      for(var i=0;i<b.poses.length;i++) b.poses[i].classList.toggle('on', i===n);
+    }
+    /* a behaviour is: hold the pose for a beat, then return to rest. The HOLD is
+       what makes it read as a bird — it is the stillness between moves, not the
+       move, that sells it. */
+    var POSE_OF={bob:4,look:2,preen:3,flick:0,fluff:5,stretch:6,
+                 lunge:1,recoil:5,offer:4};
+    function act(b,beat,ms){
+      var pn=POSE_OF[beat];
+      if(pn!=null) setPose(b,pn);
+      b.el.dataset.beat=beat;
+      return new Promise(function(r){
+        setTimeout(function(){ b.el.dataset.beat=''; setPose(b,0); r(); }, ms);
+      });
     }
     function flapStart(b,dur){
       var i=0, beat=Math.max(38, Math.min(72, 96-dur*0.012));
@@ -4124,8 +4181,7 @@ hr {
     /* an exchange, played as turns. One acts, the other answers, with a beat of
        stillness between — which is what makes it read as two birds reacting to
        each other rather than two sprites vibrating in unison. */
-    function step(el,beat,ms){ el.dataset.beat=beat;
-      return new Promise(function(r){ setTimeout(function(){ el.dataset.beat=''; r(); }, ms); }); }
+
     function meet(b){
       birds.forEach(function(o){
         if(o===b||o.flying||b.flying||b.busy||o.busy) return;
@@ -4142,7 +4198,7 @@ hr {
              [b,'preen',2200],[o,'preen',2200]];
         (function run(i){
           if(i>=seq.length || document.hidden){ b.busy=o.busy=false; return; }
-          step(seq[i][0].el, seq[i][1], seq[i][2]).then(function(){
+          act(seq[i][0], seq[i][1], seq[i][2]).then(function(){
             setTimeout(function(){ run(i+1); }, 260);   /* the pause between turns */
           });
         })(0);
@@ -4152,8 +4208,8 @@ hr {
       setTimeout(function(){
         if(!b.el.isConnected) return;
         if(!document.hidden && !b.flying && !b.busy && !b.el.dataset.beat && !b.el.dataset.emote){
-          b.el.dataset.beat=BEATS[(Math.random()*BEATS.length)|0];
-          setTimeout(function(){ b.el.dataset.beat=''; },3000);
+          var pick=BEATS[(Math.random()*BEATS.length)|0];
+          act(b, pick, 1500+Math.random()*1600);
         }
         beatLoop(b);
       }, 6000+Math.random()*6000+b.idx*1900);
@@ -4192,10 +4248,14 @@ hr {
           });
           return wrap;
         }
-        var perched=pose(spec.perch[0],spec.perch[1],spec.perch[2],true);
+        /* seven DRAWN perched poses, not one sprite being rotated. Behaviour is a
+           sprite swap: a preen actually buries the head, an alert actually
+           extends the neck. Transforms alone can only ever tilt. */
+        var poses=[]; for(var q=0;q<7;q++) poses.push(pose('bp-'+spec.wing+'-'+q,64,64,q===0));
+        var perched=poses[0];
         var wings=[]; for(var p=0;p<PHASES;p++) wings.push(pose('fw-'+spec.wing+'-'+p,76,54,false));
         host.appendChild(el);
-        var b={el:el,inner:inner,perched:perched,wings:wings,w:w,h:h,facing:1,anim:null,flapT:null,flying:false,idx:idx};
+        var b={el:el,inner:inner,perched:perched,poses:poses,wings:wings,w:w,h:h,facing:1,anim:null,flapT:null,flying:false,idx:idx};
         b.at=findPerch(w,h,null,null)||{x:60+idx*160,y:scrollY+150};
         place(b); birds.push(b);
         var lastEmote=-1;
