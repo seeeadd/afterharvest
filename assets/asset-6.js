@@ -1553,6 +1553,9 @@
     var FR=4, ph0=(frame%FR)/FR*6.2832;
     var R=rngFrom(form==='b'? 811 : 409);
     var leafIdx=0;
+    /* leaf size derived from the grid, so foliage keeps its proportion whatever
+       size the branch is drawn at */
+    var LS=Math.max(3.4, Math.min(W,H)*0.042);
 
     function branch(x,y,ang,len,wid,depth){
       var ex=x+Math.cos(ang)*len, ey=y+Math.sin(ang)*len;
@@ -1563,20 +1566,20 @@
       if(!isLeafPass) swood(G,[[x,y],[mx,my],[x2,y2]], wid, Math.max(0.9,wid*0.46), tkB, tkA, tkC);
 
       if(isLeafPass && depth<=2){
-        var n=(depth<=1? 7 : 5)+((R()*4)|0);
+        var n=(depth<=1? 9 : 7)+((R()*5)|0);
         for(var k=0;k<n;k++){
           var f=(k+1)/(n+1);
           var lx=x+(x2-x)*f, ly=y+(y2-y)*f;
           var side=(k%2)?1:-1, la=ang+side*(0.85+R()*0.5);
           var sway=Math.sin(ph0+leafIdx*0.97); leafIdx++;
-          var off=3.2+R()*2.4;
+          var off=LS*1.15+R()*LS*0.8;
           /* the displacement has to be big enough to SEE between frames. At 1.5px
              the leaves technically moved and read as perfectly still. */
           leaf(lx+Math.cos(la)*off+sway*4.2, ly+Math.sin(la)*off+Math.cos(ph0+leafIdx*0.7)*3.0,
-               2.0+R()*1.5, la+sway*0.62, PAL[(R()*PAL.length)|0]);
+               LS*(0.80+R()*0.55), la+sway*0.62, PAL[(R()*PAL.length)|0]);
         }
         leaf(x2+Math.cos(ang)*2.4+Math.sin(ph0+leafIdx)*3.6,
-             y2+Math.sin(ang)*2.4+Math.cos(ph0+leafIdx*1.2)*2.6, 2.2+R()*1.2,
+             y2+Math.sin(ang)*2.4+Math.cos(ph0+leafIdx*1.2)*2.6, LS*(0.85+R()*0.45),
              ang+Math.sin(ph0+leafIdx)*0.55, PAL[(R()*PAL.length)|0]);
         leafIdx++;
       }

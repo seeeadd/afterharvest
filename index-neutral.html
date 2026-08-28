@@ -1927,7 +1927,6 @@ hr {
     <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
     <div class="wb-leaves" data-form="b"></div>
   </div>
-  <div class="drift" aria-hidden="true"></div>
   <div class="flock" aria-hidden="true"></div>
   <div class="nav-wrap">
     <div class="nav-shell">
@@ -3967,7 +3966,12 @@ hr {
       /* NB: never list a full-bleed container (.flock, .drift, .wallbranch) — an
          inset:0 layer makes every position illegal and all birds fall back to
          their seed coordinates in a neat row. */
-      '.vsl,.cats-wrap,.cta-row,.pill,.nav-wrap,.dock,.vsl-step,.pf,.seam'.split(',').forEach(function(q){
+      /* everything a visitor interacts with, plus the Cal embed and any iframe —
+         a bird sitting on the booking calendar looks broken and, worse, sits over
+         a control someone is trying to click */
+      ('.vsl,.cats-wrap,.cta-row,.pill,.nav-wrap,.dock,.vsl-step,.pf,.seam,'+
+       '.plan-book,.plan-book-frame,.plan-book-head,.plan-book-lead,iframe,'+
+       '.pfd-cal,.foot').split(',').forEach(function(q){
         document.querySelectorAll(q).forEach(function(el){
           var x=el.getBoundingClientRect(); if(x.bottom<-260||x.top>innerHeight+260) return;
           out.push({l:x.left-PAD,t:x.top+scrollY-PAD,r:x.right+PAD,b:x.bottom+scrollY+PAD});
@@ -4136,14 +4140,9 @@ hr {
     var FLOWERS=['fb-daisy','fb-aster','fb-rose','fb-bell','fb-pom'], lastBloom=-1;
     function driftBloom(){
       if(driftBuilt||innerWidth<1040) return;
-      var host=document.querySelector('.drift'); if(!host) return;
       driftBuilt=true;
-      for(var i=0;i<POOL;i++)(function(i){
-        var el=document.createElement('div'); el.className='leaf';
-        var c=document.createElement('canvas'); el.appendChild(c); host.appendChild(el);
-        queue.push(function(){ AHStitch.mount(c,{kind:'dl-'+(i%5),cols:24,rows:20,cell:0.95,seed:3+i,twinkle:false,animate:false}); });
-        leaves.push({el:el,anim:null,t:null});
-      })(i);
+      /* the falling-leaf layer is gone on purpose: leaves belong on the branch,
+         not raining down the page. The bloom popper below stays. */
       SPOTS.forEach(function(sp,i){
         var h2=document.querySelector(sp.s); if(!h2) return;
         var el=document.createElement('div'); el.className='wb-bloom';
@@ -4153,7 +4152,6 @@ hr {
         blooms.push(el);
       });
       pump();
-      leaves.forEach(function(L,i){ L.t=setTimeout(function(){ fall(L,0); }, i*900+Math.random()*1200); });
       setInterval(function(){
         if(document.hidden||!blooms.length) return;
         var pick; do{ pick=(Math.random()*blooms.length)|0; } while(blooms.length>1&&pick===lastBloom);
@@ -4179,7 +4177,7 @@ hr {
     function build(){
       if(!window.AHStitch) return;
       seams(); branches();
-      if(!REDUCE){ flock(); driftBloom(); }
+      if(!REDUCE){ flock(); driftBloom(); }   /* driftBloom now only builds the blooms */
     }
     /* retry: a first paint can land before the viewport has a usable width */
     function boot(n){
