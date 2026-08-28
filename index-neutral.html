@@ -1817,14 +1817,20 @@ hr {
     z-index: 2; pointer-events: none; }
   .wallbranch.left  { left: -132px; transform: scaleX(-1); opacity: 0.95; }
   .wallbranch.right { right: -132px; opacity: 0.92; }
+  /* THE MASK MUST NOT EAT THE FOLIAGE.
+     The limb enters at the canvas's RIGHT edge and reaches left, so the thick bare
+     butt is on the right and every leaf is at the left tip. The previous fade ran
+     from 74% to 90% across the canvas, which erased exactly and only the leafy
+     end — the branch rendered as bare wood while the leaf canvas sat there fully
+     painted. The fade is now confined to the outermost 3% at each end. */
   .wb-limb, .wb-leaves { position: absolute; right: 0; top: 0;
     -webkit-mask-image:
-      linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 50%, rgba(0,0,0,0.30) 74%, transparent 90%),
-      linear-gradient(to bottom, #000 0 74%, rgba(0,0,0,0.4) 90%, transparent 100%);
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.55) 3%, #000 10%, #000 90%, rgba(0,0,0,0.55) 97%, transparent 100%),
+      linear-gradient(to bottom, #000 0 88%, rgba(0,0,0,0.5) 96%, transparent 100%);
     -webkit-mask-composite: source-in;
     mask-image:
-      linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 50%, rgba(0,0,0,0.30) 74%, transparent 90%),
-      linear-gradient(to bottom, #000 0 74%, rgba(0,0,0,0.4) 90%, transparent 100%);
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.55) 3%, #000 10%, #000 90%, rgba(0,0,0,0.55) 97%, transparent 100%),
+      linear-gradient(to bottom, #000 0 88%, rgba(0,0,0,0.5) 96%, transparent 100%);
     mask-composite: intersect; }
   .wb-limb canvas { display: block; }
   .wb-leaves canvas { position: absolute; right: 0; top: 0; display: block; opacity: 0; }
