@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><title>check</title><body style="margin:0;background:#F9F9F7">
+<script src="assets/asset-6.js"></script>
+<script>
+window.__check=function(){
+  var kinds=['bd-crow','bd-owl','bd-wren','bd-robin','bd-heron',
+             'wb-limb-a','wb-limb-b','wb-leaf-a-0','wb-leaf-b-2',
+             'fb-daisy','fb-aster','fb-rose','fb-bell','fb-pom',
+             'dl-0','dl-1','dl-2','dl-3','dl-4','seam-chevron'];
+  for(var i=0;i<12;i++){kinds.push('fw-a-'+i);kinds.push('fw-b-'+i);kinds.push('fw-c-'+i);}
+  var bad=[],ok=0;
+  kinds.forEach(function(k){
+    var c=document.createElement('canvas');
+    var dim = k.indexOf('wb-')===0 ? [210,176,1.2]
+            : k.indexOf('seam')===0 ? [120,11,1.5]
+            : k.indexOf('fw-')===0 ? [76,54,1.2]
+            : k.indexOf('dl-')===0 ? [24,20,1.5]
+            : k.indexOf('fb-')===0 ? [30,30,1.5] : [60,66,1.2];
+    try{ AHStitch.mount(c,{kind:k,cols:dim[0],rows:dim[1],cell:dim[2],seed:7,twinkle:false,animate:false}); }
+    catch(e){ bad.push(k+' THREW '+e.message); return; }
+    var g=c.getContext('2d'),d=g.getImageData(0,0,c.width,c.height).data,n=0;
+    for(var p=3;p<d.length;p+=4) if(d[p]>10) n++;
+    if(n<120) bad.push(k+' empty('+n+')'); else ok++;
+  });
+  return JSON.stringify({total:kinds.length,ok:ok,failures:bad});
+};
+</script></body>
