@@ -1808,10 +1808,14 @@ hr {
      it reads as continuing off-frame, the thin inner tip so it dissolves before
      reaching the text column. Wood is one static bitmap; leaves are four
      rasterised frames cycled by opacity. */
-  .wallbranch { position: absolute; top: -214px; width: 540px; height: 420px;
+  /* Sits LOW enough that the leafy crown is on screen. Raising it to dodge the
+     headline pushed the entire canopy above the viewport and left only the bare
+     butt end showing — which is why it read as a bare stick. The narrower canvas
+     is what buys the clearance instead. */
+  .wallbranch { position: absolute; top: -96px; width: 380px; height: 360px;
     z-index: 2; pointer-events: none; }
-  .wallbranch.left  { left: -150px; transform: scaleX(-1); opacity: 0.94; }
-  .wallbranch.right { right: -150px; opacity: 0.9; }
+  .wallbranch.left  { left: -118px; transform: scaleX(-1); opacity: 0.94; }
+  .wallbranch.right { right: -118px; opacity: 0.9; }
   .wb-limb, .wb-leaves { position: absolute; right: 0; top: 0;
     -webkit-mask-image:
       linear-gradient(to left, transparent 0, rgba(0,0,0,0.45) 5%, #000 15%, #000 62%, rgba(0,0,0,0.35) 84%, transparent 97%),
@@ -1908,11 +1912,11 @@ hr {
 
   <!-- ============ floating irregular sticky header ============ -->
   <div class="wallbranch left" aria-hidden="true">
-    <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.35"></div>
+    <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="150" data-rows="150" data-cell="2.20"></div>
     <div class="wb-leaves" data-form="a"></div>
   </div>
   <div class="wallbranch right" aria-hidden="true">
-    <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.55"></div>
+    <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="150" data-rows="150" data-cell="2.35"></div>
     <div class="wb-leaves" data-form="b"></div>
   </div>
   <div class="drift" aria-hidden="true"></div>
@@ -3917,7 +3921,7 @@ hr {
             var cv=document.createElement('canvas');
             if(fr===0) cv.className='on';
             el.appendChild(cv);
-            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:210,rows:176,cell:cell,seed:3,twinkle:false,animate:false});
+            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:150,rows:150,cell:cell,seed:3,twinkle:false,animate:false});
           });
         })(fr);
       });
