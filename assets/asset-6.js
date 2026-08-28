@@ -1558,7 +1558,7 @@
     /* leaf area scales with the square of this, so it drives ink far harder than
        the leaf COUNT does — halving the count only took 12% off, dropping the size
        is what actually thins the canopy */
-    var LS=Math.max(2.6, Math.min(W,H)*0.028);
+    var LS=Math.max(2.2, Math.min(W,H)*0.020);
 
     function branch(x,y,ang,len,wid,depth){
       var ex=x+Math.cos(ang)*len, ey=y+Math.sin(ang)*len;
@@ -1574,7 +1574,7 @@
            the tip */
         /* thinned: dense enough to read as a leafy branch, sparse enough that the
            wood still shows through it */
-        var n=(depth<=1? 4 : (depth===2? 3 : 1))+((R()*3)|0);
+        var n=(depth<=1? 3 : (depth===2? 2 : 1))+((R()*2)|0);
         for(var k=0;k<n;k++){
           var f=(k+1)/(n+1);
           var lx=x+(x2-x)*f, ly=y+(y2-y)*f;
@@ -1624,7 +1624,7 @@
        thirds of the branch is bare wood no matter how dense the twigs are. */
     if(isLeafPass){
       var LR=rngFrom(form==='b'? 553 : 241);
-      var count=Math.round(W*0.14);
+      var count=Math.round(W*0.07);
       for(var q=0;q<count;q++){
         var tq=0.06+LR()*0.90;
         var sg=Math.min(main.length-2, Math.floor(tq*(main.length-1)));
