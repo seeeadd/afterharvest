@@ -1565,8 +1565,11 @@
       var x2=mx+Math.cos(ang)*len*0.52,  y2=my+Math.sin(ang)*len*0.52;
       if(!isLeafPass) swood(G,[[x,y],[mx,my],[x2,y2]], wid, Math.max(0.9,wid*0.46), tkB, tkA, tkC);
 
-      if(isLeafPass && depth<=2){
-        var n=(depth<=1? 9 : 7)+((R()*5)|0);
+      if(isLeafPass){
+        /* fewer on the thick members, dense on the fine ones — but never zero,
+           so foliage runs the whole length of the branch instead of clumping at
+           the tip */
+        var n=(depth<=1? 9 : (depth===2? 7 : 4))+((R()*5)|0);
         for(var k=0;k<n;k++){
           var f=(k+1)/(n+1);
           var lx=x+(x2-x)*f, ly=y+(y2-y)*f;
@@ -1611,6 +1614,26 @@
       branch(fx,fy, Math.PI+forks[i2][1], S*forks[i2][2], 7.0*(1-t*0.55), 3);
     }
     branch(main[main.length-1][0], main[main.length-1][1], Math.PI-0.16, S*0.20, 4.2, 3);
+
+    /* leaves growing directly off the main limb. Without these the thick two
+       thirds of the branch is bare wood no matter how dense the twigs are. */
+    if(isLeafPass){
+      var LR=rngFrom(form==='b'? 553 : 241);
+      var count=Math.round(W*0.55);
+      for(var q=0;q<count;q++){
+        var tq=0.06+LR()*0.90;
+        var sg=Math.min(main.length-2, Math.floor(tq*(main.length-1)));
+        var ff=(tq*(main.length-1))-sg;
+        var mx2=main[sg][0]+(main[sg+1][0]-main[sg][0])*ff;
+        var my2=main[sg][1]+(main[sg+1][1]-main[sg][1])*ff;
+        var dxm=main[sg+1][0]-main[sg][0], dym=main[sg+1][1]-main[sg][1];
+        var am=Math.atan2(dym,dxm)+(LR()-0.5)*2.5;
+        var rad=LS*(0.9+LR()*1.5);
+        var swy=Math.sin(ph0+q*0.83);
+        leaf(mx2+Math.cos(am)*rad+swy*3.6, my2+Math.sin(am)*rad+Math.cos(ph0+q*0.6)*2.6,
+             LS*(0.75+LR()*0.5), am+swy*0.5, PAL[(LR()*PAL.length)|0]);
+      }
+    }
   }
 
   /* ================= BLOOMS AND DRIFT ======================================= */
