@@ -1808,26 +1808,34 @@ hr {
      it reads as continuing off-frame, the thin inner tip so it dissolves before
      reaching the text column. Wood is one static bitmap; leaves are four
      rasterised frames cycled by opacity. */
-  /* Sits LOW enough that the leafy crown is on screen. Raising it to dodge the
-     headline pushed the entire canopy above the viewport and left only the bare
-     butt end showing — which is why it read as a bare stick. The narrower canvas
-     is what buys the clearance instead. */
-  .wallbranch { position: absolute; top: -96px; width: 380px; height: 360px;
+  /* BIG, and sat low so the whole leafy crown is on screen. It passes BEHIND the
+     headline (z-index 2 against the hero's 10) and its inner tip is masked to
+     nothing well before it gets there — which is how it can be this size without
+     ever competing with the copy. Shrinking it to dodge the text was the wrong
+     trade; the mask does that job. */
+  .wallbranch { position: absolute; top: -70px; width: 620px; height: 540px;
     z-index: 2; pointer-events: none; }
-  .wallbranch.left  { left: -118px; transform: scaleX(-1); opacity: 0.94; }
-  .wallbranch.right { right: -118px; opacity: 0.9; }
+  .wallbranch.left  { left: -132px; transform: scaleX(-1); opacity: 0.95; }
+  .wallbranch.right { right: -132px; opacity: 0.92; }
   .wb-limb, .wb-leaves { position: absolute; right: 0; top: 0;
     -webkit-mask-image:
-      linear-gradient(to left, transparent 0, rgba(0,0,0,0.45) 5%, #000 15%, #000 62%, rgba(0,0,0,0.35) 84%, transparent 97%),
-      linear-gradient(to bottom, #000 0 68%, rgba(0,0,0,0.4) 88%, transparent 100%);
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 50%, rgba(0,0,0,0.30) 74%, transparent 90%),
+      linear-gradient(to bottom, #000 0 74%, rgba(0,0,0,0.4) 90%, transparent 100%);
     -webkit-mask-composite: source-in;
     mask-image:
-      linear-gradient(to left, transparent 0, rgba(0,0,0,0.45) 5%, #000 15%, #000 62%, rgba(0,0,0,0.35) 84%, transparent 97%),
-      linear-gradient(to bottom, #000 0 68%, rgba(0,0,0,0.4) 88%, transparent 100%);
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 50%, rgba(0,0,0,0.30) 74%, transparent 90%),
+      linear-gradient(to bottom, #000 0 74%, rgba(0,0,0,0.4) 90%, transparent 100%);
     mask-composite: intersect; }
   .wb-limb canvas { display: block; }
   .wb-leaves canvas { position: absolute; right: 0; top: 0; display: block; opacity: 0; }
   .wb-leaves canvas.on { opacity: 1; }
+  /* compound motion: the frames give per-leaf flutter, this gives the whole canopy
+     a slow lean, so it reads as wind through a tree rather than a looping sprite */
+  .wb-leaves { animation: wb-wind 7.5s ease-in-out infinite; transform-origin: 88% 40%; }
+  .wallbranch.right .wb-leaves { animation-duration: 9.1s; animation-delay: -2.3s; }
+  @keyframes wb-wind { 0%,100%{transform:rotate(-0.7deg) translateX(-2px)}
+                        50%{transform:rotate(0.9deg) translateX(3px)} }
+  @media (prefers-reduced-motion: reduce){ .wb-leaves { animation: none; } }
   @media (max-width: 1240px){ .wallbranch.left { display: none; } }
   @media (max-width: 1040px){ .wallbranch { display: none; } }
 
@@ -1912,11 +1920,11 @@ hr {
 
   <!-- ============ floating irregular sticky header ============ -->
   <div class="wallbranch left" aria-hidden="true">
-    <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="150" data-rows="150" data-cell="2.20"></div>
+    <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.70"></div>
     <div class="wb-leaves" data-form="a"></div>
   </div>
   <div class="wallbranch right" aria-hidden="true">
-    <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="150" data-rows="150" data-cell="2.35"></div>
+    <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
     <div class="wb-leaves" data-form="b"></div>
   </div>
   <div class="drift" aria-hidden="true"></div>
@@ -3921,7 +3929,7 @@ hr {
             var cv=document.createElement('canvas');
             if(fr===0) cv.className='on';
             el.appendChild(cv);
-            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:150,rows:150,cell:cell,seed:3,twinkle:false,animate:false});
+            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:210,rows:176,cell:cell,seed:3,twinkle:false,animate:false});
           });
         })(fr);
       });

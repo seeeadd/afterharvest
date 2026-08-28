@@ -1563,18 +1563,21 @@
       if(!isLeafPass) swood(G,[[x,y],[mx,my],[x2,y2]], wid, Math.max(0.9,wid*0.46), tkB, tkA, tkC);
 
       if(isLeafPass && depth<=2){
-        var n=(depth<=1? 5 : 3)+((R()*4)|0);
+        var n=(depth<=1? 7 : 5)+((R()*4)|0);
         for(var k=0;k<n;k++){
           var f=(k+1)/(n+1);
           var lx=x+(x2-x)*f, ly=y+(y2-y)*f;
           var side=(k%2)?1:-1, la=ang+side*(0.85+R()*0.5);
           var sway=Math.sin(ph0+leafIdx*0.97); leafIdx++;
           var off=3.2+R()*2.4;
-          leaf(lx+Math.cos(la)*off+sway*1.5, ly+Math.sin(la)*off+Math.cos(ph0+leafIdx*0.7)*1.1,
-               2.0+R()*1.5, la+sway*0.35, PAL[(R()*PAL.length)|0]);
+          /* the displacement has to be big enough to SEE between frames. At 1.5px
+             the leaves technically moved and read as perfectly still. */
+          leaf(lx+Math.cos(la)*off+sway*4.2, ly+Math.sin(la)*off+Math.cos(ph0+leafIdx*0.7)*3.0,
+               2.0+R()*1.5, la+sway*0.62, PAL[(R()*PAL.length)|0]);
         }
-        leaf(x2+Math.cos(ang)*2.4, y2+Math.sin(ang)*2.4, 2.2+R()*1.2,
-             ang+Math.sin(ph0+leafIdx)*0.3, PAL[(R()*PAL.length)|0]);
+        leaf(x2+Math.cos(ang)*2.4+Math.sin(ph0+leafIdx)*3.6,
+             y2+Math.sin(ang)*2.4+Math.cos(ph0+leafIdx*1.2)*2.6, 2.2+R()*1.2,
+             ang+Math.sin(ph0+leafIdx)*0.55, PAL[(R()*PAL.length)|0]);
         leafIdx++;
       }
       if(depth<=0) return;
