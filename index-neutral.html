@@ -281,11 +281,18 @@ hr {
   /* ===== copied verbatim from index.html so the hero renders identically standalone ===== */
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
+  html { overflow-x: hidden; overflow-x: clip; }
   body {
     margin: 0; background: var(--eggshell);
     background-image: url("assets/asset-14.svg"), url("assets/asset-15.svg");
     background-size: 220px 220px, 30px 30px;
-    color: var(--ink); font-family: var(--font-serif); overflow-x: hidden;
+    color: var(--ink); font-family: var(--font-serif);
+    /* clip, not hidden. The branches deliberately sit past the page edge, and
+       overflow-x:hidden on body alone still left the viewport scrollable a few
+       px. Setting it on the root as well fixes that - but it has to be `clip`,
+       because `overflow:hidden` on an ancestor turns off position:sticky, and
+       the nav depends on sticky to compact on scroll. */
+    overflow-x: hidden; overflow-x: clip;
   }
   ::selection { background: var(--yolk-tint-22); }
   a { color: var(--ink); text-decoration-color: var(--wheat); text-underline-offset: 3px; }
@@ -1883,13 +1890,23 @@ hr {
      nothing well before it gets there — which is how it can be this size without
      ever competing with the copy. Shrinking it to dodge the text was the wrong
      trade; the mask does that job. */
-  /* overflow:hidden is a guarantee, not a nicety. The canvas is a child sized in
-     stitches; if it ever computes larger than this box it used to spill straight
-     across the hero copy. Now the box is the hard limit whatever happens. */
-  .wallbranch { position: absolute; top: -132px; width: 620px; height: 540px;
-    z-index: 2; pointer-events: none; overflow: hidden; }
-  .wallbranch.left  { left: -132px; transform: scaleX(-1); opacity: 0.95; }
-  .wallbranch.right { right: -132px; opacity: 0.92; }
+  /* Clips at the PAGE edge, which is where the branch is meant to run off. This
+     is a non-root element, so `clip` genuinely prevents scrolling here -
+     overflow on the root only propagates to the viewport, where it stops user
+     scrolling but still reports overflow and permits programmatic scroll. */
+  .grove-clip { position: absolute; top: 0; left: 0; right: 0; height: 0;
+    overflow-x: clip; overflow-y: visible; z-index: 2; pointer-events: none; }
+
+  /* ONE variable drives width, height and offset, so every scale stays in
+     proportion instead of each breakpoint re-guessing three numbers. Height is
+     an aspect-ratio off the art's own 620x540, and the offsets are fractions of
+     the width, so the branch always hangs off the edge by the same proportion. */
+  .wallbranch { --wbw: 620px; --wboff: -0.213;
+    position: absolute; width: var(--wbw); aspect-ratio: 620 / 540; height: auto;
+    top: calc(var(--wbw) * var(--wboff));
+    z-index: 2; pointer-events: none; }
+  .wallbranch.left  { left:  calc(var(--wbw) * var(--wboff)); transform: scaleX(-1); opacity: 0.95; }
+  .wallbranch.right { right: calc(var(--wbw) * var(--wboff)); opacity: 0.92; }
   /* THE MASK MUST NOT EAT THE FOLIAGE.
      The limb enters at the canvas's RIGHT edge and reaches left, so the thick bare
      butt is on the right and every leaf is at the left tip. The previous fade ran
@@ -1905,7 +1922,15 @@ hr {
       linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 58%, rgba(0,0,0,0.34) 80%, transparent 95%),
       linear-gradient(to bottom, #000 0 78%, rgba(0,0,0,0.42) 92%, transparent 100%);
     mask-composite: intersect; }
-  .wb-limb canvas { display: block; }
+  /* The canvas always fills its box, at any viewport. This is what makes the
+     branch responsive: the backing store is rasterised once at whatever size
+     suited the box then, and layout scales it to the box now. Previously the
+     pixel size was fixed at build time, so any resize left the canvas and the
+     box disagreeing - and with the box clipping, that mismatch showed up as the
+     art being sliced into a hard rectangle.
+     !important because mount() writes an inline width/height on the element. */
+  .wb-limb canvas, .wb-leaves canvas, .wb-cash canvas {
+    display: block; width: 100% !important; height: auto !important; }
   /* money rides above the foliage: same geometry and seed as the limb, drawn on
      its own pass, so it is not buried under the leaf layer */
   .wb-cash { z-index: 2; }
@@ -1933,21 +1958,18 @@ hr {
      worst of both: the full render cost on a phone, and nothing to show for it.
      Sizes step down so it keeps peeking from the corners without crowding the
      headline; the JS builds it at a matching resolution. */
-  @media (max-width: 1240px){
-    .wallbranch { width: 520px; height: 452px; top: -110px; }
-    .wallbranch.left { left: -110px; } .wallbranch.right { right: -110px; } }
-  @media (max-width: 1040px){
-    .wallbranch { width: 420px; height: 366px; top: -90px; }
-    .wallbranch.left { left: -92px; } .wallbranch.right { right: -92px; } }
+  /* Only --wbw and --wboff change per breakpoint; width, height and both offsets
+     all derive from them, so a scale can never end up with a size that does not
+     match its offset. The px cap stops the art growing past the size it was
+     drawn for; the vw term stops it crowding the headline on narrow screens. */
+  @media (max-width: 1240px){ .wallbranch { --wbw: min(520px, 41vw); } }
+  @media (max-width: 1040px){ .wallbranch { --wbw: min(420px, 40vw); } }
   @media (max-width: 760px){
-    .wallbranch { width: 300px; height: 262px; top: -66px; opacity: 0.82; }
-    .wallbranch.left { left: -74px; } .wallbranch.right { right: -74px; }
+    .wallbranch { --wbw: 46vw; --wboff: -0.36; opacity: 0.80; }
     /* static on phones: cycling four full-size frames is a battery cost for a
        decoration nobody is watching */
     .wallbranch .wb-leaves { animation: none; } }
-  @media (max-width: 430px){
-    .wallbranch { width: 232px; height: 202px; top: -52px; opacity: 0.72; }
-    .wallbranch.left { left: -62px; } .wallbranch.right { right: -62px; } }
+  @media (max-width: 430px){ .wallbranch { --wbw: 52vw; --wboff: -0.40; opacity: 0.70; } }
 
   /* ---------- THE SEAM ---------- */
   .seam { position: relative; z-index: 1; width: 100%; overflow: hidden; line-height: 0; opacity: 0.62; }
@@ -2160,6 +2182,7 @@ hr {
   
 
   <!-- ============ floating irregular sticky header ============ -->
+  <div class="grove-clip" aria-hidden="true">
   <div class="wallbranch left" aria-hidden="true">
     <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.70"></div>
     <div class="wb-leaves" data-form="a"></div>
@@ -2169,6 +2192,7 @@ hr {
     <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
     <div class="wb-leaves" data-form="b"></div>
     <div class="wb-cash" data-kind="wb-cash-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
+  </div>
   </div>
   <div class="flock" aria-hidden="true"></div>
   <div class="nav-wrap">
@@ -4204,6 +4228,8 @@ hr {
           if(getComputedStyle(el.parentElement).display==='none') return;
           var c=document.createElement('canvas'); el.appendChild(c);
           var cl=wbCell(el, +el.dataset.cols); if(!cl) return;
+          var hostW=(el.closest('.wallbranch')||el).getBoundingClientRect().width;
+          (el.closest('.wallbranch')||el).dataset.builtW=Math.round(hostW);
           AHStitch.mount(c,{kind:el.dataset.kind,cols:+el.dataset.cols,rows:+el.dataset.rows,
             cell:cl,seed:+el.dataset.seed,twinkle:false,animate:false});
         });
@@ -4232,6 +4258,32 @@ hr {
       });
       pump();
     }
+    /* CSS keeps the canvas fitting its box at any width, so a resize can never
+       clip or overflow. But a canvas rasterised for a 232px box and then scaled
+       up to 620px is soft, and one rasterised at 620px scaled down to 232px is
+       wasted memory. So past a threshold the branch is rebuilt at the new size.
+       Debounced, and only on a real change - iOS fires resize on scroll when the
+       address bar collapses, which would otherwise rebuild constantly. */
+    var wbT=null, wbLastW=innerWidth;
+    addEventListener('resize', function(){
+      if(innerWidth===wbLastW) return;          /* height-only change: ignore */
+      wbLastW=innerWidth;
+      clearTimeout(wbT);
+      wbT=setTimeout(function(){
+        document.querySelectorAll('.wallbranch').forEach(function(host){
+          if(getComputedStyle(host).display==='none') return;
+          var now=host.getBoundingClientRect().width, was=+host.dataset.builtW||0;
+          if(!was || !now) return;
+          var k=now/was;
+          if(k<1.32 && k>0.76) return;          /* scaling still looks fine */
+          host.querySelectorAll('.wb-limb, .wb-cash, .wb-leaves').forEach(function(l){
+            l.innerHTML=''; delete l.dataset.built;
+          });
+        });
+        branches();
+      }, 320);
+    }, {passive:true});
+
     var btick=0;
     setInterval(function(){
       if(document.hidden) return;
