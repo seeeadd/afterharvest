@@ -1927,13 +1927,25 @@
        the base is full and the tip comes to a point, and there is a midrib.
        Three profiles for variety: ovate, lanceolate, obovate. */
     var LSHAPE=[[0.42,0.52],[0.62,0.38],[0.34,0.72]];
-    function leaf(x,y,sz,ang,tone,shp){
+    /* SUNLIGHT. Brightening every tone equally just washes the canopy out - what
+       reads as sun is DIRECTION and WARMTH: a hot golden face turned toward the
+       light, a rim where the light comes through the leaf from behind, and
+       shadow that stays deep on the other side. Contrast is the effect, not
+       lift. `sun` (0..1) is how exposed this particular leaf is, so the canopy
+       has light falling across it rather than glowing uniformly. */
+    var SUNW=mix(P.creamLt, P.yolk, 0.42);       /* the colour of the light */
+    function leaf(x,y,sz,ang,tone,shp,sun){
       if(x < sz+2 || x > W-sz-2 || y < sz+3 || y > H-sz-3) return;
       var ca=Math.cos(ang), sa=Math.sin(ang);
       var S2=LSHAPE[(shp||0)%3], A2=S2[0], B2=S2[1];
       var peak=Math.pow(A2/(A2+B2),A2)*Math.pow(B2/(A2+B2),B2);
       var LEN=sz*1.85, WID=sz*0.44/peak;
-      var lit=mix(tone,P.creamLt,0.34), shd=darken(tone,0.13), rib=darken(tone,0.30);
+      var u=(sun===undefined? 0.5 : sun);
+      var lit  = mix(tone, SUNW, 0.30+0.36*u);   /* the face turned to the sun  */
+      var hot  = mix(tone, SUNW, 0.56+0.34*u);   /* where it burns out          */
+      var glow = mix(tone, SUNW, 0.44+0.30*u);   /* light coming through it     */
+      var shd  = darken(tone, 0.24-0.05*u);      /* and the side that does not  */
+      var rib  = darken(tone, 0.34);
       for(var q=0;q<=LEN;q+=0.5){
         var t=q/LEN;
         var hw=WID*Math.pow(t,A2)*Math.pow(1-t,B2);
@@ -1941,14 +1953,26 @@
         var bx=x+ca*(q-LEN*0.5), by=y+sa*(q-LEN*0.5);
         for(var w=-hw;w<=hw;w+=0.5){
           var side=w*(sa*0.60-ca*0.80);          /* light from the upper left */
-          put(G, bx-sa*w, by+ca*w,
-              (Math.abs(w)>hw-0.7)? shd : (side>0? lit : tone));
+          var edge=Math.abs(w)>hw-0.7;
+          var t2;
+          if(side>0){                            /* sunward half */
+            t2 = edge ? glow                     /* translucent rim           */
+               : (u>0.62 && t>0.30 && t<0.86 && Math.abs(w)<hw*0.55 ? hot : lit);
+          } else {
+            t2 = edge ? shd : darken(tone, 0.08);
+          }
+          put(G, bx-sa*w, by+ca*w, t2);
         }
       }
       for(var r2=LEN*0.06;r2<=LEN*0.94;r2+=0.5)  /* the midrib */
         put(G, x+ca*(r2-LEN*0.5), y+sa*(r2-LEN*0.5), rib);
       var sx=x-ca*LEN*0.56, sy=y-sa*LEN*0.56;    /* the stalk */
       put(G,sx,sy,tkC); put(G,sx-ca*0.9,sy-sa*0.9,tkC);
+    }
+    /* How much sun a leaf catches: high and outboard is exposed, low and inside
+       the canopy is shaded, plus jitter so it is dappled rather than a gradient. */
+    function sunAt(px,py,r){
+      return Math.max(0, Math.min(1, 1.18 - (py/H)*1.30 + (r-0.5)*0.30));
     }
 
     var kp=kind.split('-');
@@ -1993,11 +2017,13 @@
           /* the displacement has to be big enough to SEE between frames. At 1.5px
              the leaves technically moved and read as perfectly still. */
           leaf(lx+Math.cos(la)*off+sway*4.2, ly+Math.sin(la)*off+Math.cos(ph0+leafIdx*0.7)*3.0,
-               LS*(0.80+R()*0.55), la+sway*0.62, PAL[(R()*PAL.length)|0], (R()*3)|0);
+               LS*(0.80+R()*0.55), la+sway*0.62, PAL[(R()*PAL.length)|0], (R()*3)|0,
+               sunAt(lx, ly, R()));
         }
         leaf(x2+Math.cos(ang)*2.4+Math.sin(ph0+leafIdx)*3.6,
              y2+Math.sin(ang)*2.4+Math.cos(ph0+leafIdx*1.2)*2.6, LS*(0.85+R()*0.45),
-             ang+Math.sin(ph0+leafIdx)*0.55, PAL[(R()*PAL.length)|0], (R()*3)|0);
+             ang+Math.sin(ph0+leafIdx)*0.55, PAL[(R()*PAL.length)|0], (R()*3)|0,
+             sunAt(x2, y2, R()));
         leafIdx++;
       }
       if(depth<=0) return;
@@ -2255,7 +2281,8 @@
         var rad=LS*(0.9+LR()*1.5);
         var swy=Math.sin(ph0+q*0.83);
         leaf(mx2+Math.cos(am)*rad+swy*3.6, my2+Math.sin(am)*rad+Math.cos(ph0+q*0.6)*2.6,
-             LS*(0.75+LR()*0.5), am+swy*0.5, PAL[(LR()*PAL.length)|0], (LR()*3)|0);
+             LS*(0.75+LR()*0.5), am+swy*0.5, PAL[(LR()*PAL.length)|0], (LR()*3)|0,
+             sunAt(mx2, my2, LR()));
       }
     }
   }
