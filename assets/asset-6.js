@@ -2088,15 +2088,66 @@
         return [w,w];
       });
     }
-    function mCoin(x,y,sc){
-      var r3=Math.max(2.0, sc*0.95);
-      for(var j=-r3-1;j<=r3+1;j++) for(var i=-r3-1;i<=r3+1;i++){
-        var d3=(i*i+j*j)/(r3*r3); if(d3>1.16) continue;
-        put(G,x+i,y+j, d3>0.88? M.cr : (d3>0.60? M.cd : ((-i-j)>r3*0.45? M.cl : M.cm)));
+    /* A coin is not a gold disc. What identifies one at any size is the RIM: a
+       raised ring inset from the edge, milled reeding around the circumference,
+       and a device struck in the middle. A flat filled circle reads as a berry,
+       which is what these were doing. Two builds - struck face-on, and a short
+       stack seen edge-on, because a stack is unmistakable. */
+    function coinFace(x,y,r){
+      for(var j=-r-1;j<=r+1;j++) for(var i=-r-1;i<=r+1;i++){
+        var d=Math.sqrt(i*i+j*j)/r; if(d>1.0) continue;
+        var lit=(-i-j)/(r*1.42);                       /* light from upper left */
+        var t;
+        if(d>0.90){                                     /* milled edge: the ticks
+              live INSIDE a thin annulus and are found per pixel from the angle.
+              Drawn as a separate ring of stamps they stuck out past the disc and
+              the coin came out looking like a gear. */
+          var ang=Math.atan2(j,i);
+          t = ((Math.floor(ang/0.20)&1)? M.cr : M.cd);
+        }
+        else if(d>0.74) t=(lit>0.05? M.cl : M.cd);     /* the raised rim        */
+        else if(d>0.66) t=M.cr;                        /* the groove inside it  */
+        else            t=(lit>0.36? M.cl : (lit>-0.20? M.cm : M.cd));
+        put(G,x+i,y+j,t);
       }
-      put(G,x-Math.round(r3*0.34),y-Math.round(r3*0.34),M.cl);
-      for(var t5=0;t5<9;t5++){ var a5=t5*0.698;    /* milled rim */
-        put(G,x+Math.cos(a5)*r3*1.03,y+Math.sin(a5)*r3*1.03,M.cr); }
+      if(r>=3.2){                                       /* the struck device     */
+        var hr=Math.max(1.2, r*0.26);
+        for(var hj=-hr;hj<=hr*0.5;hj++) for(var hi=-hr;hi<=hr;hi++){
+          var hu=hi/hr, hv=hj/hr; if(hu*hu+hv*hv>1) continue;
+          put(G,x+hi,y+hj-hr*0.25,M.cr);
+        }
+        for(var nj=hr*0.25;nj<=hr*1.15;nj++)
+          for(var ni=-hr*0.66;ni<=hr*0.38;ni++) put(G,x+ni,y+nj,M.cr);
+        put(G, x-hr*0.42, y-hr*0.72, M.cl);
+      }
+    }
+    function coinStack(x,y,r){
+      var n=3, th=Math.max(1.6, r*0.42);
+      for(var k=n-1;k>=0;k--){
+        var oy=y+k*(th+0.9);
+        for(var i=-r;i<=r;i++){                        /* the cylinder wall     */
+          var e=Math.sqrt(Math.max(0,1-(i/r)*(i/r)));
+          for(var j=0;j<=th;j++){
+            var lit=(-i)/(r*1.2);
+            put(G, x+i, oy+j+e*0.9-0.9,
+                (j>=th-0.7)? M.cr : (lit>0.28? M.cl : (lit>-0.30? M.cm : M.cd)));
+          }
+        }
+        for(var i2=-r;i2<=r;i2++){                     /* the milled edge       */
+          if(((i2+k)&1)===0) continue;
+          var e2=Math.sqrt(Math.max(0,1-(i2/r)*(i2/r)));
+          put(G, x+i2, oy+e2*0.9-0.9, M.cr);
+        }
+      }
+      var ty=y-(th*0.55);                              /* the top face, elliptic */
+      for(var tj=-r*0.42;tj<=r*0.42;tj++) for(var ti=-r;ti<=r;ti++){
+        var u=ti/r, v=tj/(r*0.42), d=u*u+v*v; if(d>1) continue;
+        put(G, x+ti, ty+tj, d>0.90? M.cr : (d>0.62? M.cl : ((-u-v)>0.15? M.cl : M.cm)));
+      }
+    }
+    function mCoin(x,y,sc,r2){
+      var r=Math.max(3.0, sc*1.32);
+      if(r2 && r2()<0.42) coinStack(x,y,r*0.92); else coinFace(x,y,r);
     }
     function mCard(x,y,sc,r2){                      /* the black card */
       var w2=sc*1.6, h2=sc*1.02, tilt=(r2()-0.5)*0.42;
@@ -2151,7 +2202,7 @@
         else if(fmr===1) mFolded(ax,my3-drop*0.10,sc);
         else if(fmr===2) mRolled(ax-sc*1.5,my3+sc*0.6,sc,MR);
         else if(fmr===3) mBundle(ax,my3+sc*0.8,sc);
-        else if(fmr===4) mCoin(ax,my3+sc,sc);
+        else if(fmr===4) mCoin(ax,my3+sc,sc,MR);
         else if(fmr===5) mCurled(ax,my3,sc);
         else mCard(ax,my3+sc,sc,MR);
         hung++;
