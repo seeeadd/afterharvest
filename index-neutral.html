@@ -1805,6 +1805,20 @@ hr {
     font-family: 'Literata', Georgia, serif; font-size: 12.5px; }
   footer.foot { border-top: 1px solid var(--hairline); }
 
+  /* ---- TYPE SCALE ----------------------------------------------------------
+     The page had six sizes of the same face doing body work - 20, 18, 17, 16.5,
+     16 and 15.5 - and four of those were section leads, i.e. the same role at
+     four different sizes. Three steps now: lead, body, small, on one leading
+     ratio so the vertical rhythm matches between sections.
+     text-wrap:balance evens the rag so a paragraph does not end on a stub
+     line, which is the "division of lines" problem in the hero. */
+  .hero .sub, .plan-head p, .plan-book .plan-book-lead, .pf-screen .pf-start-p {
+    font-size: 18px; line-height: 1.62; text-wrap: balance; }
+  .ch-index .ch-list li { font-size: 16px; line-height: 1.62; }
+  .hero .sub { max-width: 68ch; margin-left: auto; margin-right: auto; }
+  .kf-band p, .vsl-note, .cats-wrap p { line-height: 1.68; text-wrap: pretty; }
+  h1.headline, .plan-head h2, .kf-band h2, .dock-head { text-wrap: balance; }
+
 
   /* ---------- WALL BRANCHES ----------
      A limb reaching in from each edge, faded at BOTH ends: the thick outer end so
@@ -1993,8 +2007,14 @@ hr {
      it, and confined to the outer margins where the branches actually are, so
      nothing ever tracks across a line the reader is on. */
   .drift { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-  .drift .leaf { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
-  .drift .leaf canvas { display: block; }
+  /* opacity:0 is load-bearing. The leaf sits at left:0/top:0 and is moved only
+     by its animation, so between page load and its first fall (5-16s later) it
+     was parked fully visible in the top-left corner of the page. */
+  .drift .leaf { position: absolute; left: 0; top: 0; opacity: 0;
+    will-change: transform, opacity; }
+  /* size the sprite here rather than through the mount cell, which does not map
+     1:1 to CSS pixels - asking for 1.42 produced a 43px leaf, nearly a coin */
+  .drift .leaf canvas { display: block; width: 27px; height: 27px; }
   .wb-bloom { position: absolute; z-index: 3; pointer-events: none;
     transform-origin: 50% 60%; opacity: 0; will-change: transform, opacity; }
   .wb-bloom canvas { display: block; }
