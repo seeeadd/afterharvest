@@ -17,11 +17,19 @@
   'use strict';
 
   /* ---------- color helpers ---------- */
+  var _cc={};
   function hx(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
   function toHex(r,g,b){ var c=function(n){return ('0'+Math.max(0,Math.min(255,Math.round(n))).toString(16)).slice(-2);}; return '#'+c(r)+c(g)+c(b); }
-  function lighten(h,a){ var p=hx(h); return toHex(p[0]+(255-p[0])*a, p[1]+(255-p[1])*a, p[2]+(255-p[2])*a); }
-  function darken(h,a){ var p=hx(h); return toHex(p[0]*(1-a), p[1]*(1-a), p[2]*(1-a)); }
-  function mix(h1,h2,t){ var a=hx(h1),b=hx(h2); return toHex(a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t); }
+  function lighten(h,a){ var k='l'+h+a; var v=_cc[k]; if(v!==undefined) return v;
+    var p=hx(h); return (_cc[k]=toHex(p[0]+(255-p[0])*a, p[1]+(255-p[1])*a, p[2]+(255-p[2])*a)); }
+  /* These three are pure, and drawStitch calls them three times for EVERY
+     stitch - each call parses a hex string, does the arithmetic, and builds a
+     new string. Across a page of ~100k stitches that is ~300k parses. Cached,
+     they become map lookups. Output is bit-identical. */
+  function darken(h,a){ var k='d'+h+a; var v=_cc[k]; if(v!==undefined) return v;
+    var p=hx(h); return (_cc[k]=toHex(p[0]*(1-a), p[1]*(1-a), p[2]*(1-a))); }
+  function mix(h1,h2,t){ var k='m'+h1+h2+t; var v=_cc[k]; if(v!==undefined) return v;
+    var a=hx(h1),b=hx(h2); return (_cc[k]=toHex(a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t)); }
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
   /* ---------- palette (embroidery only) ---------- */
@@ -35,7 +43,34 @@
     dusk:'#B6AFC4', plum:'#6E6079', sand:'#E8E0CF',
     slate:'#7E8894', slateDk:'#5B6570', slateLt:'#AEB6BF', steel:'#C9CDD2',
     stripe:'#635BFF', stripeDk:'#4A43CC', stripeLt:'#918CFF', stripeXl:'#C6C3FF',
-    ink:'#161310', inkDk:'#0B0906', inkLt:'#2C2820'
+    ink:'#161310', inkDk:'#0B0906', inkLt:'#2C2820',
+    /* ---- rebuilt 2026-08-28 ---- */
+    /* birds */
+    dove:'#9A948C',   doveDk:'#6E6A63',  doveLt:'#BEB8AE',
+    jay:'#6B7C8C',    jayDk:'#4C5A67',   jayLt:'#96A4B1',
+    robin:'#A5705A',  robinDk:'#7A4E3C',
+    owlB:'#7A6650',   owlDk:'#57472F',
+    crow:'#3A3A3C',   crowDk:'#232326',  crowLt:'#5C5C60', crowSheen:'#7C8290',
+    barn:'#C9B48E',   barnDk:'#96805C',  barnFace:'#F2ECE0',
+    breast:'#B98A5E', breastDk:'#8A6440',
+    slateF:'#7E858E', slateFDk:'#5A616A', slateFLt:'#A6ACB4',
+    awn:'#C6B27A',    awnDk:'#9C8A54',
+    /* wood + foliage */
+    bark:'#6B5644',   barkDk:'#463628',  barkLt:'#8E765E',
+    trunkA:'#5E4936', trunkB:'#7A6048',  trunkC:'#3B2C1F',
+    leafA:'#7C8A5E',  leafB:'#93A071',   leafC:'#5F6E46',  leafD:'#A9B489',
+    /* ACTUAL autumn — scarlet, orange, gold, crimson. Browns are supporting only;
+       an all-brown set reads as late winter, not October. */
+    /* money. Held well back from a saturated dollar-green: on a cream ground a
+       true banknote green goes fluorescent and drags the whole page toward
+       novelty. This is a grey-green that sits with the autumn leaves. */
+    notePaper:'#C7D4BB', noteField:'#9DB690', noteInk:'#3B5440',
+    noteDeep:'#233527', noteHi:'#E6ECDD', noteSeal:'#8A5A3C',
+    coin:'#C0A03A', coinDk:'#876920', coinLt:'#DEC578', coinRim:'#6B5418',
+    cardA:'#26231F', cardB:'#38342F', cardChip:'#C0A03A', cardBand:'#4A453E',
+    blA:'#E67E22', blB:'#D9503D', blC:'#EFB33F', blD:'#F2D072',
+    blE:'#B4483B', blF:'#F08C4A', blG:'#C86B34', blH:'#F7E08F',
+    blI:'#D65C41', blJ:'#EC9635', blK:'#BE5A2E', blL:'#F7BB60'
   };
 
   function rngFrom(seed){ var s=seed>>>0; return function(){ s+=0x6D2B79F5; var t=s; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -309,9 +344,14 @@
     for(var r=0;r<rows;r++)for(var c=0;c<cols;c++){
       var tone=G[r][c]; if(!tone) continue;
       var edge=Math.min(1, Math.min(Math.min(c,cols-1-c)/(cols*0.5), Math.min(r,rows-1-r)/(rows*0.5))*1.5);
-      var keep = dense ? (0.955+0.045*edge) : (0.5+0.5*edge), spark=false;
+      /* dense: false = frayed border (the sampler look), true = mostly solid,
+         'solid' = no fray at all. Anything drawn as a FIGURE rather than a motif
+         has to be solid: the fray is keyed to the tile border, so a bird whose
+         tail reaches the edge of its tile gets that tail eaten. */
+      var keep = dense==='solid' ? 1 : (dense ? (0.955+0.045*edge) : (0.5+0.5*edge)), spark=false;
       if(rnd()>keep){ if(!dense && rnd()<0.1) spark=true; else continue; }
-      if(edge<0.26 && rnd()<(dense?0.05:0.5)) spark=true;
+      if(dense==='solid'){ if(edge>0.30 && rnd()<0.010) spark=true; }
+      else if(edge<0.26 && rnd()<(dense?0.05:0.5)) spark=true;
       cells.push({c:c, r:r, tone:tone, spark:spark});
     }
     return { cells:cells, cols:cols, rows:rows };
@@ -478,6 +518,65 @@
   }
 
   /* ---------- detailed webinar-UI motifs (dense stitched app screens) ---------- */
+  /* ---------- stroked primitives ----------
+     Deliberately named sbar/sarc/sspike rather than bar/arc/spike: a later
+     `function bar(G,x0,x1,y,tone)` in this file hoists over any earlier one, and
+     that collision silently fed coordinates in as colour values. */
+  function sbar(G, x0, y0, x1, y1, w, tone, tone2){
+    var dx=x1-x0, dy=y1-y0, n=Math.max(Math.abs(dx),Math.abs(dy)), h=(w||1)/2;
+    if(n<1) n=1;
+    for(var i=0;i<=n;i++){
+      var t=i/n, cx=x0+dx*t, cy=y0+dy*t;
+      var t2=(tone2 && i>n*0.55)? tone2 : tone;
+      for(var oy=-h;oy<=h;oy+=0.5) for(var ox=-h;ox<=h;ox+=0.5){
+        if(ox*ox+oy*oy > h*h+0.30) continue;
+        put(G, cx+ox, cy+oy, t2);
+      }
+    }
+  }
+  function sarc(G, cx, cy, r, a0, a1, w, tone, tone2){
+    var steps=Math.max(6, Math.round(Math.abs(a1-a0)*r*1.9)), h=(w||1)/2;
+    for(var i=0;i<=steps;i++){
+      var a=a0+(a1-a0)*(i/steps), x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
+      var t2=(tone2 && i>steps*0.55)? tone2 : tone;
+      for(var oy=-h;oy<=h;oy+=0.5) for(var ox=-h;ox<=h;ox+=0.5){
+        if(ox*ox+oy*oy > h*h+0.30) continue;
+        put(G, x+ox, y+oy, t2);
+      }
+    }
+  }
+  function sspike(G, x0, y0, x1, y1, w0, w1, tone){
+    var dx=x1-x0, dy=y1-y0, n=Math.max(Math.abs(dx),Math.abs(dy)); if(n<1) n=1;
+    for(var i=0;i<=n;i++){
+      var t=i/n, cx=x0+dx*t, cy=y0+dy*t, h=(w0+(w1-w0)*t)/2;
+      for(var oy=-h;oy<=h;oy+=0.5) for(var ox=-h;ox<=h;ox+=0.5){
+        if(ox*ox+oy*oy > h*h+0.30) continue;
+        put(G, cx+ox, cy+oy, tone);
+      }
+    }
+  }
+  /* tapered wood that WALKS each segment. Stamping only at polyline vertices
+     renders a 3-point trunk as two thin bars with nothing between them. */
+  function swood(G, pts, w0, w1, lit, mid, dark){
+    var segs=[], total=0, i;
+    for(i=0;i<pts.length-1;i++){
+      var L=Math.hypot(pts[i+1][0]-pts[i][0], pts[i+1][1]-pts[i][1])||0.001;
+      segs.push(L); total+=L;
+    }
+    var acc=0;
+    for(i=0;i<pts.length-1;i++){
+      var x0=pts[i][0], y0=pts[i][1], dx=pts[i+1][0]-x0, dy=pts[i+1][1]-y0;
+      var L2=segs[i], nx=-dy/L2, ny=dx/L2, steps=Math.max(2, Math.ceil(L2*2));
+      for(var j=0;j<=steps;j++){
+        var f=j/steps, x=x0+dx*f, y=y0+dy*f;
+        var t=(acc+L2*f)/total, wd=w0+(w1-w0)*t;
+        for(var o=-wd/2;o<=wd/2;o+=0.5)
+          put(G, x+nx*o, y+ny*o, o<-wd*0.2? lit : (o>wd*0.25? dark : mid));
+      }
+      acc+=L2;
+    }
+  }
+
   function tRect(G,x0,y0,x1,y1,tone,rnd,dens){ dens=(dens==null)?1:dens; for(var y=Math.round(y0);y<=Math.round(y1);y++)for(var x=Math.round(x0);x<=Math.round(x1);x++){ if(rnd&&dens<1&&rnd()>dens) continue; put(G,x,y,tone); } }
   function tBorder(G,x0,y0,x1,y1,tone){ x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1); for(var x=x0;x<=x1;x++){ put(G,x,y0,tone); put(G,x,y1,tone); } for(var y=y0;y<=y1;y++){ put(G,x0,y,tone); put(G,x1,y,tone); } }
   function tH(G,x0,x1,y,tone){ y=Math.round(y); for(var x=Math.round(x0);x<=Math.round(x1);x++) put(G,x,y,tone); }
@@ -1233,6 +1332,1032 @@
     }
   }
 
+  /* ================= THE FLIGHT =============================================
+     Six perched birds drawn at 56-72 columns so anatomy survives: a four-step
+     shade ramp from a fixed upper-left light, real feather groups, an eye with a
+     catchlight, and a stippled ground shadow. At ~30 columns none of that reads
+     and every bird collapses to a silhouette. */
+  function bird(G, kind, W, H, rnd){
+    function mu(t){ return mix(t, P.umber, 0.10); }
+    function dk(t){ return darken(t, 0.22); }
+
+    function mass(x,y,rx,ry,tilt,lit,body,shade,rim){
+      tilt=tilt||0;
+      var ct=Math.cos(tilt), st=Math.sin(tilt), m=Math.ceil(Math.max(rx,ry))+2;
+      for(var j=-m;j<=m;j++) for(var i=-m;i<=m;i++){
+        var u=(i*ct+j*st)/rx, v=(j*ct-i*st)/ry, d=u*u+v*v;
+        if(d>1.0) continue;
+        var l=(-u*0.62-v*0.78);
+        put(G,x+i,y+j, d>0.86? rim : (l>0.46? lit : (l>-0.02? body : (l>-0.52? shade : dk(shade)))));
+      }
+    }
+    function quills(x,y,n,len,a0,a1,w,t1,t2,grow){
+      grow=(grow==null)?0.16:grow;
+      for(var i=0;i<n;i++){
+        var f=n===1?0:i/(n-1), a=a0+(a1-a0)*f, L=len*(1+f*grow);
+        sbar(G,x,y,x+Math.cos(a)*L,y+Math.sin(a)*L,w,(i%2)?t1:t2);
+      }
+    }
+    function coverts(x,y,rows2,cols2,dx,dy,r,t1,t2){
+      for(var rr=0;rr<rows2;rr++) for(var cc=0;cc<cols2;cc++){
+        var px=x+cc*dx+(rr%2)*dx*0.5, py=y+rr*dy;
+        sarc(G,px,py,r,3.34,6.08,1.0,((rr+cc)%2)?t1:t2);
+      }
+    }
+    function eye(x,y,r,ring){
+      mass(x,y,r,r,0,P.umberDk,P.umberDk,P.umberDk,P.umberDk);
+      if(ring) sarc(G,x,y,r+1.2,0,6.28,1.0,ring);
+      put(G,x-r*0.4,y-r*0.4,P.creamLt);
+    }
+    function bill(x,y,len,ang,thick,t,td){
+      sspike(G,x,y,x+Math.cos(ang)*len,y+Math.sin(ang)*len,thick,0.8,t);
+      sbar(G,x,y+thick*0.22,x+Math.cos(ang)*len*0.86,y+Math.sin(ang)*len*0.86+thick*0.18,0.9,td);
+    }
+    function foot(x,y,h2,t){
+      sbar(G,x,y,x,y+h2,1.2,t);
+      sbar(G,x,y+h2,x-2.2,y+h2+1.6,1.0,t);
+      sbar(G,x,y+h2,x+2.4,y+h2+1.4,1.0,t);
+      sbar(G,x,y+h2,x+0.6,y+h2+2.4,1.0,t);
+    }
+    function perch(x0,x1,y,t){ sbar(G,x0,y,x1,y,1.6,t); }
+    function cast(x,y,rx,ry){
+      var m=Math.ceil(Math.max(rx,ry))+1;
+      for(var j=-m;j<=m;j++) for(var i=-m;i<=m;i++){
+        var u=i/rx, v=j/ry; if(u*u+v*v>1) continue;
+        if(rnd()<0.42) continue;
+        put(G,x+i,y+j,mix(P.creamSh,P.umber,0.30));
+      }
+    }
+
+    var cx=W/2;
+    var cw=mu(P.crow), cwd=mu(P.crowDk), cwl=mu(P.crowLt), cws=mu(P.crowSheen),
+        bn=mu(P.barn), bnd=mu(P.barnDk), bf=P.barnFace,
+        jy=mu(P.jay), jyd=mu(P.jayDk), jyl=mu(P.jayLt),
+        rb=mu(P.robin), rbd=mu(P.robinDk), br=mu(P.breast), brd=mu(P.breastDk),
+        sf=mu(P.slateF), sfd=mu(P.slateFDk), sfl=mu(P.slateFLt),
+        cr=P.creamLt, aw=mu(P.awn), awd=mu(P.awnDk), ink=P.umberDk, ms=mu(P.moss||P.olive);
+
+    switch(kind){
+      case 'bd-crow':
+        cast(cx+W*0.02,H*0.93,W*0.24,H*0.022);
+        mass(cx+W*0.02,H*0.58,W*0.25,H*0.20,-0.22,cwl,cw,cwd,cwd);
+        quills(cx-W*0.02,H*0.50,7,H*0.30,0.16,0.62,2.1,cw,cwd,0.24);
+        coverts(cx-W*0.10,H*0.48,3,4,W*0.055,H*0.045,2.0,cwl,cw);
+        for(var g=0;g<9;g++) put(G,cx-W*0.06+g*(W*0.03),H*0.46+((g%2)?1:0),cws);
+        quills(cx+W*0.14,H*0.62,4,H*0.34,0.30,0.52,2.4,cw,cwd,0.10);
+        mass(cx-W*0.22,H*0.34,W*0.14,H*0.115,-0.12,cwl,cw,cwd,cwd);
+        bill(cx-W*0.34,H*0.345,W*0.24,3.05,3.4,cwd,ink);
+        sbar(G,cx-W*0.34,H*0.335,cx-W*0.24,H*0.325,1.0,cws);
+        for(var n=0;n<4;n++) put(G,cx-W*0.30+n,H*0.325,cwd);
+        eye(cx-W*0.20,H*0.325,1.6,cws);
+        foot(cx-W*0.02,H*0.76,H*0.10,ink); foot(cx+W*0.08,H*0.76,H*0.10,ink);
+        perch(cx-W*0.20,cx+W*0.24,H*0.885,mu(P.bark));
+        break;
+      case 'bd-owl':
+        cast(cx,H*0.95,W*0.22,H*0.020);
+        mass(cx,H*0.62,W*0.28,H*0.24,0,mix(bn,cr,0.35),bn,bnd,bnd);
+        mass(cx,H*0.30,W*0.24,H*0.19,0,bf,mix(bf,bn,0.25),bnd,bnd);
+        sarc(G,cx-W*0.09,H*0.27,H*0.115,2.5,5.9,1.6,bnd);
+        sarc(G,cx+W*0.09,H*0.27,H*0.115,3.5,6.9,1.6,bnd);
+        sbar(G,cx,H*0.40,cx-W*0.05,H*0.30,1.3,bnd);
+        sbar(G,cx,H*0.40,cx+W*0.05,H*0.30,1.3,bnd);
+        eye(cx-W*0.085,H*0.285,2.1,bf); eye(cx+W*0.085,H*0.285,2.1,bf);
+        bill(cx,H*0.33,H*0.075,1.57,2.2,bf,bnd);
+        quills(cx+W*0.13,H*0.48,6,H*0.30,0.42,0.86,2.0,bn,bnd,0.18);
+        for(var b2=0;b2<5;b2++)
+          quills(cx-W*0.16,H*0.46+b2*(H*0.055),4,W*0.20,-0.12,0.12,1.0,bnd,mix(bn,cr,0.2),0);
+        for(var sp=0;sp<16;sp++){
+          var sx=cx-W*0.16+(sp%4)*(W*0.105), sy=H*0.56+Math.floor(sp/4)*(H*0.065);
+          put(G,sx,sy,bnd); put(G,sx+1,sy+1,mix(bn,cr,0.4));
+        }
+        foot(cx-W*0.07,H*0.84,H*0.07,aw); foot(cx+W*0.07,H*0.84,H*0.07,aw);
+        perch(cx-W*0.22,cx+W*0.22,H*0.925,mu(P.bark));
+        break;
+      case 'bd-wren':
+        cast(cx-W*0.02,H*0.92,W*0.17,H*0.020);
+        mass(cx-W*0.02,H*0.60,W*0.24,H*0.20,0.06,mix(rb,cr,0.42),rb,rbd,rbd);
+        mass(cx-W*0.17,H*0.44,W*0.135,H*0.105,-0.08,mix(rb,cr,0.5),rb,rbd,rbd);
+        bill(cx-W*0.29,H*0.455,W*0.10,3.10,1.9,aw,awd);
+        eye(cx-W*0.175,H*0.425,1.5,mix(rb,cr,0.6));
+        sbar(G,cx-W*0.27,H*0.40,cx-W*0.10,H*0.375,1.3,mix(rb,cr,0.62));
+        for(var bw=0;bw<6;bw++)
+          quills(cx+W*0.02,H*0.50+bw*(H*0.052),4,W*0.17,-0.18,0.18,1.0,rbd,mix(rb,cr,0.25),0);
+        quills(cx-W*0.06,H*0.54,5,H*0.24,0.30,0.78,1.7,rb,rbd,0.16);
+        quills(cx+W*0.16,H*0.56,5,H*0.30,-1.42,-1.06,1.9,rbd,rb,0.14);
+        foot(cx-W*0.04,H*0.78,H*0.07,aw); foot(cx+W*0.05,H*0.78,H*0.07,aw);
+        perch(cx-W*0.20,cx+W*0.20,H*0.875,mu(P.bark));
+        break;
+      case 'bd-robin':
+        cast(cx,H*0.93,W*0.19,H*0.020);
+        mass(cx+W*0.02,H*0.60,W*0.25,H*0.21,0.04,mix(ms,cr,0.30),ms,dk(ms),dk(ms));
+        mass(cx-W*0.10,H*0.56,W*0.155,H*0.145,0,mix(br,cr,0.34),br,brd,brd);
+        mass(cx-W*0.16,H*0.40,W*0.135,H*0.115,-0.06,mix(br,cr,0.42),br,brd,brd);
+        mass(cx-W*0.09,H*0.36,W*0.085,H*0.075,0,mix(ms,cr,0.34),ms,dk(ms),dk(ms));
+        bill(cx-W*0.28,H*0.415,W*0.085,3.08,1.9,ink,ink);
+        eye(cx-W*0.175,H*0.385,1.6,mix(br,cr,0.5));
+        quills(cx+W*0.06,H*0.52,6,H*0.26,0.34,0.80,1.9,ms,dk(ms),0.18);
+        coverts(cx-W*0.02,H*0.50,2,3,W*0.060,H*0.045,1.9,mix(ms,cr,0.28),ms);
+        quills(cx+W*0.16,H*0.66,4,H*0.22,0.42,0.66,1.8,dk(ms),ms,0.10);
+        foot(cx-W*0.02,H*0.79,H*0.07,aw); foot(cx+W*0.07,H*0.79,H*0.07,aw);
+        perch(cx-W*0.20,cx+W*0.22,H*0.885,mu(P.bark));
+        break;
+      case 'bd-heron':
+        sbar(G,cx-W*0.03,H*0.62,cx-W*0.07,H*0.90,1.6,aw);
+        sbar(G,cx+W*0.06,H*0.62,cx+W*0.11,H*0.90,1.6,aw);
+        sbar(G,cx-W*0.11,H*0.74,cx-W*0.05,H*0.74,1.1,awd);
+        sbar(G,cx+W*0.10,H*0.74,cx+W*0.16,H*0.74,1.1,awd);
+        foot(cx-W*0.07,H*0.90,H*0.012,awd); foot(cx+W*0.11,H*0.90,H*0.012,awd);
+        mass(cx+W*0.05,H*0.53,W*0.21,H*0.105,0.10,sfl,sf,sfd,sfd);
+        quills(cx+W*0.12,H*0.50,7,H*0.20,0.24,0.74,1.7,sf,sfd,0.22);
+        coverts(cx-W*0.02,H*0.48,2,4,W*0.055,H*0.032,1.7,sfl,sf);
+        quills(cx+W*0.22,H*0.58,3,H*0.14,0.30,0.50,1.6,sfd,sf,0.08);
+        sbar(G,cx-W*0.02,H*0.47,cx-W*0.10,H*0.34,3.4,sf,sfd);
+        sbar(G,cx-W*0.10,H*0.34,cx-W*0.03,H*0.22,3.0,sf,sfd);
+        sbar(G,cx-W*0.09,H*0.35,cx-W*0.03,H*0.24,1.3,sfl);
+        mass(cx-W*0.05,H*0.175,W*0.085,H*0.048,-0.10,sfl,sf,sfd,sfd);
+        bill(cx-W*0.11,H*0.185,W*0.28,3.22,2.4,aw,awd);
+        eye(cx-W*0.055,H*0.170,1.3,sfl);
+        sbar(G,cx-W*0.02,H*0.155,cx+W*0.14,H*0.125,1.5,sfd);
+        sbar(G,cx-W*0.01,H*0.168,cx+W*0.11,H*0.148,1.0,sfl);
+        for(var lp=0;lp<4;lp++)
+          sbar(G,cx-W*0.05,H*0.42+lp*(H*0.028),cx+W*0.04,H*0.43+lp*(H*0.028),1.1,sfd);
+        break;
+      default:
+        mass(cx,H*0.5,W*0.25,H*0.18,0,cr,mu(P.dove),mu(P.doveDk),mu(P.doveDk));
+    }
+  }
+
+  /* ================= PERCHED POSES ==========================================
+     Rebuilt as a SILHOUETTE, not a stack of solids. The previous version drew an
+     ellipse for the body and a circle for the head, which is a snowman: there is
+     always a seam where the two solids meet, and no amount of shading hides it.
+     Here the crown, nape, back, rump, tail, belly, breast and throat are control
+     points on ONE closed contour. It is splined, scanline-filled to a mask, and
+     shaded from a distance transform, so the bird has a continuous outline and a
+     rim that darkens the way a feathered edge actually does.
+
+     Poses deform the landmarks rather than swapping sprites: the head group
+     rotates about the neck joint, the tail group about the rump, and the body
+     inflates about its centroid. That is why a preen buries the bill in the
+     flank instead of tilting the whole bird.
+
+     bp-<plumage>-<pose>   plumage a|b|c, pose 0..6
+       0 rest  1 alert  2 look-back  3 preen  4 peck  5 fluff  6 stretch        */
+  function perchPose(G, kind, W, H, rnd){
+    function mu(t){ return mix(t, P.umber, 0.10); }
+    var kp=kind.split('-'), sp=kp[1], pose=parseInt(kp[2],10)||0;
+
+    /* ---- ANATOMY. Landmarks run clockwise from the forehead, around the crown
+       and back, out along the tail, and home under the belly and breast. Facing
+       left. Units are fractions of the tile. g=group: 0 body, 1 head, 2 tail. --- */
+    var SPEC={
+      /* WREN — a fist with a tail pointing at the sky. Barely any neck, the
+         crown runs straight into the mantle, and the tail cocks past vertical. */
+      a:{ scale:0.74, neck:[0.30,0.40], rump:[0.66,0.47], eye:[0.175,0.355],
+          billLen:0.15, billW:0.052, billDrop:0.10, billCurve:0.22,
+          legLen:0.13, legX:[-0.055,0.045], tailFeath:4,
+          wing:{x:0.44,y:0.50,rx:0.20,ry:0.115,rot:0.16,prim:4,primLen:0.20,primAng:0.30},
+          brow:true, bars:true, sheen:false, breast:false, capDark:false,
+          lit:mix(mu(P.robin),P.creamLt,0.50), body:mu(P.robin), dark:mu(P.robinDk),
+          bill:mu(P.awn), billDk:P.awnDk, foot:mu(P.awn),
+          accent:mix(mu(P.robin),P.creamLt,0.80),
+          pts:[[0.115,0.325,1],[0.185,0.268,1],[0.275,0.253,1],[0.360,0.290,3],
+               [0.455,0.352,0],[0.570,0.400,0],[0.665,0.442,0],
+               [0.700,0.415,2],[0.752,0.220,2],[0.828,0.048,2],[0.900,0.092,2],[0.836,0.286,2],[0.778,0.474,2],
+               [0.720,0.610,0],[0.615,0.712,0],[0.470,0.762,0],[0.330,0.745,0],
+               [0.205,0.660,0],[0.138,0.545,3],[0.098,0.430,3]] },
+      /* ROBIN — upright and plump. A real neck notch behind the head, a deep
+         round breast carried high, and a modest tail angled down and back. */
+      b:{ scale:0.86, neck:[0.315,0.360], rump:[0.700,0.480], eye:[0.165,0.310],
+          billLen:0.115, billW:0.060, billDrop:0.02, billCurve:0.06,
+          legLen:0.17, legX:[-0.050,0.050], tailFeath:5,
+          wing:{x:0.455,y:0.470,rx:0.215,ry:0.130,rot:0.20,prim:5,primLen:0.235,primAng:0.26},
+          brow:false, bars:false, sheen:false, breast:true, capDark:true,
+          lit:mix(mu(P.olive),P.creamLt,0.38), body:mu(P.olive), dark:darken(mu(P.olive),0.30),
+          bill:P.awnDk, billDk:P.umberDk, foot:mu(P.awn), accent:mu(P.breast),
+          pts:[[0.098,0.292,1],[0.160,0.212,1],[0.258,0.178,1],[0.350,0.212,1],
+               [0.398,0.300,3],[0.428,0.372,0],[0.560,0.408,0],[0.700,0.470,0],
+               [0.836,0.516,2],[0.958,0.566,2],[0.988,0.622,2],[0.940,0.652,2],[0.812,0.628,2],
+               [0.710,0.640,0],[0.610,0.742,0],[0.470,0.822,0],[0.315,0.820,0],
+               [0.183,0.720,0],[0.108,0.560,3],[0.072,0.395,3]] },
+      /* CROW — long, low and level. Flat crown, heavy dagger bill with a visible
+         gonys, a long wedge tail, and legs set well back under a deep body. */
+      c:{ scale:0.95, neck:[0.330,0.345], rump:[0.735,0.430], eye:[0.205,0.318],
+          billLen:0.220,billW:0.070, billDrop:0.05, billCurve:0.09,
+          legLen:0.185, legX:[-0.045,0.055], tailFeath:6,
+          wing:{x:0.480,y:0.430,rx:0.255,ry:0.115,rot:0.11,prim:6,primLen:0.300,primAng:0.18},
+          brow:false, bars:false, sheen:true, breast:false, capDark:false,
+          lit:mu(P.crowLt), body:mu(P.crow), dark:mu(P.crowDk),
+          bill:P.crowDk, billDk:'#0F0D0B', foot:P.umberDk, accent:mu(P.crowSheen),
+          pts:[[0.128,0.288,1],[0.198,0.246,1],[0.300,0.238,1],[0.392,0.262,3],
+               [0.452,0.315,0],[0.585,0.358,0],[0.735,0.415,0],
+               [0.868,0.440,2],[0.984,0.470,2],[1.000,0.536,2],[0.962,0.582,2],[0.862,0.568,2],
+               [0.755,0.585,0],[0.640,0.665,0],[0.490,0.712,0],[0.335,0.700,0],
+               [0.212,0.618,0],[0.146,0.492,3],[0.108,0.372,3]] }
+    };
+    var A=SPEC[sp]||SPEC.a, cr=P.creamLt;
+
+    /* Pose deltas: headRot, headDX, headDY, puff, tailRot, wingOut, crouch, flip.
+       Screen y runs down, and rot() ADDS to the angle, so a POSITIVE headRot
+       raises the bill and a negative one drives it down. Getting that backwards
+       is what made the preen point at the sky.
+       "Look" is a hard upward cock of the head, not a turn over the shoulder:
+       reversing the head in profile either tears the neck joint open or buries
+       the bill in the bird's own shoulder, and a cocked head is what these birds
+       actually do all day anyway. */
+    var POSE=[
+      [ 0.00, 0.000, 0.000, 1.00,  0.00, 0.00, 0.00, 0],  /* rest    */
+      [ 0.26,-0.030,-0.080, 0.94,  0.16, 0.00,-0.03, 0],  /* alert   */
+      [ 0.66, 0.030,-0.055, 1.00,  0.06, 0.00, 0.00, 0],  /* look    */
+      [-1.95, 0.050, 0.120, 1.06, -0.10, 0.16, 0.02, 0],  /* preen   */
+      [-0.88,-0.020, 0.150, 0.98, -0.16, 0.00, 0.05, 0],  /* peck    */
+      [ 0.05,-0.005,-0.020, 1.22,  0.20, 0.06, 0.04, 0],  /* fluff   */
+      [ 0.10, 0.000,-0.025, 1.01,  0.26, 1.00,-0.02, 0]   /* stretch */
+    ][Math.max(0,Math.min(6,pose))];
+    var hRot=POSE[0], hDX=POSE[1], hDY=POSE[2], puff=POSE[3],
+        tRot=POSE[4], wingOut=POSE[5], crouch=POSE[6];
+
+    /* ---- place the bird in the tile ---- */
+    var S=Math.min(W,H)*A.scale, ox=W*0.5-S*0.50, oy=H*0.50-S*0.46+H*crouch;
+    function TX(p){ return ox+p[0]*S; }
+    function TY(p){ return oy+p[1]*S; }
+
+    var neckP=[ox+A.neck[0]*S, oy+A.neck[1]*S],
+        rumpP=[ox+A.rump[0]*S, oy+A.rump[1]*S];
+    var bodyC=[ox+0.46*S, oy+0.50*S];
+
+    function rot(x,y,px,py,a){
+      var c=Math.cos(a), s=Math.sin(a), dx=x-px, dy=y-py;
+      return [px+dx*c-dy*s, py+dx*s+dy*c];
+    }
+    /* Every head feature goes through this one transform. The bill used to carry
+       its own hand-derived angle, which is how it ended up pointing away from the
+       head it was attached to. */
+    function headPt(nx,ny){
+      var r=rot(ox+nx*S, oy+ny*S, neckP[0], neckP[1], hRot);
+      return [r[0]+hDX*S, r[1]+hDY*S];
+    }
+
+    /* deform the landmarks by group */
+    var pts=A.pts.map(function(p){
+      var x=TX(p), y=TY(p), g=p[2];
+      if(g===1||g===3){        /* head + neck rotate together about the neck joint */
+        var hp=headPt(p[0],p[1]);
+        x=hp[0]; y=hp[1];
+      } else if(g===2){                            /* tail rotates about the rump */
+        var t=rot(x,y,rumpP[0],rumpP[1],-tRot);
+        x=t[0]; y=t[1];
+      } else {                                     /* body inflates about centroid */
+        x=bodyC[0]+(x-bodyC[0])*puff;
+        y=bodyC[1]+(y-bodyC[1])*puff;
+      }
+      return [x,y];
+    });
+    /* the head follows the body when it puffs, or it detaches */
+    if(puff!==1){
+      var hc=rot(neckP[0],neckP[1],bodyC[0],bodyC[1],0);
+      var shiftX=(hc[0]-bodyC[0])*(puff-1), shiftY=(hc[1]-bodyC[1])*(puff-1);
+      A.pts.forEach(function(p,i){ if(p[2]===1||p[2]===2||p[2]===3){ pts[i][0]+=shiftX; pts[i][1]+=shiftY; } });
+      neckP=[neckP[0]+shiftX, neckP[1]+shiftY];
+    }
+
+    /* ---- Catmull-Rom through the landmarks: an organic closed contour ---- */
+    function spline(P0, samples){
+      /* cardinal spline at a tension below Catmull-Rom's 0.5 — at full tension
+         the curve overshoots the sharp corner at a tail tip and ties a small
+         loop, which then punches holes through the fill */
+      var out=[], n=P0.length, TEN=0.34;
+      for(var i=0;i<n;i++){
+        var p0=P0[(i-1+n)%n], p1=P0[i], p2=P0[(i+1)%n], p3=P0[(i+2)%n];
+        var m1x=TEN*(p2[0]-p0[0]), m1y=TEN*(p2[1]-p0[1]),
+            m2x=TEN*(p3[0]-p1[0]), m2y=TEN*(p3[1]-p1[1]);
+        for(var k=0;k<samples;k++){
+          var t=k/samples, t2=t*t, t3=t2*t;
+          var h00=2*t3-3*t2+1, h10=t3-2*t2+t, h01=-2*t3+3*t2, h11=t3-t2;
+          out.push([ h00*p1[0]+h10*m1x+h01*p2[0]+h11*m2x,
+                     h00*p1[1]+h10*m1y+h01*p2[1]+h11*m2y ]);
+        }
+      }
+      return out;
+    }
+    var poly=spline(pts, 12);
+
+    /* ---- scanline fill to a mask, then a chamfer distance transform so the
+       edge can be darkened. A feathered bird has no hard outline, it has a rim
+       that falls off, and this is what produces that. ---- */
+    var mask=new Uint8Array(W*H), dist=new Float32Array(W*H);
+    var yMin=H, yMax=0;
+    for(var pi=0;pi<poly.length;pi++){
+      if(poly[pi][1]<yMin) yMin=poly[pi][1];
+      if(poly[pi][1]>yMax) yMax=poly[pi][1];
+    }
+    yMin=Math.max(0,Math.floor(yMin)); yMax=Math.min(H-1,Math.ceil(yMax));
+    for(var y=yMin;y<=yMax;y++){
+      var xs=[];
+      for(var e=0;e<poly.length;e++){
+        var a1=poly[e], b1=poly[(e+1)%poly.length];
+        if(a1[1]<=y&&b1[1]>y)      xs.push([a1[0]+(y-a1[1])/(b1[1]-a1[1])*(b1[0]-a1[0]), 1]);
+        else if(b1[1]<=y&&a1[1]>y) xs.push([a1[0]+(y-a1[1])/(b1[1]-a1[1])*(b1[0]-a1[0]),-1]);
+      }
+      xs.sort(function(u,v){return u[0]-v[0];});
+      var wind=0;                       /* nonzero winding: survives self-overlap */
+      for(var s2=0;s2+1<xs.length;s2++){
+        wind+=xs[s2][1];
+        if(wind===0) continue;
+        var x0=Math.max(0,Math.ceil(xs[s2][0])), x1=Math.min(W-1,Math.floor(xs[s2+1][0]));
+        for(var x=x0;x<=x1;x++) mask[y*W+x]=1;
+      }
+    }
+    var BIG=1e6;
+    for(var i2=0;i2<W*H;i2++) dist[i2]=mask[i2]?BIG:0;
+    for(var yy=0;yy<H;yy++) for(var xx=0;xx<W;xx++){
+      var o=yy*W+xx; if(!mask[o]) continue;
+      var m1=dist[o];
+      if(xx>0) m1=Math.min(m1,dist[o-1]+1);
+      if(yy>0) m1=Math.min(m1,dist[o-W]+1);
+      if(xx>0&&yy>0) m1=Math.min(m1,dist[o-W-1]+1.414);
+      if(xx<W-1&&yy>0) m1=Math.min(m1,dist[o-W+1]+1.414);
+      dist[o]=m1;
+    }
+    for(var yb=H-1;yb>=0;yb--) for(var xb=W-1;xb>=0;xb--){
+      var ob=yb*W+xb; if(!mask[ob]) continue;
+      var m2=dist[ob];
+      if(xb<W-1) m2=Math.min(m2,dist[ob+1]+1);
+      if(yb<H-1) m2=Math.min(m2,dist[ob+W]+1);
+      if(xb<W-1&&yb<H-1) m2=Math.min(m2,dist[ob+W+1]+1.414);
+      if(xb>0&&yb<H-1) m2=Math.min(m2,dist[ob+W-1]+1.414);
+      dist[ob]=m2;
+    }
+
+    /* head centre — the shading pass needs it for the cap */
+    var hd0=headPt(A.eye[0], A.eye[1]);
+    var hcx=hd0[0], hcy=hd0[1];
+
+    /* ---- shade: directional light from upper-left plus the rim falloff ---- */
+    var rimD=Math.max(2.0, S*0.055);
+    for(var sy=0;sy<H;sy++) for(var sx=0;sx<W;sx++){
+      var so=sy*W+sx; if(!mask[so]) continue;
+      var u=(sx-bodyC[0])/(S*0.30), v=(sy-bodyC[1])/(S*0.26);
+      var l=(-u*0.55-v*0.72);
+      var d=dist[so], t3;
+      if(d<rimD*0.55) t3=A.dark;
+      else if(d<rimD) t3=(l>0.30? A.body : A.dark);
+      else t3=(l>0.62? A.lit : (l>-0.10? A.body : A.dark));
+
+      /* Plumage as soft REGIONS blended into the shading, not ovals stamped on
+         top. A hard-edged disc of colour reads as a hood or a sticker; fading
+         across the outer fifth of the radius, and letting the rim keep winning,
+         reads as a bird that is that colour there. */
+      if(A.breast){
+        var bd=Math.hypot((sx-(bodyC[0]-S*0.225))/(S*0.205),(sy-(bodyC[1]+S*0.105))/(S*0.240));
+        if(bd<1.06){
+          var ac=(d<rimD*0.55)? darken(A.accent,0.34)
+               : (l>0.52? mix(A.accent,cr,0.30) : (l>-0.05? A.accent : darken(A.accent,0.20)));
+          t3 = bd>0.84 ? mix(t3, ac, (1.06-bd)/0.22) : ac;
+        }
+      }
+      if(A.capDark){
+        var cd=Math.hypot((sx-hcx)/(S*0.150),(sy-(hcy-S*0.030))/(S*0.135));
+        if(cd<1.04) t3 = cd>0.80 ? mix(t3, A.dark, (1.04-cd)/0.24) : A.dark;
+      }
+      if(A.sheen && d>rimD*0.70){
+        var sd=Math.hypot((sx-(bodyC[0]+S*0.045))/(S*0.280),(sy-(bodyC[1]-S*0.115))/(S*0.135));
+        if(sd<1.0 && l>0.10) t3 = mix(t3, A.accent, 0.52*(1-sd));
+      }
+      put(G,sx,sy,t3);
+    }
+    function inMask(x,y){ x=Math.round(x); y=Math.round(y);
+      return x>=0&&y>=0&&x<W&&y<H&&mask[y*W+x]; }
+    function putIn(x,y,t){ if(inMask(x,y)) put(G,x,y,t); }
+
+    /* ---- tail feather separations, drawn along the tail's own axis ---- */
+    var tAng=Math.atan2(pts[9][1]-rumpP[1], pts[9][0]-rumpP[0]);
+    for(var tf=1;tf<A.tailFeath;tf++){
+      var spread=(tf/A.tailFeath-0.5)*0.42;
+      var aT=tAng+spread;
+      for(var q=0.34;q<1.14;q+=0.022){
+        var qx=rumpP[0]+Math.cos(aT)*S*0.42*q, qy=rumpP[1]+Math.sin(aT)*S*0.42*q;
+        putIn(qx,qy, tf%2? A.dark : darken(A.body,0.12));
+      }
+    }
+
+    /* ---- the folded wing: a lens lying on the flank with primaries that run
+       back past the rump. This is the shape that most says "bird" after the
+       silhouette itself, and the old version only hinted at it. ---- */
+    var Wg=A.wing, wcx=ox+Wg.x*S, wcy=oy+Wg.y*S;
+    if(puff!==1){ wcx=bodyC[0]+(wcx-bodyC[0])*puff; wcy=bodyC[1]+(wcy-bodyC[1])*puff; }
+    var wRot=Wg.rot - wingOut*0.62;
+    var wRx=S*Wg.rx*(1+wingOut*0.42), wRy=S*Wg.ry*(1+wingOut*0.30);
+    var cw=Math.cos(wRot), sw=Math.sin(wRot);
+    for(var wj=-Math.ceil(wRy)-2;wj<=Math.ceil(wRy)+2;wj++)
+      for(var wi=-Math.ceil(wRx)-2;wi<=Math.ceil(wRx)+2;wi++){
+        var wu=(wi*cw+wj*sw)/wRx, wv=(wj*cw-wi*sw)/wRy;
+        var wd=wu*wu+wv*wv; if(wd>1) continue;
+        var wt=(wd>0.80)? A.dark : ((wv<-0.30)? A.lit : A.body);
+        if(A.bars && ((wi+wj*2)%7===0)) wt=A.dark;                 /* barred wing */
+        if(A.sheen && wv<-0.42 && wu>-0.30 && wu<0.45) wt=A.accent; /* gloss band */
+        putIn(wcx+wi, wcy+wj, wt);
+      }
+    /* primaries */
+    for(var pr=0;pr<Wg.prim;pr++){
+      var pa=wRot+Wg.primAng*(pr/(Wg.prim-1)-0.15)+wingOut*0.30;
+      var plen=S*Wg.primLen*(1-pr*0.055)*(1+wingOut*0.55);
+      var px0=wcx+Math.cos(wRot)*wRx*0.42, py0=wcy+Math.sin(wRot)*wRy*0.30+pr*(S*0.017);
+      /* folded, the primaries are separation lines inside the silhouette. Spread,
+         they are the wing itself, so they need width and a filled web between
+         them or the stretch pose reads as three loose threads. */
+      var half = wingOut>0 ? Math.max(1.2, S*0.021*(1-pr*0.06)) : 0.5;
+      for(var pq=0;pq<plen;pq+=0.5){
+        var pxx=px0+Math.cos(pa)*pq, pyy=py0+Math.sin(pa)*pq;
+        var fade=1-(pq/plen)*0.35;
+        for(var pw=-half;pw<=half;pw+=0.5){
+          var qx2=pxx-Math.sin(pa)*pw, qy2=pyy+Math.cos(pa)*pw;
+          if(wingOut>0){
+            put(G,qx2,qy2, (Math.abs(pw)>half*0.62)? A.dark
+                          : (fade>0.82? mix(A.body,A.lit,0.30) : darken(A.body,0.14)));
+          } else if(inMask(qx2,qy2)) put(G,qx2,qy2, pr%2? A.dark : darken(A.body,0.18));
+        }
+      }
+    }
+    /* wing coverts: a few short strokes so the shoulder is not a blank field */
+    for(var cvr=0;cvr<3;cvr++)
+      for(var cvq=0;cvq<S*0.11;cvq+=0.6)
+        putIn(wcx-wRx*0.45+cvq*Math.cos(wRot+0.5), wcy-wRy*0.30+cvr*(S*0.045)+cvq*Math.sin(wRot+0.5),
+              darken(A.body,0.10));
+
+    /* ---- brow stripe: the wren's supercilium, the one mark that identifies it ---- */
+    var hx=hcx, hy=hcy;
+    if(A.brow){
+      var bw0=headPt(A.eye[0]-0.085, A.eye[1]-0.048), bw1=headPt(A.eye[0]+0.105, A.eye[1]-0.068);
+      var bwA=Math.atan2(bw1[1]-bw0[1], bw1[0]-bw0[0]), bwL=Math.hypot(bw1[0]-bw0[0],bw1[1]-bw0[1]);
+      for(var bq=0;bq<bwL;bq+=0.5){
+        putIn(bw0[0]+Math.cos(bwA)*bq, bw0[1]+Math.sin(bwA)*bq, A.accent);
+        putIn(bw0[0]+Math.cos(bwA)*bq+Math.sin(bwA)*1.2,
+              bw0[1]+Math.sin(bwA)*bq-Math.cos(bwA)*1.2, mix(A.accent,A.dark,0.35));
+      }
+    }
+
+    /* ---- bill: a wedge with a real gape line, hung off the head landmarks so
+       it swings with the pose. Needle on the wren, dagger on the crow. ---- */
+    var gape=headPt(A.eye[0]-0.055, A.eye[1]+0.028);
+    var btip=headPt(A.eye[0]-0.055-A.billLen, A.eye[1]+0.028+A.billDrop*0.55);
+    var gx=gape[0], gy=gape[1];
+    var bAng=Math.atan2(btip[1]-gy, btip[0]-gx);
+    var bLen=Math.hypot(btip[0]-gx, btip[1]-gy), bHalf=S*A.billW*0.5;
+    var cbA=Math.cos(bAng), sbA=Math.sin(bAng);
+    for(var q2=0;q2<=bLen;q2+=0.42){
+      var f2=q2/bLen, taper=(1-f2*0.80);   /* linear: a wedge, not a tube with a point */
+      var curve=Math.sin(f2*3.14159)*A.billCurve*S*0.10;
+      var bx=gx+cbA*q2 - sbA*curve, byy=gy+sbA*q2 + cbA*curve;
+      var hh=bHalf*taper;
+      for(var w2=-hh;w2<=hh;w2+=0.5){
+        var t4=(w2<-hh*0.25)? A.bill : (w2>hh*0.30? A.billDk : mix(A.bill,A.billDk,0.30));
+        put(G, bx - sbA*w2, byy + cbA*w2, t4);
+      }
+      if(f2>0.10) put(G, bx, byy, A.billDk);                 /* the gape line */
+    }
+    if(A.sheen){                                              /* nasal bristles */
+      for(var nb=0;nb<5;nb++)
+        for(var nq=0;nq<S*0.055;nq+=0.5)
+          put(G, gx+cbA*nq*1.1, gy+sbA*nq+nb*0.9-1.8, A.billDk);
+    }
+
+    /* ---- eye: a dark bead with a lit catch, ringed so it does not vanish ---- */
+    var eR=Math.max(1.5, S*0.026);
+    var ring=A.sheen? mix(A.lit,cr,0.72) : mix(A.lit,cr,0.50);   /* dark birds need a lighter orbital */
+    for(var ej=-Math.ceil(eR)-2;ej<=Math.ceil(eR)+2;ej++)
+      for(var ei=-Math.ceil(eR)-2;ei<=Math.ceil(eR)+2;ei++){
+        var ed=(ei*ei+ej*ej)/(eR*eR);
+        if(ed>1.62) continue;
+        put(G, hx+ei, hy+ej, ed>1.18? ring : (ed>0.94? P.umberDk : '#141210'));
+      }
+    put(G, hx-Math.max(1,eR*0.34), hy-Math.max(1,eR*0.34), cr);   /* catchlight */
+
+    /* ---- legs: a feathered thigh, a scaled tarsus and three forward toes.
+       No perch bar: these birds sit on real page elements, and drawing a stand
+       under them made every one look like a museum mount. ---- */
+    var footY=oy+S*(0.78+A.legLen);
+    [0,1].forEach(function(li){
+      var lx=bodyC[0]+S*A.legX[li];
+      var thighY=oy+S*0.70;
+      sbar(G, lx, thighY, lx+S*0.012, footY-S*0.02, Math.max(1.6,S*0.026), A.foot);
+      for(var sc=0;sc<4;sc++)                                   /* tarsus scales */
+        put(G, lx+S*0.006, thighY+S*0.03+sc*(S*0.030), darken(A.foot,0.30));
+      var fx=lx+S*0.012;
+      sbar(G, fx, footY-S*0.02, fx-S*0.055, footY+S*0.010, Math.max(1.2,S*0.017), A.foot);
+      sbar(G, fx, footY-S*0.02, fx-S*0.020, footY+S*0.022, Math.max(1.2,S*0.017), A.foot);
+      sbar(G, fx, footY-S*0.02, fx+S*0.048, footY+S*0.014, Math.max(1.2,S*0.017), darken(A.foot,0.18));
+    });
+  }
+
+  /* ================= WINGS — twelve phases ==================================
+     Five held poses read as a slideshow; twelve at ~40-70ms fuse into motion.
+     The attitude is a continuous function of phase, and deliberately asymmetric:
+     the downstroke is fast and powerful, the recovery slower and folded, and the
+     camber flips sign with direction. */
+  function wingBird(G, kind, W, H, rnd){
+    function mu(t){ return mix(t, P.umber, 0.10); }
+    var parts=kind.split('-'), species=parts[1], phase=parseInt(parts[2],10)||0;
+    var PLS={
+      a:{ lit:mu(P.jayLt), body:mu(P.jay),   dark:mu(P.jayDk),  bill:P.umberDk, throat:mu(P.robin) },
+      b:{ lit:mix(mu(P.breast),P.creamLt,0.34), body:mu(P.breast), dark:mu(P.breastDk), bill:P.umberDk, throat:mu(P.olive) },
+      c:{ lit:mu(P.crowLt), body:mu(P.crow),  dark:mu(P.crowDk), bill:P.crowDk,  throat:mu(P.crowSheen) }
+    };
+    var PL=PLS[species]||PLS.a;
+    var lit=PL.lit, body=PL.body, dark=PL.dark, bill=PL.bill, thr=PL.throat, cr=P.creamLt;
+
+    function mass(x,y,rx,ry,tilt){
+      var ct=Math.cos(tilt||0), st=Math.sin(tilt||0), m=Math.ceil(Math.max(rx,ry))+2;
+      for(var j=-m;j<=m;j++) for(var i=-m;i<=m;i++){
+        var u=(i*ct+j*st)/rx, v=(j*ct-i*st)/ry, d=u*u+v*v;
+        if(d>1) continue;
+        var l=(-u*0.62-v*0.78);
+        put(G,x+i,y+j, d>0.84? dark : (l>0.42? lit : (l>-0.14? body : dark)));
+      }
+    }
+    var cx=W*0.44, cy=H*0.54;
+    var TOTAL=12, ph=(phase%TOTAL)/TOTAL;
+    var rise=Math.cos(ph*6.2832), down=Math.sin(ph*6.2832)<0;
+    var skew=down? Math.pow(Math.abs(rise),0.72)*(rise<0?-1:1) : rise;
+    var A=[skew, 0.06+Math.abs(rise)*0.13, (down?0.34:-0.26)*Math.abs(rise)];
+
+    mass(cx,cy,W*0.155,H*0.098,0.10);
+    mass(cx-W*0.17,cy-H*0.075,W*0.082,H*0.062,0.04);
+    sspike(G,cx-W*0.245,cy-H*0.062,cx-W*0.325,cy-H*0.045,1.9,0.7,bill);
+    for(var t=0;t<5;t++) put(G,cx-W*0.19+t*1.3,cy+H*0.02,thr);
+    mass(cx-W*0.165,cy-H*0.088,1.4,1.4,0);
+    put(G,cx-W*0.168,cy-H*0.094,P.umberDk);
+    put(G,cx-W*0.185,cy-H*0.105,cr);
+
+    var farLift=-A[0]*H*0.20;
+    sspike(G,cx-W*0.02,cy-H*0.02, cx+W*0.14, cy-H*0.02+farLift*0.55, 4.0,1.0, dark);
+    var tipx=cx-W*0.05+A[1]*W*0.10, tipy=cy-H*0.03+A[0]*H*0.46;
+    sspike(G,cx-W*0.02,cy-H*0.03, tipx, tipy, 7.2,1.6, body);
+    sspike(G,cx-W*0.02,cy-H*0.05, tipx-W*0.01, tipy+A[2]*H*0.06, 3.4,0.9, lit);
+    for(var pf=0;pf<3;pf++){
+      var sp=(pf-1)*0.16;
+      sbar(G, cx+W*0.02, cy-H*0.03+A[0]*H*0.20,
+              tipx+sp*W*0.09, tipy+sp*H*0.10 + (A[0]>0? H*0.05 : -H*0.05), 1.3, pf%2?dark:body);
+    }
+    for(var tf=-1;tf<=1;tf++)
+      sbar(G,cx+W*0.13,cy+H*0.02, cx+W*0.30+tf*W*0.02, cy+H*0.02+tf*H*0.11 - A[0]*H*0.05, 1.9, tf?dark:body);
+  }
+
+  /* ================= THE WALL BRANCH =========================================
+     A limb entering from the page edge: thick where it leaves frame, tapering as
+     it reaches inward, forking into finer twigs each carrying small alternating
+     leaves. The butt end runs off the canvas at full width so there is no visible
+     origin. Drawn entering from the RIGHT; mirror in CSS for the other side.
+
+     Everything is bounds-guarded. Anything drawn outside W x H is simply lost and
+     renders as a straight slice, which is what made the first version look cut. */
+  function wallBranch(G, kind, W, H, rnd){
+    function mu(t){ return mix(t, P.umber, 0.03); }
+    var tkA=mu(P.trunkA), tkB=mu(P.trunkB), tkC=P.trunkC;
+    /* No umber mute on the foliage. mu() pulls every tone toward umber, and
+       across twelve autumn colours that reads as a layer of dust over all of
+       them. The wood still gets it - that is where it belongs. */
+    var PAL=[P.blA,P.blB,P.blC,P.blD,P.blE,P.blF,
+             P.blH,P.blI,P.blJ,P.blK,P.blL,mix(P.leafA,P.creamLt,0.12)];
+
+    /* A leaf is ASYMMETRIC along its length: rounded at the base where it meets
+       the stalk, pointed at the tip. The old one was an ellipse tapered equally
+       at both ends with a highlight stripe down the middle, which at nine pixels
+       is a banana. Half-width is now a beta curve peaking about 45% along, so
+       the base is full and the tip comes to a point, and there is a midrib.
+       Three profiles for variety: ovate, lanceolate, obovate. */
+    var LSHAPE=[[0.42,0.52],[0.62,0.38],[0.34,0.72]];
+    function leaf(x,y,sz,ang,tone,shp){
+      if(x < sz+2 || x > W-sz-2 || y < sz+3 || y > H-sz-3) return;
+      var ca=Math.cos(ang), sa=Math.sin(ang);
+      var S2=LSHAPE[(shp||0)%3], A2=S2[0], B2=S2[1];
+      var peak=Math.pow(A2/(A2+B2),A2)*Math.pow(B2/(A2+B2),B2);
+      var LEN=sz*1.85, WID=sz*0.44/peak;
+      var lit=mix(tone,P.creamLt,0.34), shd=darken(tone,0.13), rib=darken(tone,0.30);
+      for(var q=0;q<=LEN;q+=0.5){
+        var t=q/LEN;
+        var hw=WID*Math.pow(t,A2)*Math.pow(1-t,B2);
+        if(hw<0.3) continue;
+        var bx=x+ca*(q-LEN*0.5), by=y+sa*(q-LEN*0.5);
+        for(var w=-hw;w<=hw;w+=0.5){
+          var side=w*(sa*0.60-ca*0.80);          /* light from the upper left */
+          put(G, bx-sa*w, by+ca*w,
+              (Math.abs(w)>hw-0.7)? shd : (side>0? lit : tone));
+        }
+      }
+      for(var r2=LEN*0.06;r2<=LEN*0.94;r2+=0.5)  /* the midrib */
+        put(G, x+ca*(r2-LEN*0.5), y+sa*(r2-LEN*0.5), rib);
+      var sx=x-ca*LEN*0.56, sy=y-sa*LEN*0.56;    /* the stalk */
+      put(G,sx,sy,tkC); put(G,sx-ca*0.9,sy-sa*0.9,tkC);
+    }
+
+    var kp=kind.split('-');
+    var isLeafPass = kp[1]==='leaf';
+    /* The money gets its OWN pass. The leaf layer is a separate element stacked
+       above the limb, so money drawn on the limb sits underneath the foliage and
+       is never seen. Same geometry, same seed, drawn alone, mounted on top. */
+    var isCashPass = kp[1]==='cash';
+    var form = kp[2]||'a';
+    var frame = isLeafPass ? (parseInt(kp[3],10)||0) : 0;
+    var FR=4, ph0=(frame%FR)/FR*6.2832;
+    var R=rngFrom(form==='b'? 811 : 409);
+    var leafIdx=0;
+    /* leaf size derived from the grid, so foliage keeps its proportion whatever
+       size the branch is drawn at */
+    /* leaf area scales with the square of this, so it drives ink far harder than
+       the leaf COUNT does — halving the count only took 12% off, dropping the size
+       is what actually thins the canopy */
+    var LS=Math.max(2.4, Math.min(W,H)*0.0175);
+
+    function branch(x,y,ang,len,wid,depth){
+      var ex=x+Math.cos(ang)*len, ey=y+Math.sin(ang)*len;
+      if(ex< -2 || ex> W+2 || ey< 6 || ey> H-4) return;
+      var midA=ang+(R()-0.5)*0.34;
+      var mx=x+Math.cos(midA)*len*0.52, my=y+Math.sin(midA)*len*0.52;
+      var x2=mx+Math.cos(ang)*len*0.52,  y2=my+Math.sin(ang)*len*0.52;
+      if(!isLeafPass && !isCashPass) swood(G,[[x,y],[mx,my],[x2,y2]], wid, Math.max(0.9,wid*0.46), tkB, tkA, tkC);
+
+      if(isLeafPass){
+        /* fewer on the thick members, dense on the fine ones — but never zero,
+           so foliage runs the whole length of the branch instead of clumping at
+           the tip */
+        /* thinned: dense enough to read as a leafy branch, sparse enough that the
+           wood still shows through it */
+        var n=(depth<=1? 3 : (depth===2? 2 : 1))+((R()*2)|0);
+        for(var k=0;k<n;k++){
+          var f=(k+1)/(n+1);
+          var lx=x+(x2-x)*f, ly=y+(y2-y)*f;
+          var side=(k%2)?1:-1, la=ang+side*(0.85+R()*0.5);
+          var sway=Math.sin(ph0+leafIdx*0.97); leafIdx++;
+          var off=LS*1.15+R()*LS*0.8;
+          /* the displacement has to be big enough to SEE between frames. At 1.5px
+             the leaves technically moved and read as perfectly still. */
+          leaf(lx+Math.cos(la)*off+sway*4.2, ly+Math.sin(la)*off+Math.cos(ph0+leafIdx*0.7)*3.0,
+               LS*(0.80+R()*0.55), la+sway*0.62, PAL[(R()*PAL.length)|0], (R()*3)|0);
+        }
+        leaf(x2+Math.cos(ang)*2.4+Math.sin(ph0+leafIdx)*3.6,
+             y2+Math.sin(ang)*2.4+Math.cos(ph0+leafIdx*1.2)*2.6, LS*(0.85+R()*0.45),
+             ang+Math.sin(ph0+leafIdx)*0.55, PAL[(R()*PAL.length)|0], (R()*3)|0);
+        leafIdx++;
+      }
+      if(depth<=0) return;
+      var spread=0.42+R()*0.40;
+      branch(x2,y2, ang-spread,               len*(0.62+R()*0.16), wid*0.56, depth-1);
+      branch(x2,y2, ang+spread*(0.6+R()*0.8), len*(0.58+R()*0.18), wid*0.52, depth-1);
+      if(depth>1 && R()<0.66) branch(mx,my, ang+(R()-0.5)*1.7, len*0.46, wid*0.44, depth-2);
+    }
+
+    /* reach is scaled to the SHORTER axis, so a wide grid cannot stretch a fork
+       out of frame vertically */
+    var S=Math.min(W*0.5, H*0.86);
+    var yIn = form==='b' ? H*0.80 : H*0.74;
+    var main = form==='b'
+      ? [[W+10,yIn],[W*0.78,H*0.72],[W*0.58,H*0.70],[W*0.42,H*0.60],[W*0.30,H*0.55]]
+      : [[W+10,yIn],[W*0.80,H*0.66],[W*0.60,H*0.66],[W*0.44,H*0.56],[W*0.32,H*0.51]];
+    if(!isLeafPass && !isCashPass) swood(G, main, 20.0, 3.2, tkB, tkA, tkC);
+
+    var forks = form==='b'
+      ? [[0.16,-0.95,0.34],[0.34,0.72,0.20],[0.50,-1.05,0.30],[0.66,0.55,0.16],[0.80,-0.85,0.22],[0.90,0.42,0.11]]
+      : [[0.14,-0.85,0.36],[0.30,0.80,0.19],[0.46,-1.10,0.30],[0.62,0.62,0.15],[0.78,-0.80,0.22],[0.92,-0.45,0.14]];
+    for(var i2=0; i2<forks.length && !isCashPass; i2++){
+      var t=forks[i2][0];
+      var seg=Math.min(main.length-2, Math.floor(t*(main.length-1)));
+      var lf=(t*(main.length-1))-seg;
+      var fx=main[seg][0]+(main[seg+1][0]-main[seg][0])*lf;
+      var fy=main[seg][1]+(main[seg+1][1]-main[seg][1])*lf;
+      branch(fx,fy, Math.PI+forks[i2][1], S*forks[i2][2], 7.0*(1-t*0.55), 3);
+    }
+    if(!isCashPass) branch(main[main.length-1][0], main[main.length-1][1], Math.PI-0.16, S*0.20, 4.2, 3);
+
+    /* ================= MONEY ON THE TREE ===============================
+       Seven ways a note can hang. Seven of one shape is wallpaper, so each
+       formation has its own geometry: a note is flat, folded, rolled, banded,
+       curled; a coin is round; a card is hard-edged. They hang off the wood
+       pass rather than the leaf pass, so they stay put while the leaves move,
+       which is also what money does on a branch. */
+    function moneyPal(){
+      return { paper:mu(P.notePaper), field:mu(P.noteField), ink:P.noteInk,
+               deep:P.noteDeep, hi:P.noteHi, seal:mu(P.noteSeal),
+               cm:mu(P.coin), cd:P.coinDk, cl:mu(P.coinLt), cr:P.coinRim,
+               ka:P.cardA, kb:P.cardB, kc:P.cardChip, kn:P.cardBand };
+    }
+    var M=moneyPal();
+
+    /* A banknote is not a green rectangle: at any size it reads as LIGHT paper
+       carrying DARK print. Margin, border rule, engraved field, a portrait oval
+       and corner denominations - that grammar is what says "cash", and a flat
+       mid-tone slab says "leaf". */
+    function noteBody(x,y,w2,h2,tilt,curlFn){
+      var ca=Math.cos(tilt), sa=Math.sin(tilt);
+      function P2(i,j,t){ put(G, x+i*ca-j*sa, y+i*sa+j*ca, t); }
+      for(var i=-w2;i<=w2;i++){
+        var top=-h2, bot=h2;
+        if(curlFn){ var cf=curlFn((i+w2)/(2*w2)); top+=cf[0]; bot+=cf[1]; }
+        var mid=(top+bot)/2, hh=Math.max(0.8,(bot-top)/2);
+        for(var j=top;j<=bot;j++){
+          var di=w2-Math.abs(i), dj=hh-Math.abs(j-mid);   /* inset from each edge */
+          var t;
+          if(di<0.75 || dj<0.75)      t=M.paper;          /* the cut white margin */
+          else if(di<1.9 || dj<1.7)   t=M.deep;           /* the printed border   */
+          else if(di<2.7 || dj<2.4)   t=M.paper;
+          else t=(((i+j)%3)? M.field : M.paper);          /* engraved field       */
+          P2(i,j,t);
+        }
+      }
+      var rx=w2*0.30, ry=h2*0.56;
+      if(rx>=1.6 && ry>=1.6){
+        for(var oj=-ry;oj<=ry;oj++) for(var oi=-rx;oi<=rx;oi++){
+          var u=oi/rx, v=oj/ry, d=u*u+v*v; if(d>1) continue;
+          P2(oi,oj, d>0.80? M.ink : (d>0.42? M.field : M.paper));   /* portrait */
+        }
+        for(var hj=-ry*0.52;hj<=ry*0.18;hj++)                        /* the head  */
+          for(var hi=-rx*0.34;hi<=rx*0.34;hi++){
+            var hu=hi/(rx*0.34), hv=(hj+ry*0.17)/(ry*0.40);
+            if(hu*hu+hv*hv>1) continue; P2(hi,hj,M.ink);
+          }
+      }
+      var cx2=w2-2.6, cy2=h2-2.2;                                    /* denominations */
+      if(cx2>1 && cy2>0.6) [[-cx2,-cy2],[cx2,-cy2],[-cx2,cy2],[cx2,cy2]].forEach(function(k){
+        P2(k[0],k[1],M.ink); P2(k[0]+(k[0]<0?1:-1),k[1],M.ink);
+        if(h2>4) P2(k[0],k[1]+(k[1]<0?1:-1),M.ink);
+      });
+      if(w2>6) for(var gy=-h2+3.4;gy<=h2-3.4;gy+=3)                  /* guilloche */
+        for(var gx=-w2+3.6;gx<=w2-3.6;gx+=1)
+          if(Math.abs(gx)>rx+1.2) P2(gx,gy,M.paper);
+      if(w2>7){ P2(w2-4.2,0,M.seal); P2(w2-4.2,1,M.seal); P2(w2-3.6,0,M.seal); }
+    }
+    function mFlat(x,y,sc,r2){ noteBody(x,y+sc*0.95, sc*2.05, sc*1.12, (r2()-0.5)*0.42); }
+    function mFolded(x,y,sc){
+      /* folded over the twig: TWO clean panels meeting at a crease. The organic
+         drape it used to draw read as a hanging rag, not as paper. */
+      noteBody(x-sc*0.60, y+sc*1.35, sc*1.05, sc*1.42,  0.30);
+      noteBody(x+sc*0.66, y+sc*1.15, sc*0.95, sc*1.24, -0.24);
+      for(var s3=0;s3<=sc*2.6;s3++) put(G,x,y+s3,M.deep);            /* the crease */
+    }
+    function mRolled(x,y,sc,r2){
+      var len=sc*3.4, rr=Math.max(1.8,sc*0.72), tilt=(r2()-0.5)*0.55;
+      var ct=Math.cos(tilt), st=Math.sin(tilt);
+      for(var i=0;i<=len;i++) for(var j=-rr;j<=rr;j++){
+        var edge=(Math.abs(j)>rr-0.9);
+        put(G, x+i*ct-j*st, y+i*st+j*ct, edge? M.deep : ((i%5<2)? M.field : M.paper));
+      }
+      for(var a3=0;a3<6.28;a3+=0.26)                                 /* the rolled end */
+        put(G, x+Math.cos(a3)*rr*0.60*ct-Math.sin(a3)*rr*0.60*st,
+               y+Math.cos(a3)*rr*0.60*st+Math.sin(a3)*rr*0.60*ct, M.ink);
+      put(G,x,y,M.deep);
+    }
+    function mBundle(x,y,sc){
+      for(var s4=2;s4>=0;s4--) noteBody(x+s4*1.2, y+s4*1.9, sc*1.85, sc*0.92, 0.02);
+      var bw=sc*0.42;                                                /* the paper band */
+      for(var b4=-sc*1.3;b4<=sc*3.4;b4++) for(var bi=-bw;bi<=bw;bi++)
+        put(G, x-sc*0.30+bi, y+b4, Math.abs(bi)>bw-0.7? M.deep : M.seal);
+    }
+    function mCurled(x,y,sc){
+      noteBody(x,y+sc*0.95, sc*2.10, sc*1.02, 0.03, function(u){
+        var w=Math.sin(u*3.14159*1.25-0.35)*sc*0.30;
+        return [w,w];
+      });
+    }
+    /* A coin is not a gold disc. What identifies one at any size is the RIM: a
+       raised ring inset from the edge, milled reeding around the circumference,
+       and a device struck in the middle. A flat filled circle reads as a berry,
+       which is what these were doing. Two builds - struck face-on, and a short
+       stack seen edge-on, because a stack is unmistakable. */
+    function coinFace(x,y,r){
+      for(var j=-r-1;j<=r+1;j++) for(var i=-r-1;i<=r+1;i++){
+        var d=Math.sqrt(i*i+j*j)/r; if(d>1.0) continue;
+        var lit=(-i-j)/(r*1.42);                       /* light from upper left */
+        var t;
+        if(d>0.90){                                     /* milled edge: the ticks
+              live INSIDE a thin annulus and are found per pixel from the angle.
+              Drawn as a separate ring of stamps they stuck out past the disc and
+              the coin came out looking like a gear. */
+          var ang=Math.atan2(j,i);
+          t = ((Math.floor(ang/0.20)&1)? M.cr : M.cd);
+        }
+        else if(d>0.74) t=(lit>0.05? M.cl : M.cd);     /* the raised rim        */
+        else if(d>0.66) t=M.cr;                        /* the groove inside it  */
+        else            t=(lit>0.36? M.cl : (lit>-0.20? M.cm : M.cd));
+        put(G,x+i,y+j,t);
+      }
+      if(r>=3.2){                                       /* the struck device     */
+        var hr=Math.max(1.2, r*0.26);
+        for(var hj=-hr;hj<=hr*0.5;hj++) for(var hi=-hr;hi<=hr;hi++){
+          var hu=hi/hr, hv=hj/hr; if(hu*hu+hv*hv>1) continue;
+          put(G,x+hi,y+hj-hr*0.25,M.cr);
+        }
+        for(var nj=hr*0.25;nj<=hr*1.15;nj++)
+          for(var ni=-hr*0.66;ni<=hr*0.38;ni++) put(G,x+ni,y+nj,M.cr);
+        put(G, x-hr*0.42, y-hr*0.72, M.cl);
+      }
+    }
+    function coinStack(x,y,r){
+      var n=3, th=Math.max(1.6, r*0.42);
+      for(var k=n-1;k>=0;k--){
+        var oy=y+k*(th+0.9);
+        for(var i=-r;i<=r;i++){                        /* the cylinder wall     */
+          var e=Math.sqrt(Math.max(0,1-(i/r)*(i/r)));
+          for(var j=0;j<=th;j++){
+            var lit=(-i)/(r*1.2);
+            put(G, x+i, oy+j+e*0.9-0.9,
+                (j>=th-0.7)? M.cr : (lit>0.28? M.cl : (lit>-0.30? M.cm : M.cd)));
+          }
+        }
+        for(var i2=-r;i2<=r;i2++){                     /* the milled edge       */
+          if(((i2+k)&1)===0) continue;
+          var e2=Math.sqrt(Math.max(0,1-(i2/r)*(i2/r)));
+          put(G, x+i2, oy+e2*0.9-0.9, M.cr);
+        }
+      }
+      var ty=y-(th*0.55);                              /* the top face, elliptic */
+      for(var tj=-r*0.42;tj<=r*0.42;tj++) for(var ti=-r;ti<=r;ti++){
+        var u=ti/r, v=tj/(r*0.42), d=u*u+v*v; if(d>1) continue;
+        put(G, x+ti, ty+tj, d>0.90? M.cr : (d>0.62? M.cl : ((-u-v)>0.15? M.cl : M.cm)));
+      }
+    }
+    function mCoin(x,y,sc,r2){
+      var r=Math.max(3.0, sc*1.32);
+      if(r2 && r2()<0.42) coinStack(x,y,r*0.92); else coinFace(x,y,r);
+    }
+    function mCard(x,y,sc,r2){                      /* the black card */
+      var w2=sc*1.6, h2=sc*1.02, tilt=(r2()-0.5)*0.42;
+      var ca=Math.cos(tilt), sa=Math.sin(tilt);
+      for(var i=-w2;i<=w2;i++) for(var j=-h2;j<=h2;j++){
+        if((Math.abs(i)>w2-1.2)&&(Math.abs(j)>h2-1.2)) continue;   /* rounded corners */
+        var edge=(Math.abs(i)>=w2-0.6||Math.abs(j)>=h2-0.6);
+        put(G, x+i*ca-j*sa, y+i*sa+j*ca, edge? M.kn : (((i-j)&3)===0? M.kb : M.ka));
+      }
+      for(var ci=-w2*0.62;ci<=-w2*0.18;ci++)        /* the chip */
+        for(var cj=-h2*0.30;cj<=h2*0.22;cj++)
+          put(G, x+ci*ca-cj*sa, y+ci*sa+cj*ca, ((ci+cj)&1)? M.kc : M.cd);
+      for(var ni=-w2*0.55;ni<=w2*0.66;ni+=1)        /* embossed number row */
+        put(G, x+ni*ca-(h2*0.56)*sa, y+ni*sa+(h2*0.56)*ca, M.kn);
+    }
+
+    if(isCashPass){
+      var MR=rngFrom(form==='b'? 907 : 421);
+      var anchors=[];
+      for(var ma=0;ma<7;ma++){                      /* along the main limb */
+        var tm=0.04+ma*0.140+(MR()-0.5)*0.05;
+        var sgm=Math.min(main.length-2, Math.floor(tm*(main.length-1)));
+        var fm=(tm*(main.length-1))-sgm;
+        anchors.push([ main[sgm][0]+(main[sgm+1][0]-main[sgm][0])*fm,
+                       main[sgm][1]+(main[sgm+1][1]-main[sgm][1])*fm, 1.0 ]);
+      }
+      for(var mf=0;mf<forks.length;mf++){           /* and out on the twigs */
+        var tf2=forks[mf][0];
+        var sf2=Math.min(main.length-2, Math.floor(tf2*(main.length-1)));
+        var lf2=(tf2*(main.length-1))-sf2;
+        var bx2=main[sf2][0]+(main[sf2+1][0]-main[sf2][0])*lf2;
+        var by2=main[sf2][1]+(main[sf2+1][1]-main[sf2][1])*lf2;
+        var aa=Math.PI+forks[mf][1], rr2=S*forks[mf][2]*(0.48+MR()*0.34);
+        anchors.push([ bx2+Math.cos(aa)*rr2, by2+Math.sin(aa)*rr2, 0.80 ]);
+      }
+      var lastForm=-1, hung=0;
+      for(var mi=0;mi<anchors.length;mi++){
+        if(MR()<0.30) continue;                     /* gaps, so it is not a row */
+        var ax=anchors[mi][0], ay=anchors[mi][1], asz=anchors[mi][2];
+        var fmr; do { fmr=(MR()*7)|0; } while(fmr===lastForm);
+        lastForm=fmr;
+        var sc=Math.min(W,H)*(0.030+MR()*0.013)*asz;
+        var drop=Math.round(Math.min(W,H)*(0.030+MR()*0.045));
+        if(ax<sc*2.2 || ax>W-sc*2.2 || ay<4 || ay+drop+sc*3.4>H-3) continue;
+        for(var dq=0;dq<drop;dq++){                 /* the thread it hangs on */
+          var jx=ax+Math.round(Math.sin(dq*0.30)*0.6);
+          put(G, jx, ay+dq, tkC);
+          if(sc>4.2) put(G, jx+1, ay+dq, tkB);       /* two ply on the heavy ones */
+        }
+        var my3=ay+drop;
+        if(fmr===0) mFlat(ax,my3,sc,MR);
+        else if(fmr===1) mFolded(ax,my3-drop*0.10,sc);
+        else if(fmr===2) mRolled(ax-sc*1.5,my3+sc*0.6,sc,MR);
+        else if(fmr===3) mBundle(ax,my3+sc*0.8,sc);
+        else if(fmr===4) mCoin(ax,my3+sc,sc,MR);
+        else if(fmr===5) mCurled(ax,my3,sc);
+        else mCard(ax,my3+sc,sc,MR);
+        hung++;
+      }
+    }
+
+    /* leaves growing directly off the main limb. Without these the thick two
+       thirds of the branch is bare wood no matter how dense the twigs are. */
+    if(isLeafPass){
+      var LR=rngFrom(form==='b'? 553 : 241);
+      var count=Math.round(W*0.07);
+      for(var q=0;q<count;q++){
+        var tq=0.06+LR()*0.90;
+        var sg=Math.min(main.length-2, Math.floor(tq*(main.length-1)));
+        var ff=(tq*(main.length-1))-sg;
+        var mx2=main[sg][0]+(main[sg+1][0]-main[sg][0])*ff;
+        var my2=main[sg][1]+(main[sg+1][1]-main[sg][1])*ff;
+        var dxm=main[sg+1][0]-main[sg][0], dym=main[sg+1][1]-main[sg][1];
+        var am=Math.atan2(dym,dxm)+(LR()-0.5)*2.5;
+        var rad=LS*(0.9+LR()*1.5);
+        var swy=Math.sin(ph0+q*0.83);
+        leaf(mx2+Math.cos(am)*rad+swy*3.6, my2+Math.sin(am)*rad+Math.cos(ph0+q*0.6)*2.6,
+             LS*(0.75+LR()*0.5), am+swy*0.5, PAL[(LR()*PAL.length)|0], (LR()*3)|0);
+      }
+    }
+  }
+
+  /* ================= BLOOMS AND DRIFT ======================================= */
+  function petalBloom(G, kind, W, H, rnd){
+    function mu(t){ return mix(t, P.umber, 0.03); }
+    var cx=W/2, cy=H/2, R=Math.min(W,H)*0.42;
+    var SET={
+      'fb-daisy': {p:mu(P.blH), q:mu(P.blD), eye:mu(P.blG), n:8,  form:'round'},
+      'fb-aster': {p:mu(P.blJ), q:mu(P.blA), eye:mu(P.blK), n:12, form:'thin'},
+      'fb-rose':  {p:mu(P.blB), q:mu(P.blI), eye:mu(P.blE), n:0,  form:'spiral'},
+      'fb-bell':  {p:mu(P.blF), q:mu(P.blL), eye:mu(P.blG), n:5,  form:'bell'},
+      'fb-pom':   {p:mu(P.blC), q:mu(P.blD), eye:mu(P.blK), n:0,  form:'pom'}
+    };
+    var S=SET[kind]||SET['fb-daisy'];
+    function petal(a,len,wide,t1,t2){
+      var ca=Math.cos(a), sa=Math.sin(a);
+      for(var d=0;d<=len;d+=0.5){
+        var w=wide*Math.sin((d/len)*3.14159)+0.5;
+        for(var o=-w;o<=w;o+=0.5)
+          put(G, cx+ca*d - sa*o, cy+sa*d + ca*o, (d>len*0.62)? t2 : t1);
+      }
+    }
+    if(S.form==='round'){ for(var i=0;i<S.n;i++) petal(i*(6.2832/S.n)+0.3, R*0.94, R*0.30, S.p, S.q); }
+    else if(S.form==='thin'){ for(var j=0;j<S.n;j++) petal(j*(6.2832/S.n), R*1.0, R*0.15, S.p, S.q); }
+    else if(S.form==='spiral'){
+      for(var k=0;k<5;k++){
+        var rr=R*(1-k*0.17);
+        for(var a2=0;a2<6.2832;a2+=0.22){
+          var x=cx+Math.cos(a2+k*0.7)*rr, y=cy+Math.sin(a2+k*0.7)*rr*0.92;
+          put(G,x,y,(k%2)?S.p:S.q); put(G,x,y+1,S.q);
+        }
+      }
+    } else if(S.form==='bell'){
+      for(var b=0;b<S.n;b++) petal(b*(6.2832/S.n)-1.57, R*0.85, R*0.34, S.p, S.q);
+      for(var yy=0;yy<R*0.7;yy++) put(G,cx,cy+yy,S.eye);
+    } else {
+      for(var ring=0;ring<4;ring++){
+        var rr2=R*(0.28+ring*0.24), n2=6+ring*5;
+        for(var m=0;m<n2;m++){
+          var am=m*(6.2832/n2)+ring*0.4;
+          var px=cx+Math.cos(am)*rr2, py=cy+Math.sin(am)*rr2*0.94;
+          for(var q=-1;q<=1;q++) for(var r3=-1;r3<=1;r3++){
+            if(q*q+r3*r3>2) continue;
+            put(G,px+q,py+r3,(ring%2)?S.p:S.q);
+          }
+        }
+      }
+    }
+    for(var ej=-2;ej<=2;ej++) for(var ei=-2;ei<=2;ei++){
+      if(ei*ei+ej*ej>5) continue;
+      put(G,cx+ei,cy+ej,(ei+ej<0)? mix(S.eye,P.creamLt,0.35) : S.eye);
+    }
+  }
+
+  function driftLeaf(G, kind, W, H, rnd){
+    function mu(t){ return mix(t, P.umber, 0.03); }
+    var TONES=[mu(P.blA),mu(P.blB),mu(P.blC),mu(P.blE),mu(P.blJ),mu(P.blG)];
+    var v=parseInt(kind.split('-')[1],10)||0;
+    var t1=TONES[v%TONES.length], t2=TONES[(v+3)%TONES.length];
+    var cx=W/2, cy=H/2, R=Math.min(W,H)*0.44;
+    if(v===0||v===3){
+      for(var j=-R;j<=R;j++) for(var i=-R*1.4;i<=R*1.4;i++){
+        var u=i/(R*1.4), w=j/R;
+        if(u*u+w*w>1) continue;
+        if(Math.abs(w)>1-Math.abs(u)*0.62) continue;
+        put(G,cx+i,cy+j,(i<0)?t1:t2);
+      }
+      for(var m2=-R*1.2;m2<=R*1.2;m2++) put(G,cx+m2,cy, mix(t1,P.umberDk,0.4));
+    } else if(v===1||v===4){
+      for(var a=0;a<5;a++){
+        var an=-1.57+(a-2)*0.62;
+        for(var d=0;d<=R*1.15;d+=0.5){
+          var wd=R*0.24*Math.sin((d/(R*1.15))*3.14159)+0.6;
+          for(var o=-wd;o<=wd;o+=0.5)
+            put(G, cx+Math.cos(an)*d-Math.sin(an)*o, cy+Math.sin(an)*d+Math.cos(an)*o, (a%2)?t1:t2);
+        }
+      }
+      for(var s2=0;s2<R*0.6;s2++) put(G,cx,cy+s2, mix(t2,P.umberDk,0.35));
+    } else {
+      for(var j2=-R;j2<=R;j2++) for(var i2=-R*1.1;i2<=R*1.1;i2++){
+        var u2=i2/(R*1.1), w2=j2/R;
+        if(u2*u2+w2*w2>1) continue;
+        put(G,cx+i2,cy+j2, ((-u2-w2)>0.2)?t2:t1);
+      }
+    }
+  }
+
+  /* the stitched section seam: a sampler border row */
+  function seamRow(G, kind, W, H, rnd){
+    var ink=P.umberDk, mid=mix(P.umberDk,P.creamLt,0.45), soft=mix(P.umberDk,P.creamLt,0.72),
+        gold=mix(P.wheat,P.umber,0.18), my=Math.floor(H/2);
+    tH(G,0,W-1,my-4,mid); tH(G,0,W-1,my+4,mid);
+    var period=8, amp=2;
+    for(var x=0;x<W;x++){
+      var ph=x%period, up=(ph<period/2)? ph : (period-ph);
+      put(G,x,my-amp+up,ink); put(G,x,my-amp+up+1,ink); put(G,x,my-amp+up+2,mid);
+    }
+    for(var k=2;k<W;k+=period*3){ put(G,k,my-4,gold); put(G,k,my+4,gold); }
+  }
+
   function buildMotif(kind, cols, rows, seed){
     var G=mkGrid(cols,rows), rnd=rngFrom(seed), W=cols, H=rows, cx=W*0.5, cy=H*0.5;
     switch(kind){
@@ -1305,9 +2430,34 @@
       case 'sunflower': case 'bluebell': case 'flax': case 'marigold':
       case 'cornflower': case 'yarrow':
         chapterBloom(G, kind, W, H, rnd); break;
+      case 'bp-a-0': case 'bp-a-1': case 'bp-a-2': case 'bp-a-3': case 'bp-a-4': case 'bp-a-5': case 'bp-a-6':
+      case 'bp-b-0': case 'bp-b-1': case 'bp-b-2': case 'bp-b-3': case 'bp-b-4': case 'bp-b-5': case 'bp-b-6':
+      case 'bp-c-0': case 'bp-c-1': case 'bp-c-2': case 'bp-c-3': case 'bp-c-4': case 'bp-c-5': case 'bp-c-6':
+        perchPose(G, kind, W, H, rnd); break;
+      case 'bd-crow': case 'bd-owl': case 'bd-wren': case 'bd-robin': case 'bd-heron':
+        bird(G, kind, W, H, rnd); break;
+      case 'fw-a-0': case 'fw-a-1': case 'fw-a-2': case 'fw-a-3': case 'fw-a-4': case 'fw-a-5':
+      case 'fw-a-6': case 'fw-a-7': case 'fw-a-8': case 'fw-a-9': case 'fw-a-10': case 'fw-a-11':
+      case 'fw-b-0': case 'fw-b-1': case 'fw-b-2': case 'fw-b-3': case 'fw-b-4': case 'fw-b-5':
+      case 'fw-b-6': case 'fw-b-7': case 'fw-b-8': case 'fw-b-9': case 'fw-b-10': case 'fw-b-11':
+      case 'fw-c-0': case 'fw-c-1': case 'fw-c-2': case 'fw-c-3': case 'fw-c-4': case 'fw-c-5':
+      case 'fw-c-6': case 'fw-c-7': case 'fw-c-8': case 'fw-c-9': case 'fw-c-10': case 'fw-c-11':
+        wingBird(G, kind, W, H, rnd); break;
+      case 'wb-limb-a': case 'wb-limb-b':
+      case 'wb-leaf-a-0': case 'wb-leaf-a-1': case 'wb-leaf-a-2': case 'wb-leaf-a-3':
+      case 'wb-leaf-b-0': case 'wb-leaf-b-1': case 'wb-leaf-b-2': case 'wb-leaf-b-3':
+        wallBranch(G, kind, W, H, rnd); break;
+      case 'fb-daisy': case 'fb-aster': case 'fb-rose': case 'fb-bell': case 'fb-pom':
+        petalBloom(G, kind, W, H, rnd); break;
+      case 'wb-cash-a': case 'wb-cash-b':
+        wallBranch(G, kind, W, H, rnd); break;
+      case 'dl-0': case 'dl-1': case 'dl-2': case 'dl-3': case 'dl-4':
+        driftLeaf(G, kind, W, H, rnd); break;
+      case 'seam-chevron': seamRow(G, kind, W, H, rnd); break;
       default: wheatSheaf(G,cx,cy,H*0.78,rnd);
     }
-    return collect(G, cols, rows, rnd, /^(ui-|launch)/.test(kind));
+    return collect(G, cols, rows, rnd,
+      /^(bp-|bd-|fl-|wb-cash)/.test(kind) ? 'solid' : /^(ui-|launch)/.test(kind));
   }
 
   /* horizontal GARLAND — undulating vine, flowers clustered toward both ends
@@ -1426,7 +2576,11 @@
     var rnd=rngFrom(seed*7+3);
     for(var q=0;q<cells.length;q++){
       var cc=cells[q];
-      cc.jit=(rnd()-0.5)*0.12;
+      /* quantised so identical stitches share a colour key and can be drawn in
+         one path. 1/64 steps on a +-0.06 jitter is a 1.5% lightness increment,
+         below the visible threshold, and it collapses thousands of colour
+         changes into a few dozen. */
+      cc.jit=Math.round((rnd()-0.5)*0.12*64)/64;
       cc.order = opts.kind==='garland' ? (cc.c/cols)*0.9+rnd()*0.1
                : opts.text ? (cc.c/cols)*0.85+rnd()*0.15
                : (rows-cc.r)/rows*0.8+rnd()*0.2;
@@ -1447,7 +2601,41 @@
 
     var buf=document.createElement('canvas'); buf.width=canvas.width; buf.height=canvas.height;
     var bctx=buf.getContext('2d'); bctx.scale(dpr,dpr);
-    function paintBuffer(){ bctx.clearRect(0,0,Wc,Hc); for(var k=0;k<total;k++){ var c=cells[k]; drawStitch(bctx,c.c*cell,c.r*cell,cell,c.tone,1,c.jit); } }
+    /* Batched paint. drawStitch sets strokeStyle and opens a path three times
+       per stitch; at 5k stitches that is 15k state changes and 15k paths for one
+       canvas. Grouping by (tone, jit) issues three per GROUP instead - same
+       geometry, same colours, same result. */
+    function paintBuffer(){
+      bctx.clearRect(0,0,Wc,Hc);
+      var groups={}, order=[];
+      for(var k=0;k<total;k++){
+        var c=cells[k], key=c.tone+'|'+c.jit, g=groups[key];
+        if(!g){ g=groups[key]=[]; order.push(key); }
+        g.push(c);
+      }
+      var i=cell*0.14, w=cell*0.42;
+      bctx.globalAlpha=1; bctx.lineCap='round';
+      for(var gi=0; gi<order.length; gi++){
+        var list=groups[order[gi]], c0=list[0];
+        var base=c0.jit ? (c0.jit>0? lighten(c0.tone,c0.jit) : darken(c0.tone,-c0.jit)) : c0.tone;
+        var n=list.length, m, x, y;
+        bctx.lineWidth=w; bctx.strokeStyle=darken(base,0.26);
+        bctx.beginPath();
+        for(m=0;m<n;m++){ x=list[m].c*cell; y=list[m].r*cell;
+          bctx.moveTo(x+i,y+i); bctx.lineTo(x+cell-i,y+cell-i); }
+        bctx.stroke();
+        bctx.strokeStyle=base;
+        bctx.beginPath();
+        for(m=0;m<n;m++){ x=list[m].c*cell; y=list[m].r*cell;
+          bctx.moveTo(x+cell-i,y+i); bctx.lineTo(x+i,y+cell-i); }
+        bctx.stroke();
+        bctx.lineWidth=w*0.30; bctx.strokeStyle=lighten(base,0.42);
+        bctx.beginPath();
+        for(m=0;m<n;m++){ x=list[m].c*cell; y=list[m].r*cell;
+          bctx.moveTo(x+cell-i*1.3,y+i*1.5); bctx.lineTo(x+i*1.5,y+cell-i*1.3); }
+        bctx.stroke();
+      }
+    }
 
     var sparks=cells.filter(function(c){return c.spark;});
 
