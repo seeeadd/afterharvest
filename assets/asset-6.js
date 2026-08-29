@@ -1933,7 +1933,11 @@
        shadow that stays deep on the other side. Contrast is the effect, not
        lift. `sun` (0..1) is how exposed this particular leaf is, so the canopy
        has light falling across it rather than glowing uniformly. */
-    var SUNW=mix(P.creamLt, P.yolk, 0.42);       /* the colour of the light */
+    /* Sunlight is brighter than the paper, not darker. The first attempt mixed
+       the highlight toward yolk (#E8A100, luminance ~164) - below creamLt's
+       ~238 - so the "sunlit" face came out dimmer than the plain one it
+       replaced. This is a warm WHITE: hotter than cream, still golden. */
+    var SUNW='#FFECB6';
     function leaf(x,y,sz,ang,tone,shp,sun){
       if(x < sz+2 || x > W-sz-2 || y < sz+3 || y > H-sz-3) return;
       var ca=Math.cos(ang), sa=Math.sin(ang);
@@ -1941,10 +1945,10 @@
       var peak=Math.pow(A2/(A2+B2),A2)*Math.pow(B2/(A2+B2),B2);
       var LEN=sz*1.85, WID=sz*0.44/peak;
       var u=(sun===undefined? 0.5 : sun);
-      var lit  = mix(tone, SUNW, 0.30+0.36*u);   /* the face turned to the sun  */
-      var hot  = mix(tone, SUNW, 0.56+0.34*u);   /* where it burns out          */
-      var glow = mix(tone, SUNW, 0.44+0.30*u);   /* light coming through it     */
-      var shd  = darken(tone, 0.24-0.05*u);      /* and the side that does not  */
+      var lit  = mix(tone, SUNW, 0.34+0.26*u);   /* the face turned to the sun  */
+      var hot  = mix(tone, SUNW, 0.54+0.24*u);   /* where it burns out          */
+      var glow = mix(tone, SUNW, 0.48+0.24*u);   /* light coming through it     */
+      var shd  = darken(tone, 0.20-0.07*u);      /* and the side that does not  */
       var rib  = darken(tone, 0.34);
       for(var q=0;q<=LEN;q+=0.5){
         var t=q/LEN;
@@ -1952,14 +1956,14 @@
         if(hw<0.3) continue;
         var bx=x+ca*(q-LEN*0.5), by=y+sa*(q-LEN*0.5);
         for(var w=-hw;w<=hw;w+=0.5){
-          var side=w*(sa*0.60-ca*0.80);          /* light from the upper left */
+          var side=w*(sa*0.60-ca*0.80) + hw*0.22;   /* light from the upper left */
           var edge=Math.abs(w)>hw-0.7;
           var t2;
           if(side>0){                            /* sunward half */
             t2 = edge ? glow                     /* translucent rim           */
-               : (u>0.62 && t>0.30 && t<0.86 && Math.abs(w)<hw*0.55 ? hot : lit);
+               : (u>0.48 && t>0.26 && t<0.88 && Math.abs(w)<hw*0.60 ? hot : lit);
           } else {
-            t2 = edge ? shd : darken(tone, 0.08);
+            t2 = edge ? shd : tone;
           }
           put(G, bx-sa*w, by+ca*w, t2);
         }
@@ -1972,7 +1976,7 @@
     /* How much sun a leaf catches: high and outboard is exposed, low and inside
        the canopy is shaded, plus jitter so it is dappled rather than a gradient. */
     function sunAt(px,py,r){
-      return Math.max(0, Math.min(1, 1.18 - (py/H)*1.30 + (r-0.5)*0.30));
+      return Math.max(0, Math.min(1, 1.34 - (py/H)*1.15 + (r-0.5)*0.26));
     }
 
     var kp=kind.split('-');
