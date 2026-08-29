@@ -381,8 +381,27 @@ hr {
   .pill::after {
     content: ""; position: absolute; inset: 0 0 7px 0; z-index: -1;
     clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
-    background: linear-gradient(180deg, rgba(244,235,214,0.2), rgba(244,235,214,0) 32%), linear-gradient(180deg, transparent calc(56% - 1px), rgba(244,235,214,0.5) 56%, transparent calc(56% + 1px)), linear-gradient(180deg, transparent calc(76% - 1px), rgba(0,0,0,0.38) 76%, transparent calc(76% + 1px));
+    /* The first layer is the travelling glint. It rides on ::after rather than
+       on .pill itself because .pill's own background is painted underneath
+       ::before, whose conic facets would hide it completely. */
+    background:
+      linear-gradient(104deg, transparent 36%, rgba(255,247,227,0.10) 43%,
+                      rgba(255,250,236,0.62) 49%, rgba(255,247,227,0.12) 55%, transparent 63%),
+      linear-gradient(180deg, rgba(244,235,214,0.2), rgba(244,235,214,0) 32%),
+      linear-gradient(180deg, transparent calc(56% - 1px), rgba(244,235,214,0.5) 56%, transparent calc(56% + 1px)),
+      linear-gradient(180deg, transparent calc(76% - 1px), rgba(0,0,0,0.38) 76%, transparent calc(76% + 1px));
+    background-size: 260% 100%, auto, auto, auto;
+    background-repeat: no-repeat, repeat, repeat, repeat;
+    background-position: 190% 0, 0 0, 0 0, 0 0;
+    animation: pillShine 5.2s var(--ease-out, ease) infinite;
   }
+  /* sweeps across, then waits off-frame - a glint, not a strobe */
+  @keyframes pillShine {
+    0%   { background-position: 190% 0, 0 0, 0 0, 0 0; }
+    34%  { background-position: -90% 0, 0 0, 0 0, 0 0; }
+    100% { background-position: -90% 0, 0 0, 0 0, 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce){ .pill::after { animation: none; } }
   .pill b { font-weight: 800; color: var(--yolk); }
   .pill::before, .pill::after { transition: filter 0.28s var(--ease-out, ease), opacity 0.28s var(--ease-out, ease); }
   .pill { transition: transform var(--dur-fast) var(--ease-out), filter 0.28s var(--ease-out), color 0.28s var(--ease-out); }
@@ -1903,8 +1922,8 @@ hr {
   .wb-leaves canvas.on { opacity: 1; }
   /* compound motion: the frames give per-leaf flutter, this gives the whole canopy
      a slow lean, so it reads as wind through a tree rather than a looping sprite */
-  .wb-leaves { animation: wb-wind 7.5s ease-in-out infinite; transform-origin: 88% 40%; }
-  .wallbranch.right .wb-leaves { animation-duration: 9.1s; animation-delay: -2.3s; }
+  .wb-leaves { animation: wb-wind 11.5s ease-in-out infinite; transform-origin: 88% 40%; }
+  .wallbranch.right .wb-leaves { animation-duration: 14s; animation-delay: -3.4s; }
   @keyframes wb-wind { 0%,100%{transform:rotate(-0.7deg) translateX(-2px)}
                         50%{transform:rotate(0.9deg) translateX(3px)} }
   @media (prefers-reduced-motion: reduce){ .wb-leaves { animation: none; } }
@@ -4219,10 +4238,10 @@ hr {
       btick++;
       document.querySelectorAll('.wb-leaves').forEach(function(el){
         var cs=el.children; if(!cs.length) return;
-        var n=Math.floor((btick*(el.__stride||1)+(el.__i||0))/3) % cs.length;
+        var n=Math.floor((btick*(el.__stride||1)+(el.__i||0))/5) % cs.length;
         for(var k=0;k<cs.length;k++) cs[k].classList.toggle('on', k===n);
       });
-    }, 190);
+    }, 320);
 
     /* ---------- the flock ---------- */
     var CAST=[{perch:['bd-wren',56,62],wing:'a',cell:0.78},
