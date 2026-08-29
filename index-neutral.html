@@ -1753,8 +1753,11 @@ hr {
 
   /* labels stamped, not whispered */
   .icp, .vsl-step, .vsl-note, .micro, .foot-meta { font-weight: 700; letter-spacing: 0.075em; }
-  .vsl-step .rule { height: 2px; background: var(--ink); opacity: 0.85; }
-  .vsl-step .step-n { font-size: 15px; font-weight: 700; letter-spacing: 0.06em; color: var(--ink);
+  /* Step 01 was the odd one out: a near-black number on 2px near-black rules,
+     where Steps 02 and 03 both use the gold number on a faint hairline. Same
+     colours across all three now. */
+  .vsl-step .rule { height: 1px; background: var(--ink); opacity: 0.30; }
+  .vsl-step .step-n { font-size: 15px; font-weight: 700; letter-spacing: 0.06em; color: var(--wheat);
     font-variant-numeric: tabular-nums slashed-zero; }
   .ch-time, .ch-n, .cal-day, .foot-meta { font-variant-numeric: tabular-nums slashed-zero; }
 
@@ -1800,7 +1803,7 @@ hr {
   /* the founders credit must not inherit the mono tagline's uppercase */
   .foot-id .tag.founders { text-transform: none; letter-spacing: 0; font-weight: 400;
     font-family: 'Literata', Georgia, serif; font-size: 12.5px; }
-  footer.foot { border-top: 3px solid var(--ink); }
+  footer.foot { border-top: 6px solid var(--ink); }
 
 
   /* ---------- WALL BRANCHES ----------
