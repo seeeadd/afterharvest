@@ -1784,14 +1784,17 @@ hr {
      backdrop to sample. */
   .nav {
     border: none; box-shadow: none; filter: none;
-    background-color: rgba(252,250,246,0.60);
+    /* Neutral glass, not beige. The tint is plain white over whatever is behind
+       it - the warmth of the page comes through the blur on its own, so the bar
+       does not need a beige fill of its own to belong. */
+    background-color: rgba(255,255,255,0.62);
     background-image:
       /* the sheen down the top third, which is what sells glass */
-      linear-gradient(180deg, rgba(255,255,255,0.80) 0%, rgba(255,255,255,0.16) 44%,
-                              rgba(255,255,255,0) 70%),
-      /* and a warm settling at the bottom edge so it does not float grey */
-      linear-gradient(180deg, rgba(160,132,96,0) 74%, rgba(150,122,88,0.11) 100%); }
-  .nav-wrap[data-compact="1"] .nav { background-color: rgba(252,250,246,0.52); }
+      linear-gradient(180deg, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.18) 46%,
+                              rgba(255,255,255,0) 72%),
+      /* a neutral settle at the bottom edge, low chroma so it reads as shade */
+      linear-gradient(180deg, rgba(56,54,50,0) 76%, rgba(56,54,50,0.07) 100%); }
+  .nav-wrap[data-compact="1"] .nav { background-color: rgba(255,255,255,0.55); }
 
   /* the shadow: a blurred copy of the bar's own shape, sitting behind it. It is
      a SIBLING of .nav, not an ancestor, so it cannot create a backdrop root. */
@@ -1799,7 +1802,9 @@ hr {
   .nav-shell::before {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
     border-radius: 13px; clip-path: url(#nav-cut);
-    background: rgba(128,101,68,0.30);
+    /* near-neutral: a fully grey shadow on cream reads as a hole punched in the
+       paper, so this keeps a trace of warmth without being a beige band */
+    background: rgba(64,60,54,0.26);
     filter: blur(11px);
     transform: translateY(6px) scale(0.985);
     transition: transform var(--nav-dur) var(--nav-ease),
@@ -1811,9 +1816,9 @@ hr {
   .nav-shell::after {
     content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
     border-radius: 13px; clip-path: url(#nav-cut);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.72),
-                inset 0 0 0 1px rgba(146,120,86,0.16),
-                inset 0 -1px 0 rgba(146,120,86,0.13); }
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.80),
+                inset 0 0 0 1px rgba(44,41,37,0.13),
+                inset 0 -1px 0 rgba(44,41,37,0.10); }
 
   /* nothing floats on hover — they press */
   .pill:hover, .pf-next:hover, .pf-go:hover, .pf-book:hover, .dock-cta:hover { transform: none; }
