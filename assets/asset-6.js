@@ -56,8 +56,8 @@
     /* money. Held well back from a saturated dollar-green: on a cream ground a
        true banknote green goes fluorescent and drags the whole page toward
        novelty. This is a grey-green that sits with the autumn leaves. */
-    noteA:'#8CA28A', noteB:'#7A9078', noteC:'#A3B79B',
-    noteEdge:'#5C7360', noteInk:'#3C4E42', notePale:'#C2D0B9',
+    notePaper:'#C7D4BB', noteField:'#9DB690', noteInk:'#3B5440',
+    noteDeep:'#233527', noteHi:'#E6ECDD', noteSeal:'#8A5A3C',
     coin:'#C0A03A', coinDk:'#876920', coinLt:'#DEC578', coinRim:'#6B5418',
     cardA:'#26231F', cardB:'#38342F', cardChip:'#C0A03A', cardBand:'#4A453E',
     blA:'#D2691E', blB:'#C0392B', blC:'#E0A32E', blD:'#E8C25A',
@@ -2006,88 +2006,86 @@
        pass rather than the leaf pass, so they stay put while the leaves move,
        which is also what money does on a branch. */
     function moneyPal(){
-      return { a:mu(P.noteA), b:mu(P.noteB), c:mu(P.noteC), e:P.noteEdge,
-               ink:P.noteInk, pale:mu(P.notePale),
+      return { paper:mu(P.notePaper), field:mu(P.noteField), ink:P.noteInk,
+               deep:P.noteDeep, hi:P.noteHi, seal:mu(P.noteSeal),
                cm:mu(P.coin), cd:P.coinDk, cl:mu(P.coinLt), cr:P.coinRim,
                ka:P.cardA, kb:P.cardB, kc:P.cardChip, kn:P.cardBand };
     }
     var M=moneyPal();
 
+    /* A banknote is not a green rectangle: at any size it reads as LIGHT paper
+       carrying DARK print. Margin, border rule, engraved field, a portrait oval
+       and corner denominations - that grammar is what says "cash", and a flat
+       mid-tone slab says "leaf". */
     function noteBody(x,y,w2,h2,tilt,curlFn){
       var ca=Math.cos(tilt), sa=Math.sin(tilt);
+      function P2(i,j,t){ put(G, x+i*ca-j*sa, y+i*sa+j*ca, t); }
       for(var i=-w2;i<=w2;i++){
         var top=-h2, bot=h2;
         if(curlFn){ var cf=curlFn((i+w2)/(2*w2)); top+=cf[0]; bot+=cf[1]; }
+        var mid=(top+bot)/2, hh=Math.max(0.8,(bot-top)/2);
         for(var j=top;j<=bot;j++){
-          var px=x+i*ca-j*sa, py=y+i*sa+j*ca;
-          var edge=(Math.abs(i)>=w2-0.6||j<=top+0.6||j>=bot-0.6);
-          put(G,px,py, edge? M.e : (((i+j)&1)? M.a : M.b));
+          var di=w2-Math.abs(i), dj=hh-Math.abs(j-mid);   /* inset from each edge */
+          var t;
+          if(di<0.75 || dj<0.75)      t=M.paper;          /* the cut white margin */
+          else if(di<1.9 || dj<1.7)   t=M.deep;           /* the printed border   */
+          else if(di<2.7 || dj<2.4)   t=M.paper;
+          else t=(((i+j)%3)? M.field : M.paper);          /* engraved field       */
+          P2(i,j,t);
         }
       }
-      /* the engraved oval + corner numerals, at whatever scale survives */
-      if(w2>=4&&h2>=2){
-        for(var oj=-h2+1.4;oj<=h2-1.4;oj++) for(var oi=-w2*0.42;oi<=w2*0.42;oi++){
-          var u=oi/(w2*0.42), v=oj/Math.max(0.8,h2-1.4);
-          if(u*u+v*v>1) continue;
-          put(G, x+oi*ca-oj*sa, y+oi*sa+oj*ca, (u*u+v*v)>0.58? M.c : M.pale);
+      var rx=w2*0.30, ry=h2*0.56;
+      if(rx>=1.6 && ry>=1.6){
+        for(var oj=-ry;oj<=ry;oj++) for(var oi=-rx;oi<=rx;oi++){
+          var u=oi/rx, v=oj/ry, d=u*u+v*v; if(d>1) continue;
+          P2(oi,oj, d>0.80? M.ink : (d>0.42? M.field : M.paper));   /* portrait */
         }
-        [[-w2+1.6,-h2+1.4],[w2-1.6,-h2+1.4],[-w2+1.6,h2-1.4],[w2-1.6,h2-1.4]].forEach(function(k){
-          put(G, x+k[0]*ca-k[1]*sa, y+k[0]*sa+k[1]*ca, M.ink);
-        });
+        for(var hj=-ry*0.52;hj<=ry*0.18;hj++)                        /* the head  */
+          for(var hi=-rx*0.34;hi<=rx*0.34;hi++){
+            var hu=hi/(rx*0.34), hv=(hj+ry*0.17)/(ry*0.40);
+            if(hu*hu+hv*hv>1) continue; P2(hi,hj,M.ink);
+          }
       }
+      var cx2=w2-2.6, cy2=h2-2.2;                                    /* denominations */
+      if(cx2>1 && cy2>0.6) [[-cx2,-cy2],[cx2,-cy2],[-cx2,cy2],[cx2,cy2]].forEach(function(k){
+        P2(k[0],k[1],M.ink); P2(k[0]+(k[0]<0?1:-1),k[1],M.ink);
+        if(h2>4) P2(k[0],k[1]+(k[1]<0?1:-1),M.ink);
+      });
+      if(w2>6) for(var gy=-h2+3.4;gy<=h2-3.4;gy+=3)                  /* guilloche */
+        for(var gx=-w2+3.6;gx<=w2-3.6;gx+=1)
+          if(Math.abs(gx)>rx+1.2) P2(gx,gy,M.paper);
+      if(w2>7){ P2(w2-4.2,0,M.seal); P2(w2-4.2,1,M.seal); P2(w2-3.6,0,M.seal); }
     }
-    function mFlat(x,y,sc,r2){ noteBody(x,y+sc*0.9, sc*1.55, sc*0.92, (r2()-0.5)*0.5); }
+    function mFlat(x,y,sc,r2){ noteBody(x,y+sc*0.95, sc*2.05, sc*1.12, (r2()-0.5)*0.42); }
     function mFolded(x,y,sc){
-      /* Draped over the twig: the two halves hang to different lengths and the
-         fold pulls the paper in at the top, otherwise it reads as a bucket. */
-      var w2=sc*1.15, h2=sc*2.0;
-      for(var i=-w2;i<=w2;i++){
-        var side=(i<0? 1.0 : 0.84);
-        var pull=Math.pow(Math.abs(i)/w2, 0.55);
-        var top=h2*0.10*(1-pull);
-        var drop=h2*side*(0.42+0.58*pull);
-        for(var j=top;j<=drop;j++){
-          var edge=(j>=drop-0.7||j<=top+0.5||Math.abs(i)>=w2-0.6);
-          put(G,x+i,y+j, edge? M.e : (((i+j)&1)? M.a : M.b));
-        }
-      }
-      for(var s3=0;s3<=h2*0.92;s3++) put(G,x,y+s3,M.ink);        /* the crease */
-      for(var k2=-w2+1.2;k2<=w2-1.2;k2+=2.2) put(G,x+k2,y+h2*0.22,M.pale);
+      /* folded over the twig: TWO clean panels meeting at a crease. The organic
+         drape it used to draw read as a hanging rag, not as paper. */
+      noteBody(x-sc*0.60, y+sc*1.35, sc*1.05, sc*1.42,  0.30);
+      noteBody(x+sc*0.66, y+sc*1.15, sc*0.95, sc*1.24, -0.24);
+      for(var s3=0;s3<=sc*2.6;s3++) put(G,x,y+s3,M.deep);            /* the crease */
     }
-    function mRolled(x,y,sc,r2){                    /* a tube, seen end on */
-      var len=sc*3.0, rr=Math.max(1.6,sc*0.62), tilt=(r2()-0.5)*0.7;
+    function mRolled(x,y,sc,r2){
+      var len=sc*3.4, rr=Math.max(1.8,sc*0.72), tilt=(r2()-0.5)*0.55;
       var ct=Math.cos(tilt), st=Math.sin(tilt);
       for(var i=0;i<=len;i++) for(var j=-rr;j<=rr;j++){
-        var t2=(Math.abs(j)>rr-0.9)? M.e : ((i%4<2)? M.a : M.b);
-        put(G, x+i*ct-j*st, y+i*st+j*ct, t2);
+        var edge=(Math.abs(j)>rr-0.9);
+        put(G, x+i*ct-j*st, y+i*st+j*ct, edge? M.deep : ((i%5<2)? M.field : M.paper));
       }
-      for(var a3=0;a3<6.28;a3+=0.30){               /* the spiral end */
-        put(G, x+Math.cos(a3)*rr*0.55*ct-Math.sin(a3)*rr*0.55*st,
-               y+Math.cos(a3)*rr*0.55*st+Math.sin(a3)*rr*0.55*ct, M.pale);
-      }
-      put(G,x,y,M.ink);
+      for(var a3=0;a3<6.28;a3+=0.26)                                 /* the rolled end */
+        put(G, x+Math.cos(a3)*rr*0.60*ct-Math.sin(a3)*rr*0.60*st,
+               y+Math.cos(a3)*rr*0.60*st+Math.sin(a3)*rr*0.60*ct, M.ink);
+      put(G,x,y,M.deep);
     }
-    function mBundle(x,y,sc){                       /* a banded stack */
-      var w2=sc*1.45, h2=sc*0.72;
-      for(var s4=2;s4>=0;s4--){
-        var oy2=y+s4*1.8, ox2=x+s4*1.1;
-        for(var j=-h2;j<=h2;j++) for(var i=-w2;i<=w2;i++){
-          var edge=(Math.abs(i)>=w2-0.6||Math.abs(j)>=h2-0.6);
-          put(G, ox2+i, oy2+j, edge? M.e : (s4===0? M.b : M.a));
-        }
-      }
-      for(var b4=-h2-1;b4<=h2+4.5;b4++){            /* the paper band */
-        put(G, x-w2*0.20, y+b4, M.ink);
-        put(G, x-w2*0.20+1, y+b4, M.c);
-      }
+    function mBundle(x,y,sc){
+      for(var s4=2;s4>=0;s4--) noteBody(x+s4*1.2, y+s4*1.9, sc*1.85, sc*0.92, 0.02);
+      var bw=sc*0.42;                                                /* the paper band */
+      for(var b4=-sc*1.3;b4<=sc*3.4;b4++) for(var bi=-bw;bi<=bw;bi++)
+        put(G, x-sc*0.30+bi, y+b4, Math.abs(bi)>bw-0.7? M.deep : M.seal);
     }
     function mCurled(x,y,sc){
-      /* A WAVE, not a pinch. Moving the top edge down while the bottom edge
-         moves up narrows the middle and the note comes out a bowtie; both edges
-         have to travel the same direction for the paper to read as curling. */
-      noteBody(x,y+sc*0.9, sc*1.6, sc*0.80, 0.04, function(u){
-        var w=Math.sin(u*3.14159*1.35-0.4)*sc*0.62;
-        return [w, w];
+      noteBody(x,y+sc*0.95, sc*2.10, sc*1.02, 0.03, function(u){
+        var w=Math.sin(u*3.14159*1.25-0.35)*sc*0.30;
+        return [w,w];
       });
     }
     function mCoin(x,y,sc){
@@ -2140,7 +2138,7 @@
         var ax=anchors[mi][0], ay=anchors[mi][1], asz=anchors[mi][2];
         var fmr; do { fmr=(MR()*7)|0; } while(fmr===lastForm);
         lastForm=fmr;
-        var sc=Math.min(W,H)*(0.026+MR()*0.013)*asz;
+        var sc=Math.min(W,H)*(0.030+MR()*0.013)*asz;
         var drop=Math.round(Math.min(W,H)*(0.030+MR()*0.045));
         if(ax<sc*2.2 || ax>W-sc*2.2 || ay<4 || ay+drop+sc*3.4>H-3) continue;
         for(var dq=0;dq<drop;dq++){                 /* the thread it hangs on */
@@ -2378,7 +2376,7 @@
       default: wheatSheaf(G,cx,cy,H*0.78,rnd);
     }
     return collect(G, cols, rows, rnd,
-      /^(bp-|bd-|fl-)/.test(kind) ? 'solid' : /^(ui-|launch)/.test(kind));
+      /^(bp-|bd-|fl-|wb-cash)/.test(kind) ? 'solid' : /^(ui-|launch)/.test(kind));
   }
 
   /* horizontal GARLAND — undulating vine, flowers clustered toward both ends

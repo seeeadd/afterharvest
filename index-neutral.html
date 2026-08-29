@@ -4098,16 +4098,28 @@ hr {
     var EMOTES=['spin','bow','flutter','tilt','puff','sing','startle','nod','wobble','jump'];
 
     function obstacles(){
-      var out=[], PAD=16;
-      'h1.headline,.hero .sub,.icp,.cats,.plan-head h2,.plan-head p'.split(',').forEach(function(sel){
-        document.querySelectorAll(sel).forEach(function(el){
-          var r=el.getBoundingClientRect(); if(r.bottom<-260||r.top>innerHeight+260) return;
-          var rng=document.createRange(); rng.selectNodeContents(el);
-          var list=rng.getClientRects();
-          for(var i=0;i<list.length;i++){ var x=list[i]; if(x.width<4) continue;
-            out.push({l:x.left,t:x.top+scrollY,r:x.right,b:x.bottom+scrollY}); }
-        });
-      });
+      var out=[], PAD=16, TPAD=13;
+      /* Every line of text on the page, found by walking TEXT NODES rather than
+         by naming selectors. The old version listed six selectors, so any heading
+         that was not on the list was fair game and birds landed on it. A text
+         node's own client rects are the exact line boxes, so this covers copy
+         that does not exist yet. */
+      var tw=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), tn;
+      while((tn=tw.nextNode())){
+        if(!tn.nodeValue || !tn.nodeValue.trim()) continue;
+        var pe=tn.parentElement; if(!pe) continue;
+        if(pe.closest('.flock,.drift,.wallbranch,script,style')) continue;
+        var cs=getComputedStyle(pe);
+        if(cs.display==='none'||cs.visibility==='hidden'||parseFloat(cs.opacity)===0) continue;
+        var rng=document.createRange(); rng.selectNodeContents(tn);
+        var list=rng.getClientRects();
+        for(var i=0;i<list.length;i++){
+          var x=list[i];
+          if(x.width<6||x.height<4) continue;
+          if(x.bottom<-260||x.top>innerHeight+260) continue;
+          out.push({l:x.left-TPAD,t:x.top+scrollY-TPAD,r:x.right+TPAD,b:x.bottom+scrollY+TPAD});
+        }
+      }
       /* NB: never list a full-bleed container (.flock, .drift, .wallbranch) — an
          inset:0 layer makes every position illegal and all birds fall back to
          their seed coordinates in a neat row. */
