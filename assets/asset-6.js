@@ -53,6 +53,13 @@
     leafA:'#7C8A5E',  leafB:'#93A071',   leafC:'#5F6E46',  leafD:'#A9B489',
     /* ACTUAL autumn — scarlet, orange, gold, crimson. Browns are supporting only;
        an all-brown set reads as late winter, not October. */
+    /* money. Held well back from a saturated dollar-green: on a cream ground a
+       true banknote green goes fluorescent and drags the whole page toward
+       novelty. This is a grey-green that sits with the autumn leaves. */
+    noteA:'#8CA28A', noteB:'#7A9078', noteC:'#A3B79B',
+    noteEdge:'#5C7360', noteInk:'#3C4E42', notePale:'#C2D0B9',
+    coin:'#C0A03A', coinDk:'#876920', coinLt:'#DEC578', coinRim:'#6B5418',
+    cardA:'#26231F', cardB:'#38342F', cardChip:'#C0A03A', cardBand:'#4A453E',
     blA:'#D2691E', blB:'#C0392B', blC:'#E0A32E', blD:'#E8C25A',
     blE:'#8E2F28', blF:'#E07B39', blG:'#A85428', blH:'#F0D479',
     blI:'#B8452F', blJ:'#D98324', blK:'#96401F', blL:'#EDA94C'
@@ -1987,6 +1994,167 @@
       branch(fx,fy, Math.PI+forks[i2][1], S*forks[i2][2], 7.0*(1-t*0.55), 3);
     }
     branch(main[main.length-1][0], main[main.length-1][1], Math.PI-0.16, S*0.20, 4.2, 3);
+
+    /* ================= MONEY ON THE TREE ===============================
+       Seven ways a note can hang. Seven of one shape is wallpaper, so each
+       formation has its own geometry: a note is flat, folded, rolled, banded,
+       curled; a coin is round; a card is hard-edged. They hang off the wood
+       pass rather than the leaf pass, so they stay put while the leaves move,
+       which is also what money does on a branch. */
+    function moneyPal(){
+      return { a:mu(P.noteA), b:mu(P.noteB), c:mu(P.noteC), e:P.noteEdge,
+               ink:P.noteInk, pale:mu(P.notePale),
+               cm:mu(P.coin), cd:P.coinDk, cl:mu(P.coinLt), cr:P.coinRim,
+               ka:P.cardA, kb:P.cardB, kc:P.cardChip, kn:P.cardBand };
+    }
+    var M=moneyPal();
+
+    function noteBody(x,y,w2,h2,tilt,curlFn){
+      var ca=Math.cos(tilt), sa=Math.sin(tilt);
+      for(var i=-w2;i<=w2;i++){
+        var top=-h2, bot=h2;
+        if(curlFn){ var cf=curlFn((i+w2)/(2*w2)); top+=cf[0]; bot+=cf[1]; }
+        for(var j=top;j<=bot;j++){
+          var px=x+i*ca-j*sa, py=y+i*sa+j*ca;
+          var edge=(Math.abs(i)>=w2-0.6||j<=top+0.6||j>=bot-0.6);
+          put(G,px,py, edge? M.e : (((i+j)&1)? M.a : M.b));
+        }
+      }
+      /* the engraved oval + corner numerals, at whatever scale survives */
+      if(w2>=4&&h2>=2){
+        for(var oj=-h2+1.4;oj<=h2-1.4;oj++) for(var oi=-w2*0.42;oi<=w2*0.42;oi++){
+          var u=oi/(w2*0.42), v=oj/Math.max(0.8,h2-1.4);
+          if(u*u+v*v>1) continue;
+          put(G, x+oi*ca-oj*sa, y+oi*sa+oj*ca, (u*u+v*v)>0.58? M.c : M.pale);
+        }
+        [[-w2+1.6,-h2+1.4],[w2-1.6,-h2+1.4],[-w2+1.6,h2-1.4],[w2-1.6,h2-1.4]].forEach(function(k){
+          put(G, x+k[0]*ca-k[1]*sa, y+k[0]*sa+k[1]*ca, M.ink);
+        });
+      }
+    }
+    function mFlat(x,y,sc,r2){ noteBody(x,y+sc*0.9, sc*1.55, sc*0.92, (r2()-0.5)*0.5); }
+    function mFolded(x,y,sc){
+      /* Draped over the twig: the two halves hang to different lengths and the
+         fold pulls the paper in at the top, otherwise it reads as a bucket. */
+      var w2=sc*1.15, h2=sc*2.0;
+      for(var i=-w2;i<=w2;i++){
+        var side=(i<0? 1.0 : 0.84);
+        var pull=Math.pow(Math.abs(i)/w2, 0.55);
+        var top=h2*0.10*(1-pull);
+        var drop=h2*side*(0.42+0.58*pull);
+        for(var j=top;j<=drop;j++){
+          var edge=(j>=drop-0.7||j<=top+0.5||Math.abs(i)>=w2-0.6);
+          put(G,x+i,y+j, edge? M.e : (((i+j)&1)? M.a : M.b));
+        }
+      }
+      for(var s3=0;s3<=h2*0.92;s3++) put(G,x,y+s3,M.ink);        /* the crease */
+      for(var k2=-w2+1.2;k2<=w2-1.2;k2+=2.2) put(G,x+k2,y+h2*0.22,M.pale);
+    }
+    function mRolled(x,y,sc,r2){                    /* a tube, seen end on */
+      var len=sc*3.0, rr=Math.max(1.6,sc*0.62), tilt=(r2()-0.5)*0.7;
+      var ct=Math.cos(tilt), st=Math.sin(tilt);
+      for(var i=0;i<=len;i++) for(var j=-rr;j<=rr;j++){
+        var t2=(Math.abs(j)>rr-0.9)? M.e : ((i%4<2)? M.a : M.b);
+        put(G, x+i*ct-j*st, y+i*st+j*ct, t2);
+      }
+      for(var a3=0;a3<6.28;a3+=0.30){               /* the spiral end */
+        put(G, x+Math.cos(a3)*rr*0.55*ct-Math.sin(a3)*rr*0.55*st,
+               y+Math.cos(a3)*rr*0.55*st+Math.sin(a3)*rr*0.55*ct, M.pale);
+      }
+      put(G,x,y,M.ink);
+    }
+    function mBundle(x,y,sc){                       /* a banded stack */
+      var w2=sc*1.45, h2=sc*0.72;
+      for(var s4=2;s4>=0;s4--){
+        var oy2=y+s4*1.8, ox2=x+s4*1.1;
+        for(var j=-h2;j<=h2;j++) for(var i=-w2;i<=w2;i++){
+          var edge=(Math.abs(i)>=w2-0.6||Math.abs(j)>=h2-0.6);
+          put(G, ox2+i, oy2+j, edge? M.e : (s4===0? M.b : M.a));
+        }
+      }
+      for(var b4=-h2-1;b4<=h2+4.5;b4++){            /* the paper band */
+        put(G, x-w2*0.20, y+b4, M.ink);
+        put(G, x-w2*0.20+1, y+b4, M.c);
+      }
+    }
+    function mCurled(x,y,sc){
+      /* A WAVE, not a pinch. Moving the top edge down while the bottom edge
+         moves up narrows the middle and the note comes out a bowtie; both edges
+         have to travel the same direction for the paper to read as curling. */
+      noteBody(x,y+sc*0.9, sc*1.6, sc*0.80, 0.04, function(u){
+        var w=Math.sin(u*3.14159*1.35-0.4)*sc*0.62;
+        return [w, w];
+      });
+    }
+    function mCoin(x,y,sc){
+      var r3=Math.max(2.0, sc*0.95);
+      for(var j=-r3-1;j<=r3+1;j++) for(var i=-r3-1;i<=r3+1;i++){
+        var d3=(i*i+j*j)/(r3*r3); if(d3>1.16) continue;
+        put(G,x+i,y+j, d3>0.88? M.cr : (d3>0.60? M.cd : ((-i-j)>r3*0.45? M.cl : M.cm)));
+      }
+      put(G,x-Math.round(r3*0.34),y-Math.round(r3*0.34),M.cl);
+      for(var t5=0;t5<9;t5++){ var a5=t5*0.698;    /* milled rim */
+        put(G,x+Math.cos(a5)*r3*1.03,y+Math.sin(a5)*r3*1.03,M.cr); }
+    }
+    function mCard(x,y,sc,r2){                      /* the black card */
+      var w2=sc*1.6, h2=sc*1.02, tilt=(r2()-0.5)*0.42;
+      var ca=Math.cos(tilt), sa=Math.sin(tilt);
+      for(var i=-w2;i<=w2;i++) for(var j=-h2;j<=h2;j++){
+        if((Math.abs(i)>w2-1.2)&&(Math.abs(j)>h2-1.2)) continue;   /* rounded corners */
+        var edge=(Math.abs(i)>=w2-0.6||Math.abs(j)>=h2-0.6);
+        put(G, x+i*ca-j*sa, y+i*sa+j*ca, edge? M.kn : (((i-j)&3)===0? M.kb : M.ka));
+      }
+      for(var ci=-w2*0.62;ci<=-w2*0.18;ci++)        /* the chip */
+        for(var cj=-h2*0.30;cj<=h2*0.22;cj++)
+          put(G, x+ci*ca-cj*sa, y+ci*sa+cj*ca, ((ci+cj)&1)? M.kc : M.cd);
+      for(var ni=-w2*0.55;ni<=w2*0.66;ni+=1)        /* embossed number row */
+        put(G, x+ni*ca-(h2*0.56)*sa, y+ni*sa+(h2*0.56)*ca, M.kn);
+    }
+
+    if(!isLeafPass){
+      var MR=rngFrom(form==='b'? 907 : 421);
+      var anchors=[];
+      for(var ma=0;ma<7;ma++){                      /* along the main limb */
+        var tm=0.04+ma*0.140+(MR()-0.5)*0.05;
+        var sgm=Math.min(main.length-2, Math.floor(tm*(main.length-1)));
+        var fm=(tm*(main.length-1))-sgm;
+        anchors.push([ main[sgm][0]+(main[sgm+1][0]-main[sgm][0])*fm,
+                       main[sgm][1]+(main[sgm+1][1]-main[sgm][1])*fm, 1.0 ]);
+      }
+      for(var mf=0;mf<forks.length;mf++){           /* and out on the twigs */
+        var tf2=forks[mf][0];
+        var sf2=Math.min(main.length-2, Math.floor(tf2*(main.length-1)));
+        var lf2=(tf2*(main.length-1))-sf2;
+        var bx2=main[sf2][0]+(main[sf2+1][0]-main[sf2][0])*lf2;
+        var by2=main[sf2][1]+(main[sf2+1][1]-main[sf2][1])*lf2;
+        var aa=Math.PI+forks[mf][1], rr2=S*forks[mf][2]*(0.48+MR()*0.34);
+        anchors.push([ bx2+Math.cos(aa)*rr2, by2+Math.sin(aa)*rr2, 0.80 ]);
+      }
+      var lastForm=-1, hung=0;
+      for(var mi=0;mi<anchors.length;mi++){
+        if(MR()<0.30) continue;                     /* gaps, so it is not a row */
+        var ax=anchors[mi][0], ay=anchors[mi][1], asz=anchors[mi][2];
+        var fmr; do { fmr=(MR()*7)|0; } while(fmr===lastForm);
+        lastForm=fmr;
+        var sc=Math.min(W,H)*(0.026+MR()*0.013)*asz;
+        var drop=Math.round(Math.min(W,H)*(0.030+MR()*0.045));
+        if(ax<sc*2.2 || ax>W-sc*2.2 || ay<4 || ay+drop+sc*3.4>H-3) continue;
+        for(var dq=0;dq<drop;dq++){                 /* the thread it hangs on */
+          var jx=ax+Math.round(Math.sin(dq*0.30)*0.6);
+          put(G, jx, ay+dq, tkC);
+          if(sc>4.2) put(G, jx+1, ay+dq, tkB);       /* two ply on the heavy ones */
+        }
+        var my3=ay+drop;
+        if(fmr===0) mFlat(ax,my3,sc,MR);
+        else if(fmr===1) mFolded(ax,my3-drop*0.10,sc);
+        else if(fmr===2) mRolled(ax-sc*1.5,my3+sc*0.6,sc,MR);
+        else if(fmr===3) mBundle(ax,my3+sc*0.8,sc);
+        else if(fmr===4) mCoin(ax,my3+sc,sc);
+        else if(fmr===5) mCurled(ax,my3,sc);
+        else mCard(ax,my3+sc,sc,MR);
+        hung++;
+      }
+    }
 
     /* leaves growing directly off the main limb. Without these the thick two
        thirds of the branch is bare wood no matter how dense the twigs are. */
