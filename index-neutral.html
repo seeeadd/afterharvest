@@ -2012,9 +2012,9 @@ hr {
      was parked fully visible in the top-left corner of the page. */
   .drift .leaf { position: absolute; left: 0; top: 0; opacity: 0;
     will-change: transform, opacity; }
-  /* size the sprite here rather than through the mount cell, which does not map
-     1:1 to CSS pixels - asking for 1.42 produced a 43px leaf, nearly a coin */
-  .drift .leaf canvas { display: block; width: 27px; height: 27px; }
+  /* NB: size comes from the mount cell below, not from here - mount() writes an
+     inline width/height, which beats any stylesheet rule */
+  .drift .leaf canvas { display: block; }
   .wb-bloom { position: absolute; z-index: 3; pointer-events: none;
     transform-origin: 50% 60%; opacity: 0; will-change: transform, opacity; }
   .wb-bloom canvas { display: block; }
@@ -4380,7 +4380,7 @@ hr {
           var L={el:el, anim:null, t:0};
           queue.push(function(){
             AHStitch.mount(c,{kind:DRIFT_SHAPES[idx%DRIFT_SHAPES.length],
-              cols:22, rows:22, cell:1.42, seed:31+idx*7, twinkle:false, animate:false});
+              cols:22, rows:22, cell:1.10, seed:31+idx*7, twinkle:false, animate:false});
           });
           leaves.push(L); sched(L);
         })(di);
