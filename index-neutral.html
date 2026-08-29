@@ -1864,8 +1864,11 @@ hr {
      nothing well before it gets there — which is how it can be this size without
      ever competing with the copy. Shrinking it to dodge the text was the wrong
      trade; the mask does that job. */
+  /* overflow:hidden is a guarantee, not a nicety. The canvas is a child sized in
+     stitches; if it ever computes larger than this box it used to spill straight
+     across the hero copy. Now the box is the hard limit whatever happens. */
   .wallbranch { position: absolute; top: -132px; width: 620px; height: 540px;
-    z-index: 2; pointer-events: none; }
+    z-index: 2; pointer-events: none; overflow: hidden; }
   .wallbranch.left  { left: -132px; transform: scaleX(-1); opacity: 0.95; }
   .wallbranch.right { right: -132px; opacity: 0.92; }
   /* THE MASK MUST NOT EAT THE FOLIAGE.
@@ -4164,24 +4167,26 @@ hr {
 
     /* ---------- wall branches ---------- */
     var FRB=4;
-    /* The canvas is sized from cols x cell, NOT from the CSS box, so a branch
-       displayed at 232px was still rasterising 1134px of stitches and throwing
-       most of it away. Scale the cell to the box the branch is actually drawn
-       in. Phones also get one wind frame instead of four. */
-    function wbScale(){
-      var w=innerWidth;
-      return w<=430? 0.375 : (w<=760? 0.485 : (w<=1040? 0.677 : (w<=1240? 0.839 : 1)));
+    /* Size the canvas from the box it is ACTUALLY in, measured. The previous
+       version kept a breakpoint table in JS mirroring the one in CSS, and the
+       two disagreed - CSS applied the <=430 box while JS picked the <=760 cell,
+       so the canvas came out wider than its container and the ink spilled across
+       the hero. One source of truth: whatever the element measures. */
+    function wbCell(el, cols){
+      var host=el.closest ? el.closest('.wallbranch') : el.parentElement;
+      var w=(host||el).getBoundingClientRect().width;
+      return w>4 ? w/cols : 0;
     }
     function wbFrames(){ return innerWidth<=760 ? 1 : FRB; }
     function branches(){
-      var SC=wbScale();
       document.querySelectorAll('.wb-limb, .wb-cash').forEach(function(el){
         if(el.dataset.built) return; el.dataset.built='1';
         queue.push(function(){
           if(getComputedStyle(el.parentElement).display==='none') return;
           var c=document.createElement('canvas'); el.appendChild(c);
+          var cl=wbCell(el, +el.dataset.cols); if(!cl) return;
           AHStitch.mount(c,{kind:el.dataset.kind,cols:+el.dataset.cols,rows:+el.dataset.rows,
-            cell:parseFloat(el.dataset.cell)*SC,seed:+el.dataset.seed,twinkle:false,animate:false});
+            cell:cl,seed:+el.dataset.seed,twinkle:false,animate:false});
         });
       });
       document.querySelectorAll('.wb-leaves').forEach(function(el,i){
@@ -4200,8 +4205,9 @@ hr {
             if(fr===0) cv.className='on';
             el.appendChild(cv);
             if(getComputedStyle(el.parentElement).display==='none') return;
+            var cl2=wbCell(el,210); if(!cl2) return;
             AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:210,rows:176,
-              cell:cell*SC,seed:3,twinkle:false,animate:false});
+              cell:cl2,seed:3,twinkle:false,animate:false});
           });
         })(fr);
       });
