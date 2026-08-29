@@ -305,9 +305,9 @@ hr {
     /* the blur is held at one value across both states on purpose: animating a
        backdrop-filter forces a full re-raster of everything behind the bar on
        every frame, which is what made the compression stutter. */
-    -webkit-backdrop-filter: none; backdrop-filter: none;
+    -webkit-backdrop-filter: blur(20px) saturate(168%);
+    backdrop-filter: blur(20px) saturate(168%);
     border: 1px solid var(--hairline);
-    filter: drop-shadow(0 8px 20px rgba(38,33,25,0.11)) drop-shadow(0 2px 5px rgba(38,33,25,0.06));
   }
   .nav .brand { display: flex; align-items: center; }
   .nav .wm { height: 26px; display: block; width: auto; }
@@ -1772,19 +1772,48 @@ hr {
      drop-shadow declared on .nav is generated and then clipped away by that same
      path. The same clip also eats any border. Warm beige-brown rather than grey:
      a grey shadow on cream reads as a hole punched in the paper. */
-  .nav { background-color: rgba(253,252,249,0.97); border: none; box-shadow: none; filter: none; }
-  .nav-shell {
-    filter:
-      drop-shadow(0 1px 0 rgba(122,96,64,0.13))
-      drop-shadow(0 3px 6px rgba(122,96,64,0.09))
-      drop-shadow(0 11px 20px rgba(138,110,76,0.08))
-      drop-shadow(0 22px 38px rgba(150,122,88,0.06));
-    transition: filter var(--nav-dur) var(--nav-ease); }
-  .nav-wrap[data-compact="1"] .nav-shell {
-    filter:
-      drop-shadow(0 1px 0 rgba(122,96,64,0.11))
-      drop-shadow(0 2px 4px rgba(122,96,64,0.07))
-      drop-shadow(0 8px 15px rgba(138,110,76,0.06)); }
+  /* ---- GLASS ---------------------------------------------------------------
+     The bar was rgba(...,0.7) with backdrop-filter:none - plain transparency,
+     no blur, which is why it read as thin rather than as glass.
+
+     The blur could not simply be switched on. An ancestor carrying a `filter`
+     creates a BACKDROP ROOT, and a backdrop-filter inside one samples only that
+     root's own content, so it blurs nothing. .nav-shell carried the bar's
+     drop-shadow, which is exactly that situation. The shadow is now a blurred
+     sibling shape rather than a filter on the ancestor, so .nav has a real
+     backdrop to sample. */
+  .nav {
+    border: none; box-shadow: none; filter: none;
+    background-color: rgba(252,250,246,0.60);
+    background-image:
+      /* the sheen down the top third, which is what sells glass */
+      linear-gradient(180deg, rgba(255,255,255,0.80) 0%, rgba(255,255,255,0.16) 44%,
+                              rgba(255,255,255,0) 70%),
+      /* and a warm settling at the bottom edge so it does not float grey */
+      linear-gradient(180deg, rgba(160,132,96,0) 74%, rgba(150,122,88,0.11) 100%); }
+  .nav-wrap[data-compact="1"] .nav { background-color: rgba(252,250,246,0.52); }
+
+  /* the shadow: a blurred copy of the bar's own shape, sitting behind it. It is
+     a SIBLING of .nav, not an ancestor, so it cannot create a backdrop root. */
+  .nav-shell { filter: none; }
+  .nav-shell::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    border-radius: 13px; clip-path: url(#nav-cut);
+    background: rgba(128,101,68,0.30);
+    filter: blur(11px);
+    transform: translateY(6px) scale(0.985);
+    transition: transform var(--nav-dur) var(--nav-ease),
+                opacity var(--nav-dur) var(--nav-ease); }
+  .nav-wrap[data-compact="1"] .nav-shell::before {
+    transform: translateY(4px) scale(0.99); opacity: 0.78; }
+  /* the hairline edge, drawn as a ring rather than a border - the clip-path on
+     .nav eats a real border */
+  .nav-shell::after {
+    content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    border-radius: 13px; clip-path: url(#nav-cut);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.72),
+                inset 0 0 0 1px rgba(146,120,86,0.16),
+                inset 0 -1px 0 rgba(146,120,86,0.13); }
 
   /* nothing floats on hover — they press */
   .pill:hover, .pf-next:hover, .pf-go:hover, .pf-book:hover, .dock-cta:hover { transform: none; }
@@ -4052,6 +4081,37 @@ hr {
 
     /* ---------- chunked build queue ---------- */
     var queue=[], pumping=false;
+
+    /* Work that is not on screen yet does not need to run during load. Anything
+       queued through defer() waits until its element is within a viewport of
+       being seen, which takes the below-the-fold canvases out of the critical
+       path entirely. Without IntersectionObserver it simply queues as before. */
+    var _io = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(!en.isIntersecting) return;
+        _io.unobserve(en.target);
+        var jobs=en.target.__ahJobs; if(!jobs) return;
+        en.target.__ahJobs=null;
+        for(var i=0;i<jobs.length;i++) queue.push(jobs[i]);
+        pump();
+      });
+    }, {rootMargin:'900px 0px'}) : null;
+    /* On screen, but not needed on the first frame - let the page settle first. */
+    function later(job){
+      /* requestIdleCallback does NOT fire in a hidden tab - not even with its
+         timeout - so a page opened in a background tab would never build these
+         at all. setTimeout still fires (throttled), so it is the guarantee and
+         idle time is only allowed to win the race earlier. */
+      var done=false;
+      var run=function(){ if(done) return; done=true; queue.push(job); pump(); };
+      if(window.requestIdleCallback) requestIdleCallback(run, {timeout:1800});
+      setTimeout(run, 1100);
+    }
+    function defer(el, job){
+      if(!_io || !el){ queue.push(job); return; }
+      if(!el.__ahJobs){ el.__ahJobs=[]; _io.observe(el); }
+      el.__ahJobs.push(job);
+    }
     function next(cb){ if(document.hidden) setTimeout(cb,8); else requestAnimationFrame(cb); }
     function pump(){
       if(pumping) return; pumping=true;
@@ -4070,8 +4130,11 @@ hr {
         var n=Math.ceil((window.innerWidth/cell)/8)*8+8;
         if(el.__cols===n) return; el.__cols=n; el.innerHTML='';
         var c=document.createElement('canvas'); el.appendChild(c);
-        AHStitch.mount(c,{kind:el.dataset.kind||'seam-chevron',cols:n,rows:+el.dataset.rows||11,
-          cell:cell,seed:7,twinkle:false,animate:false});
+        /* every seam is below the fold - none of them belong in the initial load */
+        defer(el, function(){
+          AHStitch.mount(c,{kind:el.dataset.kind||'seam-chevron',cols:n,rows:+el.dataset.rows||11,
+            cell:cell,seed:7,twinkle:false,animate:false});
+        });
       });
     }
 
@@ -4092,7 +4155,11 @@ hr {
         var cell=parseFloat(el.parentElement.querySelector('.wb-limb').dataset.cell);
         el.__i=i*2; el.__stride=1+(i%2);
         for(var fr=0;fr<FRB;fr++)(function(fr){
-          queue.push(function(){
+          /* Only frame 0 is on screen at load. Frames 1-3 exist for the wind
+             cycle and are the heaviest canvases on the page, so they are built
+             after the first paint rather than during it. The cycler below skips
+             any frame that has not been built yet. */
+          (fr===0 ? queue.push.bind(queue) : later)(function(){
             var cv=document.createElement('canvas');
             if(fr===0) cv.className='on';
             el.appendChild(cv);
@@ -4107,8 +4174,8 @@ hr {
       if(document.hidden) return;
       btick++;
       document.querySelectorAll('.wb-leaves').forEach(function(el){
-        var cs=el.children; if(cs.length<FRB) return;
-        var n=Math.floor((btick*(el.__stride||1)+(el.__i||0))/3) % FRB;
+        var cs=el.children; if(!cs.length) return;
+        var n=Math.floor((btick*(el.__stride||1)+(el.__i||0))/3) % cs.length;
         for(var k=0;k<cs.length;k++) cs[k].classList.toggle('on', k===n);
       });
     }, 190);
@@ -4378,7 +4445,7 @@ hr {
           var el=document.createElement('div'); el.className='leaf';
           var c=document.createElement('canvas'); el.appendChild(c); dw.appendChild(el);
           var L={el:el, anim:null, t:0};
-          queue.push(function(){
+          later(function(){
             AHStitch.mount(c,{kind:DRIFT_SHAPES[idx%DRIFT_SHAPES.length],
               cols:22, rows:22, cell:1.10, seed:31+idx*7, twinkle:false, animate:false});
           });

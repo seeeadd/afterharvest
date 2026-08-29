@@ -17,11 +17,19 @@
   'use strict';
 
   /* ---------- color helpers ---------- */
+  var _cc={};
   function hx(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
   function toHex(r,g,b){ var c=function(n){return ('0'+Math.max(0,Math.min(255,Math.round(n))).toString(16)).slice(-2);}; return '#'+c(r)+c(g)+c(b); }
-  function lighten(h,a){ var p=hx(h); return toHex(p[0]+(255-p[0])*a, p[1]+(255-p[1])*a, p[2]+(255-p[2])*a); }
-  function darken(h,a){ var p=hx(h); return toHex(p[0]*(1-a), p[1]*(1-a), p[2]*(1-a)); }
-  function mix(h1,h2,t){ var a=hx(h1),b=hx(h2); return toHex(a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t); }
+  function lighten(h,a){ var k='l'+h+a; var v=_cc[k]; if(v!==undefined) return v;
+    var p=hx(h); return (_cc[k]=toHex(p[0]+(255-p[0])*a, p[1]+(255-p[1])*a, p[2]+(255-p[2])*a)); }
+  /* These three are pure, and drawStitch calls them three times for EVERY
+     stitch - each call parses a hex string, does the arithmetic, and builds a
+     new string. Across a page of ~100k stitches that is ~300k parses. Cached,
+     they become map lookups. Output is bit-identical. */
+  function darken(h,a){ var k='d'+h+a; var v=_cc[k]; if(v!==undefined) return v;
+    var p=hx(h); return (_cc[k]=toHex(p[0]*(1-a), p[1]*(1-a), p[2]*(1-a))); }
+  function mix(h1,h2,t){ var k='m'+h1+h2+t; var v=_cc[k]; if(v!==undefined) return v;
+    var a=hx(h1),b=hx(h2); return (_cc[k]=toHex(a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t)); }
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
   /* ---------- palette (embroidery only) ---------- */
@@ -2565,7 +2573,11 @@
     var rnd=rngFrom(seed*7+3);
     for(var q=0;q<cells.length;q++){
       var cc=cells[q];
-      cc.jit=(rnd()-0.5)*0.12;
+      /* quantised so identical stitches share a colour key and can be drawn in
+         one path. 1/64 steps on a +-0.06 jitter is a 1.5% lightness increment,
+         below the visible threshold, and it collapses thousands of colour
+         changes into a few dozen. */
+      cc.jit=Math.round((rnd()-0.5)*0.12*64)/64;
       cc.order = opts.kind==='garland' ? (cc.c/cols)*0.9+rnd()*0.1
                : opts.text ? (cc.c/cols)*0.85+rnd()*0.15
                : (rows-cc.r)/rows*0.8+rnd()*0.2;
@@ -2586,7 +2598,41 @@
 
     var buf=document.createElement('canvas'); buf.width=canvas.width; buf.height=canvas.height;
     var bctx=buf.getContext('2d'); bctx.scale(dpr,dpr);
-    function paintBuffer(){ bctx.clearRect(0,0,Wc,Hc); for(var k=0;k<total;k++){ var c=cells[k]; drawStitch(bctx,c.c*cell,c.r*cell,cell,c.tone,1,c.jit); } }
+    /* Batched paint. drawStitch sets strokeStyle and opens a path three times
+       per stitch; at 5k stitches that is 15k state changes and 15k paths for one
+       canvas. Grouping by (tone, jit) issues three per GROUP instead - same
+       geometry, same colours, same result. */
+    function paintBuffer(){
+      bctx.clearRect(0,0,Wc,Hc);
+      var groups={}, order=[];
+      for(var k=0;k<total;k++){
+        var c=cells[k], key=c.tone+'|'+c.jit, g=groups[key];
+        if(!g){ g=groups[key]=[]; order.push(key); }
+        g.push(c);
+      }
+      var i=cell*0.14, w=cell*0.42;
+      bctx.globalAlpha=1; bctx.lineCap='round';
+      for(var gi=0; gi<order.length; gi++){
+        var list=groups[order[gi]], c0=list[0];
+        var base=c0.jit ? (c0.jit>0? lighten(c0.tone,c0.jit) : darken(c0.tone,-c0.jit)) : c0.tone;
+        var n=list.length, m, x, y;
+        bctx.lineWidth=w; bctx.strokeStyle=darken(base,0.26);
+        bctx.beginPath();
+        for(m=0;m<n;m++){ x=list[m].c*cell; y=list[m].r*cell;
+          bctx.moveTo(x+i,y+i); bctx.lineTo(x+cell-i,y+cell-i); }
+        bctx.stroke();
+        bctx.strokeStyle=base;
+        bctx.beginPath();
+        for(m=0;m<n;m++){ x=list[m].c*cell; y=list[m].r*cell;
+          bctx.moveTo(x+cell-i,y+i); bctx.lineTo(x+i,y+cell-i); }
+        bctx.stroke();
+        bctx.lineWidth=w*0.30; bctx.strokeStyle=lighten(base,0.42);
+        bctx.beginPath();
+        for(m=0;m<n;m++){ x=list[m].c*cell; y=list[m].r*cell;
+          bctx.moveTo(x+cell-i*1.3,y+i*1.5); bctx.lineTo(x+i*1.5,y+cell-i*1.3); }
+        bctx.stroke();
+      }
+    }
 
     var sparks=cells.filter(function(c){return c.spark;});
 
