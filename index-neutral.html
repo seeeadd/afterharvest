@@ -1823,7 +1823,7 @@ hr {
      from 74% to 90% across the canvas, which erased exactly and only the leafy
      end — the branch rendered as bare wood while the leaf canvas sat there fully
      painted. The fade is now confined to the outermost 3% at each end. */
-  .wb-limb, .wb-leaves { position: absolute; right: 0; top: 0;
+  .wb-limb, .wb-leaves, .wb-cash { position: absolute; right: 0; top: 0;
     -webkit-mask-image:
       linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 58%, rgba(0,0,0,0.34) 80%, transparent 95%),
       linear-gradient(to bottom, #000 0 78%, rgba(0,0,0,0.42) 92%, transparent 100%);
@@ -1833,6 +1833,10 @@ hr {
       linear-gradient(to bottom, #000 0 78%, rgba(0,0,0,0.42) 92%, transparent 100%);
     mask-composite: intersect; }
   .wb-limb canvas { display: block; }
+  /* money rides above the foliage: same geometry and seed as the limb, drawn on
+     its own pass, so it is not buried under the leaf layer */
+  .wb-cash { z-index: 2; }
+  .wb-cash canvas { display: block; }
   /* THE FIRST FRAME IS STATIC ON PURPOSE.
      Every leaf frame used to be position:absolute, so none of them contributed to
      .wb-leaves' size — the container measured 0x0, and a CSS mask on a zero-size
@@ -2061,10 +2065,12 @@ hr {
   <div class="wallbranch left" aria-hidden="true">
     <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.70"></div>
     <div class="wb-leaves" data-form="a"></div>
+    <div class="wb-cash" data-kind="wb-cash-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.70"></div>
   </div>
   <div class="wallbranch right" aria-hidden="true">
     <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
     <div class="wb-leaves" data-form="b"></div>
+    <div class="wb-cash" data-kind="wb-cash-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
   </div>
   <div class="flock" aria-hidden="true"></div>
   <div class="nav-wrap">
@@ -4049,7 +4055,7 @@ hr {
     /* ---------- wall branches ---------- */
     var FRB=4;
     function branches(){
-      document.querySelectorAll('.wb-limb').forEach(function(el){
+      document.querySelectorAll('.wb-limb, .wb-cash').forEach(function(el){
         if(el.dataset.built) return; el.dataset.built='1';
         queue.push(function(){
           var c=document.createElement('canvas'); el.appendChild(c);

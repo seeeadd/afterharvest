@@ -1923,6 +1923,10 @@
 
     var kp=kind.split('-');
     var isLeafPass = kp[1]==='leaf';
+    /* The money gets its OWN pass. The leaf layer is a separate element stacked
+       above the limb, so money drawn on the limb sits underneath the foliage and
+       is never seen. Same geometry, same seed, drawn alone, mounted on top. */
+    var isCashPass = kp[1]==='cash';
     var form = kp[2]||'a';
     var frame = isLeafPass ? (parseInt(kp[3],10)||0) : 0;
     var FR=4, ph0=(frame%FR)/FR*6.2832;
@@ -1941,7 +1945,7 @@
       var midA=ang+(R()-0.5)*0.34;
       var mx=x+Math.cos(midA)*len*0.52, my=y+Math.sin(midA)*len*0.52;
       var x2=mx+Math.cos(ang)*len*0.52,  y2=my+Math.sin(ang)*len*0.52;
-      if(!isLeafPass) swood(G,[[x,y],[mx,my],[x2,y2]], wid, Math.max(0.9,wid*0.46), tkB, tkA, tkC);
+      if(!isLeafPass && !isCashPass) swood(G,[[x,y],[mx,my],[x2,y2]], wid, Math.max(0.9,wid*0.46), tkB, tkA, tkC);
 
       if(isLeafPass){
         /* fewer on the thick members, dense on the fine ones — but never zero,
@@ -1980,12 +1984,12 @@
     var main = form==='b'
       ? [[W+10,yIn],[W*0.78,H*0.72],[W*0.58,H*0.70],[W*0.42,H*0.60],[W*0.30,H*0.55]]
       : [[W+10,yIn],[W*0.80,H*0.66],[W*0.60,H*0.66],[W*0.44,H*0.56],[W*0.32,H*0.51]];
-    if(!isLeafPass) swood(G, main, 20.0, 3.2, tkB, tkA, tkC);
+    if(!isLeafPass && !isCashPass) swood(G, main, 20.0, 3.2, tkB, tkA, tkC);
 
     var forks = form==='b'
       ? [[0.16,-0.95,0.34],[0.34,0.72,0.20],[0.50,-1.05,0.30],[0.66,0.55,0.16],[0.80,-0.85,0.22],[0.90,0.42,0.11]]
       : [[0.14,-0.85,0.36],[0.30,0.80,0.19],[0.46,-1.10,0.30],[0.62,0.62,0.15],[0.78,-0.80,0.22],[0.92,-0.45,0.14]];
-    for(var i2=0;i2<forks.length;i2++){
+    for(var i2=0; i2<forks.length && !isCashPass; i2++){
       var t=forks[i2][0];
       var seg=Math.min(main.length-2, Math.floor(t*(main.length-1)));
       var lf=(t*(main.length-1))-seg;
@@ -1993,7 +1997,7 @@
       var fy=main[seg][1]+(main[seg+1][1]-main[seg][1])*lf;
       branch(fx,fy, Math.PI+forks[i2][1], S*forks[i2][2], 7.0*(1-t*0.55), 3);
     }
-    branch(main[main.length-1][0], main[main.length-1][1], Math.PI-0.16, S*0.20, 4.2, 3);
+    if(!isCashPass) branch(main[main.length-1][0], main[main.length-1][1], Math.PI-0.16, S*0.20, 4.2, 3);
 
     /* ================= MONEY ON THE TREE ===============================
        Seven ways a note can hang. Seven of one shape is wallpaper, so each
@@ -2111,7 +2115,7 @@
         put(G, x+ni*ca-(h2*0.56)*sa, y+ni*sa+(h2*0.56)*ca, M.kn);
     }
 
-    if(!isLeafPass){
+    if(isCashPass){
       var MR=rngFrom(form==='b'? 907 : 421);
       var anchors=[];
       for(var ma=0;ma<7;ma++){                      /* along the main limb */
@@ -2366,6 +2370,8 @@
         wallBranch(G, kind, W, H, rnd); break;
       case 'fb-daisy': case 'fb-aster': case 'fb-rose': case 'fb-bell': case 'fb-pom':
         petalBloom(G, kind, W, H, rnd); break;
+      case 'wb-cash-a': case 'wb-cash-b':
+        wallBranch(G, kind, W, H, rnd); break;
       case 'dl-0': case 'dl-1': case 'dl-2': case 'dl-3': case 'dl-4':
         driftLeaf(G, kind, W, H, rnd); break;
       case 'seam-chevron': seamRow(G, kind, W, H, rnd); break;
