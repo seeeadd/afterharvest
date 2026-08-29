@@ -68,9 +68,9 @@
     noteDeep:'#233527', noteHi:'#E6ECDD', noteSeal:'#8A5A3C',
     coin:'#C0A03A', coinDk:'#876920', coinLt:'#DEC578', coinRim:'#6B5418',
     cardA:'#26231F', cardB:'#38342F', cardChip:'#C0A03A', cardBand:'#4A453E',
-    blA:'#D2691E', blB:'#C0392B', blC:'#E0A32E', blD:'#E8C25A',
-    blE:'#8E2F28', blF:'#E07B39', blG:'#A85428', blH:'#F0D479',
-    blI:'#B8452F', blJ:'#D98324', blK:'#96401F', blL:'#EDA94C'
+    blA:'#E67E22', blB:'#D9503D', blC:'#EFB33F', blD:'#F2D072',
+    blE:'#B4483B', blF:'#F08C4A', blG:'#C86B34', blH:'#F7E08F',
+    blI:'#D65C41', blJ:'#EC9635', blK:'#BE5A2E', blL:'#F7BB60'
   };
 
   function rngFrom(seed){ var s=seed>>>0; return function(){ s+=0x6D2B79F5; var t=s; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -1914,8 +1914,11 @@
   function wallBranch(G, kind, W, H, rnd){
     function mu(t){ return mix(t, P.umber, 0.03); }
     var tkA=mu(P.trunkA), tkB=mu(P.trunkB), tkC=P.trunkC;
-    var PAL=[mu(P.blA),mu(P.blB),mu(P.blC),mu(P.blD),mu(P.blE),mu(P.blF),
-             mu(P.blH),mu(P.blI),mu(P.blJ),mu(P.blK),mu(P.blL),mu(P.leafA)];
+    /* No umber mute on the foliage. mu() pulls every tone toward umber, and
+       across twelve autumn colours that reads as a layer of dust over all of
+       them. The wood still gets it - that is where it belongs. */
+    var PAL=[P.blA,P.blB,P.blC,P.blD,P.blE,P.blF,
+             P.blH,P.blI,P.blJ,P.blK,P.blL,mix(P.leafA,P.creamLt,0.12)];
 
     /* A leaf is ASYMMETRIC along its length: rounded at the base where it meets
        the stalk, pointed at the tip. The old one was an ellipse tapered equally
@@ -1930,7 +1933,7 @@
       var S2=LSHAPE[(shp||0)%3], A2=S2[0], B2=S2[1];
       var peak=Math.pow(A2/(A2+B2),A2)*Math.pow(B2/(A2+B2),B2);
       var LEN=sz*1.85, WID=sz*0.44/peak;
-      var lit=mix(tone,P.creamLt,0.26), shd=darken(tone,0.17), rib=darken(tone,0.34);
+      var lit=mix(tone,P.creamLt,0.34), shd=darken(tone,0.13), rib=darken(tone,0.30);
       for(var q=0;q<=LEN;q+=0.5){
         var t=q/LEN;
         var hw=WID*Math.pow(t,A2)*Math.pow(1-t,B2);
