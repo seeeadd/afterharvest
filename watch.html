@@ -11,12 +11,8 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2">
 <meta name="theme-color" content="#FBFAF6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#262119" media="(prefers-color-scheme: dark)">
-<link rel="canonical" href="https://www.theafterharvest.com/watch">
-<!-- Near-identical to the homepage on purpose: this is the outreach cut of the
-     video. noindex keeps it from competing with / for the same terms and from
-     splitting the signals that page has been earning. follow, so any links on it
-     still pass. Remove both lines if it should rank on its own. -->
 <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://www.theafterharvest.com/watch">
 <meta property="og:title" content="Watch: how AfterHarvest runs your 3-day virtual event">
 <meta property="og:description" content="AfterHarvest builds and runs done-for-you 3-day virtual events for course creators. $0 upfront, paid from what the launch collects, with a revenue floor.">
 <meta property="og:url" content="https://www.theafterharvest.com/watch">
@@ -29,6 +25,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://www.theafterharvest.com/#sean-canela","name":"Sean Canela","jobTitle":"Co-founder","email":"sean@theseancanela.com","description":"Co-founder of AfterHarvest, which builds and runs done-for-you 3-day virtual launch events for course creators, coaches and community builders. Writes the launch plans and runs the strategy calls.","worksFor":{"@id":"https://www.theafterharvest.com/#org"},"affiliation":{"@id":"https://www.theafterharvest.com/#org"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://www.theafterharvest.com/#theia-ahmadi","name":"Theia Ahmadi","jobTitle":"Co-founder","description":"Co-founder of AfterHarvest, which builds and runs done-for-you 3-day virtual launch events for course creators, coaches and community builders.","worksFor":{"@id":"https://www.theafterharvest.com/#org"},"affiliation":{"@id":"https://www.theafterharvest.com/#org"}}</script>
 <!-- shared design tokens + @font-face (same file the full site uses → identical rendering) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>/* ============================================================
    AFTERHARVEST — WEBFONTS  (v1.6)
    Display: FANWOOD (League of Movable Type) — a quiet Fournier
@@ -90,15 +87,15 @@
 
 :root {
   /* ---- Canvas & ink ---- */
-  --eggshell: #FBFAF6; /* warm paper-white, de-yellowed. Primary background */
-  --card:     #FEFDFA; /* raised surfaces — always with a hairline border */
-  --field:    #F1ECE1; /* deep sections / tonal shifts */
+  --eggshell: #F9F9F7; /* warm paper-white, de-yellowed. Primary background */
+  --card:     #FDFDFC; /* raised surfaces — always with a hairline border */
+  --field:    #EBEBE8; /* deep sections / tonal shifts */
   --ink:      #262119; /* all primary text, primary buttons. warm near-black */
-  --umber:    #6E6554; /* secondary text, captions, metadata */
-  --hairline: #E4DDCC; /* 1px borders, dividers, table rules */
+  --umber:    #58513F; /* secondary text, captions, metadata */
+  --hairline: #CBC7BC; /* 1px borders, dividers, table rules */
 
   /* ---- Accents (UI — rationed; unchanged) ---- */
-  --yolk:  #E8A100; /* THE accent. ≤3% of any screen */
+  --yolk:  #C98F2E; /* THE accent. ≤3% of any screen */
   --wheat: #C89B4B; /* stitch mid-tone, subdued gold */
   --rust:  #B06A4A; /* link hover, small warm highlights */
   --dusk:  #B6AFC4; /* illustration shadows + pattern accents ONLY */
@@ -172,7 +169,7 @@
   --text-h2: 34px;        --leading-h2: 1.12;      --weight-h2: 400;      --tracking-h2: -0.005em;
   --text-h3: 24px;        --leading-h3: 1.2;       --weight-h3: 400;      --tracking-h3: 0em;
   /* Body + small: Literata 400 */
-  --text-body: 17px;      --leading-body: 1.65;    --weight-body: 400;
+  --text-body: 17px;      --leading-body: 1.55;    --weight-body: 450;
   --text-small: 14px;     --leading-small: 1.5;
   /* Labels + buttons: IBM Plex Mono 500, uppercase */
   --text-label: 11.5px;   --leading-label: 1.4;    --weight-label: 500; --tracking-label: 0.08em;
@@ -197,10 +194,10 @@
   --card-pad: 32px;
 
   /* ---- Corner radius: SHARP. Crisp, not pill-soft ---- */
-  --r-input: 3px;
-  --r-button: 4px;
-  --r-card: 6px;
-  --r-panel: 8px;   /* larger frosted panels / nav bar */
+  --r-input: 1px;
+  --r-button: 2px;
+  --r-card: 2px;
+  --r-panel: 3px;   /* larger frosted panels / nav bar */
   --r-stitch: 2px;  /* the pixel-stitch cell */
 
   /* ---- Elevation: hairline first, one shadow max ---- */
@@ -282,11 +279,18 @@ hr {
   /* ===== copied verbatim from index.html so the hero renders identically standalone ===== */
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
+  html { overflow-x: hidden; overflow-x: clip; }
   body {
     margin: 0; background: var(--eggshell);
     background-image: url("assets/asset-14.svg"), url("assets/asset-15.svg");
     background-size: 220px 220px, 30px 30px;
-    color: var(--ink); font-family: var(--font-serif); overflow-x: hidden;
+    color: var(--ink); font-family: var(--font-serif);
+    /* clip, not hidden. The branches deliberately sit past the page edge, and
+       overflow-x:hidden on body alone still left the viewport scrollable a few
+       px. Setting it on the root as well fixes that - but it has to be `clip`,
+       because `overflow:hidden` on an ancestor turns off position:sticky, and
+       the nav depends on sticky to compact on scroll. */
+    overflow-x: hidden; overflow-x: clip;
   }
   ::selection { background: var(--yolk-tint-22); }
   a { color: var(--ink); text-decoration-color: var(--wheat); text-underline-offset: 3px; }
@@ -306,9 +310,9 @@ hr {
     /* the blur is held at one value across both states on purpose: animating a
        backdrop-filter forces a full re-raster of everything behind the bar on
        every frame, which is what made the compression stutter. */
-    -webkit-backdrop-filter: blur(16px) saturate(165%); backdrop-filter: blur(16px) saturate(165%);
+    -webkit-backdrop-filter: blur(20px) saturate(168%);
+    backdrop-filter: blur(20px) saturate(168%);
     border: 1px solid var(--hairline);
-    filter: drop-shadow(0 8px 20px rgba(38,33,25,0.11)) drop-shadow(0 2px 5px rgba(38,33,25,0.06));
   }
   .nav .brand { display: flex; align-items: center; }
   .nav .wm { height: 26px; display: block; width: auto; }
@@ -330,7 +334,7 @@ hr {
   /* compressed header — narrows and slims once you leave the top of the page.
      One easing, one duration, and nothing in this transition set repaints the
      page behind it. */
-  .nav-wrap { --nav-ease: cubic-bezier(0.22, 0.61, 0.24, 1); --nav-dur: 420ms; }
+  .nav-wrap { --nav-ease: cubic-bezier(0.24, 0.82, 0.22, 1); --nav-dur: 620ms; }
   .nav-wrap { transition: top var(--nav-dur) var(--nav-ease); }
   .nav-shell { transition: width var(--nav-dur) var(--nav-ease); will-change: width; }
   .nav { transition: padding var(--nav-dur) var(--nav-ease), gap var(--nav-dur) var(--nav-ease),
@@ -382,8 +386,27 @@ hr {
   .pill::after {
     content: ""; position: absolute; inset: 0 0 7px 0; z-index: -1;
     clip-path: polygon(7% 8%, 2% 58%, 10% 100%, 90% 100%, 98% 60%, 93% 10%, 50% 0);
-    background: linear-gradient(180deg, rgba(244,235,214,0.2), rgba(244,235,214,0) 32%), linear-gradient(180deg, transparent calc(56% - 1px), rgba(244,235,214,0.5) 56%, transparent calc(56% + 1px)), linear-gradient(180deg, transparent calc(76% - 1px), rgba(0,0,0,0.38) 76%, transparent calc(76% + 1px));
+    /* The first layer is the travelling glint. It rides on ::after rather than
+       on .pill itself because .pill's own background is painted underneath
+       ::before, whose conic facets would hide it completely. */
+    background:
+      linear-gradient(104deg, transparent 36%, rgba(255,247,227,0.10) 43%,
+                      rgba(255,250,236,0.62) 49%, rgba(255,247,227,0.12) 55%, transparent 63%),
+      linear-gradient(180deg, rgba(244,235,214,0.2), rgba(244,235,214,0) 32%),
+      linear-gradient(180deg, transparent calc(56% - 1px), rgba(244,235,214,0.5) 56%, transparent calc(56% + 1px)),
+      linear-gradient(180deg, transparent calc(76% - 1px), rgba(0,0,0,0.38) 76%, transparent calc(76% + 1px));
+    background-size: 260% 100%, auto, auto, auto;
+    background-repeat: no-repeat, repeat, repeat, repeat;
+    background-position: 190% 0, 0 0, 0 0, 0 0;
+    animation: pillShine 5.2s var(--ease-out, ease) infinite;
   }
+  /* sweeps across, then waits off-frame - a glint, not a strobe */
+  @keyframes pillShine {
+    0%   { background-position: 190% 0, 0 0, 0 0, 0 0; }
+    34%  { background-position: -90% 0, 0 0, 0 0, 0 0; }
+    100% { background-position: -90% 0, 0 0, 0 0, 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce){ .pill::after { animation: none; } }
   .pill b { font-weight: 800; color: var(--yolk); }
   .pill::before, .pill::after { transition: filter 0.28s var(--ease-out, ease), opacity 0.28s var(--ease-out, ease); }
   .pill { transition: transform var(--dur-fast) var(--ease-out), filter 0.28s var(--ease-out), color 0.28s var(--ease-out); }
@@ -723,7 +746,7 @@ hr {
   .say { position: relative; box-sizing: border-box; padding: 12px 14px 13px;
     background: var(--card); border: 1px solid var(--hairline); border-radius: 12px 12px 12px 3px;
     box-shadow: 0 14px 30px -18px rgba(38,33,25,0.55), 0 2px 5px rgba(38,33,25,0.06);
-    font-family: 'Literata', Georgia, serif; font-size: 13px; line-height: 1.48;
+    font-family: var(--font-serif); font-size: 13px; line-height: 1.48;
     color: var(--ink);
     opacity: 0; transform: translateY(8px) scale(0.95); transform-origin: 100% 100%;
     transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out); }
@@ -758,7 +781,7 @@ hr {
   .pf { --fbg:#2C2820; --fopt:rgba(251,250,246,0.05); --fbd:rgba(251,250,246,0.15);
     --ftx:#F7F3EA; --fmu:rgba(247,243,234,0.58);
     position: relative; background: var(--fbg); border-radius: var(--r-panel); padding: 34px 38px 30px;
-    font-family: 'Literata', Georgia, serif; color: var(--ftx);
+    font-family: var(--font-serif); color: var(--ftx);
     box-shadow: 0 26px 54px -26px rgba(38,33,25,0.55); }
   .pf-steps { display: flex; align-items: center; justify-content: center; gap: 9px; margin-bottom: 30px; }
   .pf-step { display: flex; align-items: center; gap: 9px; }
@@ -796,7 +819,7 @@ hr {
   @keyframes pfIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
   .pf-q { margin: 0 0 22px; }
   .pf-q + .pf-q { margin-top: 34px; }
-  .pf-q h3 { font-family: 'Literata', Georgia, serif; font-size: 25px; font-weight: 600; line-height: 1.25;
+  .pf-q h3 { font-family: var(--font-serif); font-size: 25px; font-weight: 600; line-height: 1.25;
     margin: 0; color: var(--ftx); -webkit-text-stroke: 0; }
   .pf-q .req { color: var(--fmu); }
   .pf-q p { font-size: 16px; line-height: 1.5; color: var(--fmu); margin: 9px 0 0; max-width: 62ch; }
@@ -804,7 +827,7 @@ hr {
   .pf-in input[type="text"], .pf-in input[type="email"], .pf-in textarea {
     width: 100%; box-sizing: border-box; background: var(--fopt); color: var(--ftx);
     border: 1.5px solid var(--fbd); border-radius: 6px; padding: 15px 16px;
-    font-family: 'Literata', Georgia, serif; font-size: 18px; line-height: 1.4; outline: none;
+    font-family: var(--font-serif); font-size: 18px; line-height: 1.4; outline: none;
     transition: border-color var(--dur-fast) var(--ease-out); }
   .pf-in textarea { min-height: 118px; resize: vertical; }
   .pf-in input::placeholder, .pf-in textarea::placeholder { color: rgba(247,243,234,0.3); }
@@ -813,7 +836,7 @@ hr {
   .pf-opt { display: inline-flex; align-items: center; gap: 13px; min-width: min(330px, 100%); max-width: 100%;
     background: var(--fopt); border: 1.5px solid var(--fbd); border-radius: 6px;
     padding: 13px 20px 13px 16px; cursor: pointer; color: var(--ftx);
-    font-family: 'Literata', Georgia, serif; font-size: 18px; text-align: left;
+    font-family: var(--font-serif); font-size: 18px; text-align: left;
     transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
   .pf-opt:hover { border-color: rgba(247,243,234,0.42); }
   .pf-opt i { width: 17px; height: 17px; border-radius: 50%; border: 1.8px solid rgba(247,243,234,0.34);
@@ -826,7 +849,7 @@ hr {
   .pf-next { margin-top: 30px; display: inline-flex; align-items: center; gap: 10px;
     background: var(--ftx); color: #201C15; border: 0; border-radius: 6px;
     padding: 15px 26px; cursor: pointer;
-    font-family: 'Literata', Georgia, serif; font-size: 19px; font-weight: 600;
+    font-family: var(--font-serif); font-size: 19px; font-weight: 600;
     transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
   .pf-next:hover { transform: translateY(-1px); background: #fff; }
   .pf-next:focus-visible { outline: 2px solid var(--yolk); outline-offset: 3px; }
@@ -945,7 +968,7 @@ hr {
   @keyframes pfs-rim { to { --rim: 360deg; } }
   .pf-start-rim::after { content: ""; position: absolute; inset: 1px; border-radius: inherit;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 40px rgba(0,0,0,0.18); }
-  .pf-start-h { font-family: 'Literata', Georgia, serif; font-size: 31px; font-weight: 600;
+  .pf-start-h { font-family: var(--font-serif); font-size: 31px; font-weight: 600;
     line-height: 1.18; color: var(--ftx); margin: 22px 0 0; }
   .pf-start-p { font-size: 16.5px; line-height: 1.55; color: var(--fmu); margin: 12px auto 0; max-width: 46ch; }
 
@@ -1215,7 +1238,7 @@ hr {
     filter: blur(var(--blur, 4px)); transform: scale(1.03);
     -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent var(--keep, 0%), #000 calc(var(--keep, 0%) + 7%));
             mask-image: linear-gradient(180deg, transparent 0, transparent var(--keep, 0%), #000 calc(var(--keep, 0%) + 7%)); }
-  .pf-proof-cap { margin: 11px 2px 0; font-family: 'Literata', Georgia, serif; font-size: 13.5px;
+  .pf-proof-cap { margin: 11px 2px 0; font-family: var(--font-serif); font-size: 13.5px;
     line-height: 1.5; color: var(--fmu); }
   .pf-proof-cap b { font-weight: 600; color: var(--ftx); }
   @media (max-width: 640px){ .pf-proof-shots { grid-template-columns: 1fr; } }
@@ -1277,7 +1300,7 @@ hr {
   .kf .icp { margin-bottom: 16px; }
   .kf h2 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 54px;
     line-height: 1.02; margin: 0 0 16px; -webkit-text-stroke: 1.5px currentColor; max-width: 14ch; }
-  .kf-lead { font-family: 'Literata', Georgia, serif; font-size: 17px; line-height: 1.68;
+  .kf-lead { font-family: var(--font-serif); font-size: 17px; line-height: 1.68;
     color: var(--umber); margin: 0; max-width: 52ch; }
 
   /* Collapsed, this section is a title and one control, so it sits as a single row
@@ -1324,7 +1347,7 @@ hr {
   .kf-facts { margin: 0; display: grid; gap: 28px; }
   .kf-facts dt { font-family: var(--font-mono); font-size: 10px; font-weight: 600;
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin: 0 0 7px; }
-  .kf-facts dd { font-family: 'Literata', Georgia, serif; font-size: 16.5px; line-height: 1.72;
+  .kf-facts dd { font-family: var(--font-serif); font-size: 16.5px; line-height: 1.72;
     color: var(--ink); margin: 0; max-width: 62ch; }
 
   @media (max-width: 900px){
@@ -1360,7 +1383,7 @@ hr {
   .tx-body[data-open="true"] { max-height: none; -webkit-mask-image: none; mask-image: none; }
   .tx-body h3 { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 22px;
     line-height: 1.22; color: var(--ink); margin: 34px 0 10px; }
-  .tx-body p { font-family: 'Literata', Georgia, serif; font-size: 16px; line-height: 1.76;
+  .tx-body p { font-family: var(--font-serif); font-size: 16px; line-height: 1.76;
     color: var(--umber); margin: 0 0 14px; max-width: 68ch; }
   .tx-more { display: inline-flex; align-items: center; gap: 8px; margin: 0;
     padding: 12px 22px; cursor: pointer; background: transparent;
@@ -1440,7 +1463,7 @@ hr {
     margin-bottom: 12px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
     letter-spacing: 0.09em; text-transform: uppercase; color: var(--umber); }
   .plan-book-head .rule { height: 1px; flex: 1; max-width: 90px; background: var(--hairline); }
-  .plan-book-lead { text-align: center; font-family: 'Literata', Georgia, serif;
+  .plan-book-lead { text-align: center; font-family: var(--font-serif);
     font-size: 15.5px; line-height: 1.65; color: var(--umber); margin: 0 auto 22px; max-width: 84ch; }
   .plan-book-frame { background: var(--card); border: 1px solid var(--hairline);
     border-radius: var(--r-panel); padding: 6px; overflow: hidden;
@@ -1463,7 +1486,7 @@ hr {
   .pf-book { display: inline-flex; align-items: center; gap: 9px; margin-top: 22px;
     padding: 14px 26px; cursor: pointer; text-decoration: none;
     background: var(--ftx); color: #201C15; border: 0; border-radius: 6px;
-    font-family: 'Literata', Georgia, serif; font-size: 17px; font-weight: 600;
+    font-family: var(--font-serif); font-size: 17px; font-weight: 600;
     transition: transform var(--dur-fast) var(--ease-out); }
   .pf-book:hover { transform: translateY(-1px); }
   .pf-done .pf-book { margin-top: 26px; }
@@ -1551,14 +1574,14 @@ hr {
   .dock-av i { position: absolute; right: 0; top: 1px; width: 10px; height: 10px; border-radius: 50%;
     background: var(--sage, #8A9068); border: 2px solid #FAF8F3; }
   .dock-id { display: block; min-width: 0; }
-  .dock-id b { display: block; font-family: 'Literata', Georgia, serif; font-size: 15px;
+  .dock-id b { display: block; font-family: var(--font-serif); font-size: 15px;
     font-weight: 600; color: var(--ink); line-height: 1.2; }
   .dock-id em { display: block; font-family: var(--font-mono); font-style: normal; font-size: 10px;
     letter-spacing: 0.05em; color: var(--umber); margin-top: 3px; }
 
   .dock-head { font-family: 'Olivera', var(--font-display); font-weight: 700; font-size: 21px;
     letter-spacing: 0.02em; line-height: 1.14; color: var(--ink); margin: 0 0 8px; }
-  .dock-copy { font-family: 'Literata', Georgia, serif; font-size: 14px; line-height: 1.58;
+  .dock-copy { font-family: var(--font-serif); font-size: 14px; line-height: 1.58;
     color: var(--umber); margin: 0 0 16px; }
 
   .dock-pick { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
@@ -1572,7 +1595,7 @@ hr {
                 background var(--dur-fast) var(--ease-out); }
   .dock-day .dow { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em;
     text-transform: uppercase; }
-  .dock-day .dom { font-family: 'Literata', Georgia, serif; font-size: 15px; font-weight: 600;
+  .dock-day .dom { font-family: var(--font-serif); font-size: 15px; font-weight: 600;
     color: var(--ink); line-height: 1.1; }
   .dock-day:hover { border-color: var(--wheat); background: rgba(255,255,255,0.92);
     color: var(--ink); }
@@ -1634,9 +1657,10 @@ hr {
   .foot-id { display: flex; align-items: flex-end; gap: 15px; }
   .foot-sprig { position: relative; flex: none; align-self: flex-end; line-height: 0; filter: drop-shadow(0 3px 6px rgba(38,33,25,0.14)); }
   .foot-id .wm2 { height: 35px; width: auto; display: block; }
-  .foot-id .tag { font-family: 'Olivera', var(--font-display); font-style: italic; font-size: 15px; color: var(--wheat); margin: 9px 0 0; }
+  .foot-id .tag { font-family: var(--font-mono); font-style: normal; font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--umber); margin: 11px 0 0; }
   /* the founder credit is a real entity signal, so it stays in the HTML, but quiet */
-  .foot-id .tag.founders { font-family: 'Literata', Georgia, serif; font-style: normal;
+  .foot-id .tag.founders { font-family: var(--font-serif); font-style: normal;
     font-size: 12.5px; color: var(--umber); margin-top: 7px; }
   .foot-id .tag.founders b { font-weight: 600; color: var(--ink); }
   .foot-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
@@ -1700,13 +1724,472 @@ hr {
     .pill, .vsl-gem, .ch-item, .ch-chev, .ch-list, .knot-bloom { transition: none; }
     .cats, .cats-wrap::after, .bloom, h1.headline .hword, .ch-reveal { animation: none !important; }
   }
+
+  /* ======================================================================
+     TYPE + WEIGHT PASS — appended last on purpose. Injecting these ahead of the
+     page's own rules loses every equal-specificity fight (the h1 margin, its
+     size), which silently pushed the headline off the hero's centre.
+     ====================================================================== */
+
+  :root {
+    --font-serif: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --font-sans:  'Hanken Grotesk', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+  body, p, li, dd, input, textarea, button, select { font-family: var(--font-serif); }
+  /* the two places Olivera keeps */
+  h1.headline, .plan-head h2 { font-family: 'Olivera', var(--font-display); }
+
+  /* a grotesque at a serif's settings sets far too tight — the serifs were doing
+     the optical separating and there are none now */
+  .hero .sub { font-size: 20px; line-height: 1.52; letter-spacing: 0.014em;
+    word-spacing: 0.045em; max-width: 66ch; font-weight: 450;
+    font-kerning: normal; font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility; text-wrap: pretty; }
+  p, li, dd { letter-spacing: 0.008em; word-spacing: 0.02em; line-height: 1.58;
+    font-kerning: normal; font-feature-settings: "kern" 1, "liga" 1; }
+  .plan-head p { font-size: 18px; line-height: 1.55; letter-spacing: 0.01em; text-wrap: pretty; }
+  h2, h3 { font-family: var(--font-serif); font-weight: 650; letter-spacing: -0.018em; }
+
+  /* the headline: opened up. Olivera is drawn tight, which is right at 14px and
+     wrong at 66. Word-spacing opens alongside the tracking, or widening the
+     letters just runs the words together. text-wrap:balance evens the rag. */
+  h1.headline {
+    font-size: 66px; line-height: 1.04; letter-spacing: 0.026em; word-spacing: 0.06em;
+    margin: 20px auto 0; -webkit-text-stroke: 2.4px currentColor;
+    font-kerning: normal; text-wrap: balance; }
+  /* the italic span fakes its bold with a stroke like the roman lines do — it was
+     getting 0.4px against their 2.4px and read as a lighter font. Slightly under
+     the roman because an italic at matched stroke closes up its own counters. */
+  h1.headline .hword { -webkit-text-stroke: 2.0px #2A2419;
+    word-spacing: -0.012em; letter-spacing: 0.028em; }
+  @media (max-width: 900px){ h1.headline { font-size: 40px; letter-spacing: 0.02em; -webkit-text-stroke: 1.3px currentColor; } }
+  @media (max-width: 560px){ h1.headline { font-size: 31px; letter-spacing: 0.016em; } }
+
+  /* Olivera tracking per size band — it closes up at every size above ~14px */
+  .kf h2         { letter-spacing: 0.024em; word-spacing: 0.05em; }
+  .plan-head h2  { letter-spacing: 0.024em; word-spacing: 0.055em; }
+  .foot .tx-h2   { letter-spacing: 0.022em; word-spacing: 0.05em; }
+  .kf-rail h3    { letter-spacing: 0.020em; word-spacing: 0.045em; }
+  .tx-body h3    { letter-spacing: 0.018em; word-spacing: 0.04em; }
+  .cats          { letter-spacing: 0.055em; gap: 11px; }
+  .dock-head     { letter-spacing: 0.038em; word-spacing: 0.07em;
+                   -webkit-text-stroke: 1.1px currentColor; }
+
+  /* labels stamped, not whispered */
+  .icp, .vsl-step, .vsl-note, .micro, .foot-meta { font-weight: 700; letter-spacing: 0.075em; }
+  /* Step 01 was the odd one out: a near-black number on 2px near-black rules,
+     where Steps 02 and 03 both use the gold number on a faint hairline. Same
+     colours across all three now. */
+  .vsl-step .rule { height: 1px; background: var(--ink); opacity: 0.30; }
+  .vsl-step .step-n { font-size: 15px; font-weight: 700; letter-spacing: 0.06em; color: var(--wheat);
+    font-variant-numeric: tabular-nums slashed-zero; }
+  .ch-time, .ch-n, .cal-day, .foot-meta { font-variant-numeric: tabular-nums slashed-zero; }
+
+  /* ink carries structure; gold is kept for the CTA */
+  .icp i { background: var(--ink); border-radius: 0; width: 5px; height: 5px; }
+  .icp .rule { background: var(--ink); opacity: 0.30; }
+  .cats em { color: var(--hairline); }
+  .plan-head h2 em { font-style: normal; border-bottom: 3px solid var(--ink); padding-bottom: 2px; }
+
+  /* THE NAV SHADOW LIVES ON THE PARENT, and must.
+     .nav is clip-path'd, and CSS applies `filter` BEFORE `clip-path` — a
+     drop-shadow declared on .nav is generated and then clipped away by that same
+     path. The same clip also eats any border. Warm beige-brown rather than grey:
+     a grey shadow on cream reads as a hole punched in the paper. */
+  /* ---- GLASS ---------------------------------------------------------------
+     The bar was rgba(...,0.7) with backdrop-filter:none - plain transparency,
+     no blur, which is why it read as thin rather than as glass.
+
+     The blur could not simply be switched on. An ancestor carrying a `filter`
+     creates a BACKDROP ROOT, and a backdrop-filter inside one samples only that
+     root's own content, so it blurs nothing. .nav-shell carried the bar's
+     drop-shadow, which is exactly that situation. The shadow is now a blurred
+     sibling shape rather than a filter on the ancestor, so .nav has a real
+     backdrop to sample. */
+  .nav {
+    border: none; box-shadow: none; filter: none;
+    /* Neutral glass, not beige. The tint is plain white over whatever is behind
+       it - the warmth of the page comes through the blur on its own, so the bar
+       does not need a beige fill of its own to belong. */
+    background-color: rgba(255,255,255,0.62);
+    background-image:
+      /* the sheen down the top third, which is what sells glass */
+      linear-gradient(180deg, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.18) 46%,
+                              rgba(255,255,255,0) 72%),
+      /* a neutral settle at the bottom edge, low chroma so it reads as shade */
+      linear-gradient(180deg, rgba(56,54,50,0) 76%, rgba(56,54,50,0.07) 100%); }
+  .nav-wrap[data-compact="1"] .nav { background-color: rgba(255,255,255,0.55); }
+
+  /* the shadow: a blurred copy of the bar's own shape, sitting behind it. It is
+     a SIBLING of .nav, not an ancestor, so it cannot create a backdrop root. */
+  .nav-shell { filter: none; }
+  .nav-shell::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    border-radius: 13px; clip-path: url(#nav-cut);
+    /* near-neutral: a fully grey shadow on cream reads as a hole punched in the
+       paper, so this keeps a trace of warmth without being a beige band */
+    background: rgba(64,60,54,0.26);
+    filter: blur(11px);
+    transform: translateY(6px) scale(0.985);
+    transition: transform var(--nav-dur) var(--nav-ease),
+                opacity var(--nav-dur) var(--nav-ease); }
+  .nav-wrap[data-compact="1"] .nav-shell::before {
+    transform: translateY(4px) scale(0.99); opacity: 0.78; }
+  /* the hairline edge, drawn as a ring rather than a border - the clip-path on
+     .nav eats a real border */
+  .nav-shell::after {
+    content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+    border-radius: 13px; clip-path: url(#nav-cut);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.80),
+                inset 0 0 0 1px rgba(44,41,37,0.13),
+                inset 0 -1px 0 rgba(44,41,37,0.10); }
+
+  /* nothing floats on hover — they press */
+  .pill:hover, .pf-next:hover, .pf-go:hover, .pf-book:hover, .dock-cta:hover { transform: none; }
+  .pill:active, .pf-next:active, .pf-go:active, .pf-book:active { transform: translateY(1px); }
+  .pill:hover { box-shadow: inset 0 0 0 2px rgba(251,250,246,0.22); }
+
+  /* the video on a letterpress offset rather than a blurred halo */
+  .vsl-frame { box-shadow: 0 0 0 2px var(--ink), 16px 16px 0 -2px var(--field), 18px 18px 0 0 var(--hairline); }
+
+  /* form controls: every one of them was a circle */
+  .pf-opt { border-radius: 2px; border-width: 2px; }
+  .pf-opt i { border-radius: 1px; border-width: 2px; }
+  .pf-opt[aria-checked="true"] i::after { border-radius: 0; width: 8px; height: 8px; }
+  .pf-in input[type="text"], .pf-in input[type="email"], .pf-in textarea { border-radius: 2px; border-width: 2px; }
+
+  /* the founders credit must not inherit the mono tagline's uppercase */
+  .foot-id .tag.founders { text-transform: none; letter-spacing: 0; font-weight: 400;
+    font-family: 'Literata', Georgia, serif; font-size: 12.5px; }
+  footer.foot { border-top: 1px solid var(--hairline); }
+
+  /* ---- TYPE SCALE ----------------------------------------------------------
+     The page had six sizes of the same face doing body work - 20, 18, 17, 16.5,
+     16 and 15.5 - and four of those were section leads, i.e. the same role at
+     four different sizes. Three steps now: lead, body, small, on one leading
+     ratio so the vertical rhythm matches between sections.
+     text-wrap:balance evens the rag so a paragraph does not end on a stub
+     line, which is the "division of lines" problem in the hero. */
+  .hero .sub, .plan-head p, .plan-book .plan-book-lead, .pf-screen .pf-start-p {
+    font-size: 18px; line-height: 1.62; text-wrap: balance; }
+  .ch-index .ch-list li { font-size: 16px; line-height: 1.62; }
+  .hero .sub { max-width: 68ch; margin-left: auto; margin-right: auto; }
+  .kf-band p, .vsl-note, .cats-wrap p { line-height: 1.68; text-wrap: pretty; }
+  h1.headline, .plan-head h2, .kf-band h2, .dock-head { text-wrap: balance; }
+
+
+  /* ---------- WALL BRANCHES ----------
+     A limb reaching in from each edge, faded at BOTH ends: the thick outer end so
+     it reads as continuing off-frame, the thin inner tip so it dissolves before
+     reaching the text column. Wood is one static bitmap; leaves are four
+     rasterised frames cycled by opacity. */
+  /* BIG, and sat low so the whole leafy crown is on screen. It passes BEHIND the
+     headline (z-index 2 against the hero's 10) and its inner tip is masked to
+     nothing well before it gets there — which is how it can be this size without
+     ever competing with the copy. Shrinking it to dodge the text was the wrong
+     trade; the mask does that job. */
+  /* Clips at the PAGE edge, which is where the branch is meant to run off. This
+     is a non-root element, so `clip` genuinely prevents scrolling here -
+     overflow on the root only propagates to the viewport, where it stops user
+     scrolling but still reports overflow and permits programmatic scroll. */
+  .grove-clip { position: absolute; top: 0; left: 0; right: 0; height: 0;
+    overflow-x: clip; overflow-y: visible; z-index: 2; pointer-events: none; }
+
+  /* ONE variable drives width, height and offset, so every scale stays in
+     proportion instead of each breakpoint re-guessing three numbers. Height is
+     an aspect-ratio off the art's own 620x540, and the offsets are fractions of
+     the width, so the branch always hangs off the edge by the same proportion. */
+  .wallbranch { --wbw: 620px; --wboff: -0.213;
+    position: absolute; width: var(--wbw); aspect-ratio: 620 / 540; height: auto;
+    top: calc(var(--wbw) * var(--wboff));
+    z-index: 2; pointer-events: none; }
+  .wallbranch.left  { left:  calc(var(--wbw) * var(--wboff)); transform: scaleX(-1); opacity: 0.95; }
+  .wallbranch.right { right: calc(var(--wbw) * var(--wboff)); opacity: 0.92; }
+  /* THE MASK MUST NOT EAT THE FOLIAGE.
+     The limb enters at the canvas's RIGHT edge and reaches left, so the thick bare
+     butt is on the right and every leaf is at the left tip. The previous fade ran
+     from 74% to 90% across the canvas, which erased exactly and only the leafy
+     end — the branch rendered as bare wood while the leaf canvas sat there fully
+     painted. The fade is now confined to the outermost 3% at each end. */
+  .wb-limb, .wb-leaves, .wb-cash { position: absolute; right: 0; top: 0;
+    -webkit-mask-image:
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 58%, rgba(0,0,0,0.34) 80%, transparent 95%),
+      linear-gradient(to bottom, #000 0 78%, rgba(0,0,0,0.42) 92%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to left, transparent 0, rgba(0,0,0,0.5) 4%, #000 13%, #000 58%, rgba(0,0,0,0.34) 80%, transparent 95%),
+      linear-gradient(to bottom, #000 0 78%, rgba(0,0,0,0.42) 92%, transparent 100%);
+    mask-composite: intersect; }
+  /* The canvas always fills its box, at any viewport. This is what makes the
+     branch responsive: the backing store is rasterised once at whatever size
+     suited the box then, and layout scales it to the box now. Previously the
+     pixel size was fixed at build time, so any resize left the canvas and the
+     box disagreeing - and with the box clipping, that mismatch showed up as the
+     art being sliced into a hard rectangle.
+     !important because mount() writes an inline width/height on the element. */
+  .wb-limb canvas, .wb-leaves canvas, .wb-cash canvas {
+    display: block; width: 100% !important; height: auto !important; }
+  /* money rides above the foliage: same geometry and seed as the limb, drawn on
+     its own pass, so it is not buried under the leaf layer */
+  .wb-cash { z-index: 2; }
+  .wb-cash canvas { display: block; }
+  /* THE FIRST FRAME IS STATIC ON PURPOSE.
+     Every leaf frame used to be position:absolute, so none of them contributed to
+     .wb-leaves' size — the container measured 0x0, and a CSS mask on a zero-size
+     element masks its entire subtree away. The frames were painted perfectly and
+     invisible. Letting frame 1 size the box, with the rest stacked over it,
+     gives the mask a real area to resolve against. */
+  .wb-leaves canvas { display: block; opacity: 0; }
+  .wb-leaves canvas:first-child { position: relative; }
+  .wb-leaves canvas:not(:first-child) { position: absolute; right: 0; top: 0; }
+  .wb-leaves canvas.on { opacity: 1; }
+  /* compound motion: the frames give per-leaf flutter, this gives the whole canopy
+     a slow lean, so it reads as wind through a tree rather than a looping sprite */
+  .wb-leaves { animation: wb-wind 11.5s ease-in-out infinite; transform-origin: 88% 40%; }
+  .wallbranch.right .wb-leaves { animation-duration: 14s; animation-delay: -3.4s; }
+  @keyframes wb-wind { 0%,100%{transform:rotate(-0.7deg) translateX(-2px)}
+                        50%{transform:rotate(0.9deg) translateX(3px)} }
+  @media (prefers-reduced-motion: reduce){ .wb-leaves { animation: none; } }
+  /* The branch SCALES rather than disappearing. It was display:none under
+     1040px, so the whole money-tree idea was desktop-only - and the canvases
+     were still being built and painted behind that display:none, which is the
+     worst of both: the full render cost on a phone, and nothing to show for it.
+     Sizes step down so it keeps peeking from the corners without crowding the
+     headline; the JS builds it at a matching resolution. */
+  /* Only --wbw and --wboff change per breakpoint; width, height and both offsets
+     all derive from them, so a scale can never end up with a size that does not
+     match its offset. The px cap stops the art growing past the size it was
+     drawn for; the vw term stops it crowding the headline on narrow screens. */
+  @media (max-width: 1240px){ .wallbranch { --wbw: min(520px, 41vw); } }
+  @media (max-width: 1040px){ .wallbranch { --wbw: min(420px, 40vw); } }
+  @media (max-width: 760px){
+    .wallbranch { --wbw: 46vw; --wboff: -0.36; opacity: 0.80; }
+    /* static on phones: cycling four full-size frames is a battery cost for a
+       decoration nobody is watching */
+    .wallbranch .wb-leaves { animation: none; } }
+  @media (max-width: 430px){ .wallbranch { --wbw: 52vw; --wboff: -0.40; opacity: 0.70; } }
+
+  /* ---------- THE SEAM ---------- */
+  .seam { position: relative; z-index: 1; width: 100%; overflow: hidden; line-height: 0; opacity: 0.62; }
+  .seam canvas { display: block; }
+
+  /* ---------- THE FLOCK ----------
+     Page-level, so the birds range the whole document and follow you down it.
+     Each carries a perched pose plus twelve wing phases on separate canvases. */
+  .flock { position: absolute; left: 0; top: 0; width: 100%; z-index: 7; pointer-events: none; }
+  .flyer { position: absolute; left: 0; top: 0; will-change: transform; pointer-events: auto; cursor: pointer;
+    filter: drop-shadow(0 2px 3px rgba(122,96,64,0.18)); }
+  .flyer canvas { display: block; }
+  .flyer .pose { position: absolute; left: 0; top: 0; opacity: 0; }
+  .flyer .pose.on { opacity: 1; }
+  .flyer .inner { display: block; transform-origin: 50% 84%; }
+  /* ---------- IDLE BEHAVIOUR ----------
+     Birds do NOT sway. They move in sharp discrete steps and then hold dead still,
+     which is the whole reason a smooth sine wave reads as fake. Every keyframe
+     below is built from fast transitions separated by plateaus — adjacent stops
+     with identical values are deliberate holds, and the easing is asymmetric so
+     the move out is quicker than the settle back. */
+
+  /* head-bob: the pigeon step. Snap forward, hold, drift back. */
+  @keyframes fl-bob {
+    0%,8%     { transform: translateX(0) rotate(0deg); }
+    16%       { transform: translateX(5px) rotate(-3deg); }
+    16.1%,34% { transform: translateX(5px) rotate(-3deg); }   /* hold */
+    44%       { transform: translateX(0) rotate(0deg); }
+    52%,60%   { transform: translateX(4px) rotate(-2deg); }   /* hold */
+    72%,100%  { transform: translateX(0) rotate(0deg); }
+  }
+  /* look-around: two fast head turns with a long stare between them */
+  @keyframes fl-look {
+    0%,10%    { transform: rotate(0deg) translateX(0); }
+    18%,40%   { transform: rotate(-22deg) translateX(-2px); }  /* snap left, stare */
+    48%       { transform: rotate(0deg) translateX(0); }
+    56%,80%   { transform: rotate(19deg) translateX(2px); }    /* snap right, stare */
+    90%,100%  { transform: rotate(0deg) translateX(0); }
+  }
+  /* preen: head buries into the flank, works there, comes back up */
+  @keyframes fl-preen {
+    0%,6%     { transform: rotate(0deg) translate(0,0); }
+    18%       { transform: rotate(38deg) translate(-3px,3px); }
+    22%,30%   { transform: rotate(34deg) translate(-3px,4px); }
+    34%,42%   { transform: rotate(41deg) translate(-4px,3px); }  /* working */
+    46%,54%   { transform: rotate(34deg) translate(-3px,4px); }
+    68%,100%  { transform: rotate(0deg) translate(0,0); }
+  }
+  /* tail-flick: almost instantaneous, then perfectly still */
+  @keyframes fl-flick {
+    0%,20%    { transform: rotate(0deg) translateY(0); }
+    26%       { transform: rotate(-9deg) translateY(-3px); }
+    32%,100%  { transform: rotate(0deg) translateY(0); }
+  }
+  /* fluff-and-settle: a fast shiver, then the feathers drop */
+  @keyframes fl-fluff {
+    0%,12%   { transform: scale(1,1) translateX(0); }
+    18%      { transform: scale(1.10,1.12) translateX(-1px); }
+    23%      { transform: scale(1.09,1.11) translateX(2px); }
+    28%      { transform: scale(1.11,1.12) translateX(-2px); }
+    33%      { transform: scale(1.09,1.11) translateX(1px); }
+    38%      { transform: scale(1.10,1.12) translateX(-1px); }
+    52%      { transform: scale(0.99,0.98) translateX(0); }
+    64%,100% { transform: scale(1,1) translateX(0); }
+  }
+  /* wing-stretch: one wing out, held open, folded away */
+  @keyframes fl-stretch {
+    0%,10%   { transform: rotate(0deg) scaleX(1) translateY(0); }
+    26%      { transform: rotate(-7deg) scaleX(1.16) translateY(-2px); }
+    30%,58%  { transform: rotate(-8deg) scaleX(1.18) translateY(-2px); }  /* hold open */
+    76%,100% { transform: rotate(0deg) scaleX(1) translateY(0); }
+  }
+  .flyer[data-beat="bob"]     .inner { animation: fl-bob 2200ms cubic-bezier(.2,.9,.2,1); }
+  .flyer[data-beat="look"]    .inner { animation: fl-look 2600ms cubic-bezier(.15,.95,.2,1); }
+  .flyer[data-beat="preen"]   .inner { animation: fl-preen 3000ms cubic-bezier(.3,.8,.3,1); }
+  .flyer[data-beat="flick"]   .inner { animation: fl-flick 1400ms cubic-bezier(.1,1,.3,1); }
+  .flyer[data-beat="fluff"]   .inner { animation: fl-fluff 1900ms cubic-bezier(.25,.9,.3,1); }
+  .flyer[data-beat="stretch"] .inner { animation: fl-stretch 2400ms cubic-bezier(.25,.9,.3,1); }
+
+  /* ---------- TWO-BIRD EXCHANGES ----------
+     Played as a SEQUENCE in JS, not as one keyframe on both birds at once —
+     simultaneous identical motion is what made the old squabble read as two
+     objects vibrating rather than two birds reacting to each other. */
+  @keyframes fl-lunge {
+    0%       { transform: translateX(0) rotate(0deg); }
+    22%      { transform: translateX(13px) rotate(-15deg); }
+    30%,38%  { transform: translateX(11px) rotate(-13deg); }
+    70%,100% { transform: translateX(0) rotate(0deg); }
+  }
+  @keyframes fl-recoil {
+    0%       { transform: translateX(0) rotate(0deg); }
+    18%      { transform: translateX(-9px) rotate(11deg); }
+    26%,40%  { transform: translateX(-8px) rotate(9deg); }
+    72%,100% { transform: translateX(0) rotate(0deg); }
+  }
+  @keyframes fl-offer {
+    0%,10%   { transform: rotate(0deg) translateY(0); }
+    30%      { transform: rotate(26deg) translateY(4px); }
+    36%,56%  { transform: rotate(24deg) translateY(4px); }   /* bow held */
+    80%,100% { transform: rotate(0deg) translateY(0); }
+  }
+  .flyer[data-beat="lunge"]  .inner { animation: fl-lunge 900ms cubic-bezier(.2,1,.3,1); }
+  .flyer[data-beat="recoil"] .inner { animation: fl-recoil 900ms cubic-bezier(.2,1,.3,1); }
+  .flyer[data-beat="offer"]  .inner { animation: fl-offer 1500ms cubic-bezier(.3,.9,.3,1); }
+  /* ten tap acts */
+  @keyframes em-spin   { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+  @keyframes em-bow    { 0%,100%{transform:rotate(0) translateY(0)} 40%{transform:rotate(24deg) translateY(4px)} }
+  @keyframes em-flutter{ 0%,100%{transform:translateY(0)} 20%{transform:translateY(-9px)} 45%{transform:translateY(-4px)} 70%{transform:translateY(-11px)} }
+  @keyframes em-tilt   { 0%,100%{transform:rotate(0)} 45%{transform:rotate(-19deg)} }
+  @keyframes em-puff   { 0%,100%{transform:scale(1)} 40%{transform:scale(1.24,1.16)} 70%{transform:scale(0.97,1.02)} }
+  @keyframes em-sing   { 0%,100%{transform:translateY(0) rotate(0)} 15%{transform:translateY(-3px) rotate(-6deg)}
+    35%{transform:translateY(0)} 55%{transform:translateY(-4px) rotate(-7deg)} 78%{transform:translateY(0)} }
+  @keyframes em-startle{ 0%{transform:translate(0,0) rotate(0)} 18%{transform:translate(9px,-13px) rotate(11deg)}
+    46%{transform:translate(-4px,-3px) rotate(-5deg)} 100%{transform:translate(0,0) rotate(0)} }
+  @keyframes em-nod    { 0%,100%{transform:rotate(0)} 25%{transform:rotate(13deg)} 50%{transform:rotate(0)} 75%{transform:rotate(11deg)} }
+  @keyframes em-wobble { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-11deg)} 45%{transform:rotate(9deg)} 70%{transform:rotate(-6deg)} }
+  @keyframes em-jump   { 0%,100%{transform:translateY(0) scaleY(1)} 25%{transform:translateY(-16px) scaleY(1.1)}
+    55%{transform:translateY(0) scaleY(0.9)} 75%{transform:translateY(-5px) scaleY(1.03)} }
+  .flyer[data-emote="spin"]    .inner { animation: em-spin 780ms cubic-bezier(.4,0,.3,1); }
+  .flyer[data-emote="bow"]     .inner { animation: em-bow 900ms ease-in-out; }
+  .flyer[data-emote="flutter"] .inner { animation: em-flutter 900ms ease-in-out; }
+  .flyer[data-emote="tilt"]    .inner { animation: em-tilt 820ms ease-in-out; }
+  .flyer[data-emote="puff"]    .inner { animation: em-puff 760ms cubic-bezier(.3,1.5,.4,1); }
+  .flyer[data-emote="sing"]    .inner { animation: em-sing 1150ms ease-in-out; }
+  .flyer[data-emote="startle"] .inner { animation: em-startle 820ms cubic-bezier(.25,1.4,.4,1); }
+  .flyer[data-emote="nod"]     .inner { animation: em-nod 900ms ease-in-out; }
+  .flyer[data-emote="wobble"]  .inner { animation: em-wobble 950ms ease-in-out; }
+  .flyer[data-emote="jump"]    .inner { animation: em-jump 820ms cubic-bezier(.3,1.3,.4,1); }
+
+  /* ---------- DRIFT + BLOOM ---------- */
+  /* Falling leaves, kept deliberately quiet: behind the content rather than over
+     it, and confined to the outer margins where the branches actually are, so
+     nothing ever tracks across a line the reader is on. */
+  .drift { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+  /* opacity:0 is load-bearing. The leaf sits at left:0/top:0 and is moved only
+     by its animation, so between page load and its first fall (5-16s later) it
+     was parked fully visible in the top-left corner of the page. */
+  .drift .leaf { position: absolute; left: 0; top: 0; opacity: 0;
+    will-change: transform, opacity; }
+  /* NB: size comes from the mount cell below, not from here - mount() writes an
+     inline width/height, which beats any stylesheet rule */
+  .drift .leaf canvas { display: block; }
+  .wb-bloom { position: absolute; z-index: 3; pointer-events: none;
+    transform-origin: 50% 60%; opacity: 0; will-change: transform, opacity; }
+  .wb-bloom canvas { display: block; }
+  /* the pop overshoots and settles — an ease-out alone reads mechanical */
+  @keyframes bloom-in {
+    0%{opacity:0;transform:scale(0.1) rotate(-28deg)} 45%{opacity:1;transform:scale(1.18) rotate(7deg)}
+    68%{transform:scale(0.94) rotate(-3deg)} 85%{transform:scale(1.04) rotate(1.5deg)}
+    100%{opacity:1;transform:scale(1) rotate(0)} }
+  @keyframes bloom-out { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(0.72) rotate(9deg)} }
+  .wb-bloom[data-state="in"]  { animation: bloom-in 1100ms cubic-bezier(.22,.9,.28,1) forwards; }
+  .wb-bloom[data-state="out"] { animation: bloom-out 620ms cubic-bezier(.4,0,.7,.4) forwards; }
+  @media (prefers-reduced-motion: reduce){ .drift, .wb-bloom, .flock { display: none; } }
+  @media (max-width: 1040px){ .drift { display: none; } }
+  @media (max-width: 900px){ .flock { display: none; } }
+
+
+  /* the mark shows in the EXPANDED bar too, not only the compressed one.
+     It was set to height:0 / opacity:0 and only revealed at data-compact="1",
+     so the long bar carried the wordmark alone. */
+  .nav .wm-mark { height: 24px; width: 24px; opacity: 1; margin-right: 11px; }
+
+
+  /* ======================================================================
+     MOBILE. The desktop pass raised the body to 20px on a 66ch measure and the
+     headline to 66px; none of that was re-scaled down, so on a phone the
+     sub-copy ran at desktop size and the nav CTA overflowed its bar.
+     ====================================================================== */
+  @media (max-width: 760px){
+    h1.headline { font-size: 32px; line-height: 1.12; letter-spacing: 0.014em;
+      word-spacing: 0.03em; -webkit-text-stroke: 1.1px currentColor; margin-top: 14px; }
+    h1.headline .hword { -webkit-text-stroke: 0.9px #2A2419; letter-spacing: 0.016em; }
+    .hero .sub { font-size: 16px; line-height: 1.58; letter-spacing: 0.006em;
+      word-spacing: 0.02em; max-width: 100%; padding: 0 4px; }
+    .cats { font-size: 13px; letter-spacing: 0.03em; gap: 6px; }
+    .icp { font-size: 10px; letter-spacing: 0.07em; }
+    .plan-head h2 { font-size: 26px; letter-spacing: 0.014em; }
+    .plan-head p { font-size: 15.5px; line-height: 1.55; }
+    .vsl-step { font-size: 9.5px; letter-spacing: 0.09em; gap: 8px; }
+    .vsl-step .rule { width: 26px; }
+    .vsl-step .step-n { font-size: 12px; }
+    /* the bar: the mark plus the full sentence does not fit a phone, so the
+       filler words go and the mark holds the brand */
+    .nav { padding: 7px 8px 7px 12px; gap: 10px; }
+    .nav .wm { height: 20px; }
+    .nav .wm-mark { height: 19px; width: 19px; margin-right: 7px; }
+    .nav .pill { font-size: 9px; letter-spacing: 0.07em; padding: 9px 12px 11px; }
+    .nav .pill .pw { display: none; }
+    .nav .pill .pill-ico { width: 12px; height: 12px; }
+    /* every decorative layer is off on a phone: they cost paint and there is no
+       margin to put them in */
+    .flock, .weeptree, .navtree { display: none !important; }
+    .seam { opacity: 0.5; }
+  }
+  @media (max-width: 430px){
+    h1.headline { font-size: 27px; letter-spacing: 0.010em; }
+    .hero .sub { font-size: 15.5px; }
+    .cats { font-size: 11.5px; gap: 4px; }
+    .nav .pill { font-size: 8.5px; padding: 8px 10px 10px; }
+  }
+
 </style>
-</head>
+  </head>
 <body>
 
   
 
   <!-- ============ floating irregular sticky header ============ -->
+  <div class="grove-clip" aria-hidden="true">
+  <div class="wallbranch left" aria-hidden="true">
+    <div class="wb-limb" data-kind="wb-limb-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.70"></div>
+    <div class="wb-leaves" data-form="a"></div>
+    <div class="wb-cash" data-kind="wb-cash-a" data-seed="3" data-cols="210" data-rows="176" data-cell="2.70"></div>
+  </div>
+  <div class="wallbranch right" aria-hidden="true">
+    <div class="wb-limb" data-kind="wb-limb-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
+    <div class="wb-leaves" data-form="b"></div>
+    <div class="wb-cash" data-kind="wb-cash-b" data-seed="8" data-cols="210" data-rows="176" data-cell="2.95"></div>
+  </div>
+  </div>
+  <div class="flock" aria-hidden="true"></div>
   <div class="nav-wrap">
     <div class="nav-shell">
       <div class="nav">
@@ -1755,7 +2238,7 @@ hr {
              Visible from the moment the player is live. Each knot opens into its own
              cross-stitch flower as the playhead passes it (chapterBloom in asset-6.js).
              Titles/times mirror Wistia's chapterList and are re-read from it at runtime. -->
-        <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="838" hidden>
+        <nav class="ch" id="vsl-chapters" aria-label="Video chapters" data-state="idle" data-duration="812" hidden>
           <!-- the list opens upward over the video: attached to what it navigates,
                costs no page flow, and never sits between the video and the CTA -->
           <div class="ch-index" id="vsl-chapter-index" data-open="false">
@@ -1874,6 +2357,7 @@ hr {
 
 
   <!-- ============ refined closing footer ============ -->
+  <div class="seam" aria-hidden="true" data-kind="seam-chevron" data-cell="1.7" data-rows="11"></div>
   <footer class="foot" data-screen-label="03 Footer">
     <span class="foot-mark" aria-hidden="true"></span>
     <div class="wrap foot-inner">
@@ -2245,7 +2729,7 @@ hr {
     var thumb = rail && rail.querySelector('i');
     var toggle = document.querySelector('.ch-toggle');
     var list = document.getElementById('ch-list');
-    var duration = parseFloat(nav.getAttribute('data-duration')) || 838;
+    var duration = parseFloat(nav.getAttribute('data-duration')) || 812;
     var stops = items.map(function(b){
       return { t: parseInt(b.getAttribute('data-t'), 10) || 0, label: b.querySelector('.ch-label').textContent };
     });
@@ -3646,5 +4130,484 @@ hr {
       window.addEventListener(t, release, { passive: true });
     });
   })();
+
+  /* ================= REBUILT ANIMATION SYSTEMS =============================
+     Three lessons are baked into all of these, each learned the hard way:
+       1. rAF and Web Animations are SUSPENDED in a hidden tab while setTimeout
+          keeps firing. Anything scheduled into a frozen timeline stacks up and
+          never completes, leaving elements stuck mid-animation forever.
+       2. A first paint can land before the viewport reports a usable width. Any
+          build that bails on a width check must retry, or it never runs at all.
+       3. Never swallow a mount error — an empty canvas with no message is the
+          most expensive kind of bug to find.
+     ======================================================================== */
+  (function(){
+    var REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- chunked build queue ---------- */
+    var queue=[], pumping=false;
+
+    /* Work that is not on screen yet does not need to run during load. Anything
+       queued through defer() waits until its element is within a viewport of
+       being seen, which takes the below-the-fold canvases out of the critical
+       path entirely. Without IntersectionObserver it simply queues as before. */
+    var _io = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(!en.isIntersecting) return;
+        _io.unobserve(en.target);
+        var jobs=en.target.__ahJobs; if(!jobs) return;
+        en.target.__ahJobs=null;
+        for(var i=0;i<jobs.length;i++) queue.push(jobs[i]);
+        pump();
+      });
+    }, {rootMargin:'900px 0px'}) : null;
+    /* On screen, but not needed on the first frame - let the page settle first. */
+    function later(job){
+      /* requestIdleCallback does NOT fire in a hidden tab - not even with its
+         timeout - so a page opened in a background tab would never build these
+         at all. setTimeout still fires (throttled), so it is the guarantee and
+         idle time is only allowed to win the race earlier. */
+      var done=false;
+      var run=function(){ if(done) return; done=true; queue.push(job); pump(); };
+      if(window.requestIdleCallback) requestIdleCallback(run, {timeout:1800});
+      setTimeout(run, 1100);
+    }
+    function defer(el, job){
+      if(!_io || !el){ queue.push(job); return; }
+      if(!el.__ahJobs){ el.__ahJobs=[]; _io.observe(el); }
+      el.__ahJobs.push(job);
+    }
+    function next(cb){ if(document.hidden) setTimeout(cb,8); else requestAnimationFrame(cb); }
+    function pump(){
+      if(pumping) return; pumping=true;
+      (function step(){
+        var job=queue.shift();
+        if(!job){ pumping=false; return; }
+        try { job(); } catch(e){ if(window.console) console.error('[ah-art]', e); }
+        next(step);
+      })();
+    }
+
+    /* ---------- the section seam ---------- */
+    function seams(){
+      document.querySelectorAll('.seam').forEach(function(el){
+        var cell=parseFloat(el.dataset.cell)||1.7;
+        var n=Math.ceil((window.innerWidth/cell)/8)*8+8;
+        if(el.__cols===n) return; el.__cols=n; el.innerHTML='';
+        var c=document.createElement('canvas'); el.appendChild(c);
+        /* every seam is below the fold - none of them belong in the initial load */
+        defer(el, function(){
+          AHStitch.mount(c,{kind:el.dataset.kind||'seam-chevron',cols:n,rows:+el.dataset.rows||11,
+            cell:cell,seed:7,twinkle:false,animate:false});
+        });
+      });
+    }
+
+    /* ---------- wall branches ---------- */
+    var FRB=4;
+    /* Size the canvas from the box it is ACTUALLY in, measured. The previous
+       version kept a breakpoint table in JS mirroring the one in CSS, and the
+       two disagreed - CSS applied the <=430 box while JS picked the <=760 cell,
+       so the canvas came out wider than its container and the ink spilled across
+       the hero. One source of truth: whatever the element measures. */
+    function wbCell(el, cols){
+      var host=el.closest ? el.closest('.wallbranch') : el.parentElement;
+      var w=(host||el).getBoundingClientRect().width;
+      return w>4 ? w/cols : 0;
+    }
+    function wbFrames(){ return innerWidth<=760 ? 1 : FRB; }
+    function branches(){
+      document.querySelectorAll('.wb-limb, .wb-cash').forEach(function(el){
+        if(el.dataset.built) return; el.dataset.built='1';
+        queue.push(function(){
+          if(getComputedStyle(el.parentElement).display==='none') return;
+          var c=document.createElement('canvas'); el.appendChild(c);
+          var cl=wbCell(el, +el.dataset.cols); if(!cl) return;
+          var hostW=(el.closest('.wallbranch')||el).getBoundingClientRect().width;
+          (el.closest('.wallbranch')||el).dataset.builtW=Math.round(hostW);
+          AHStitch.mount(c,{kind:el.dataset.kind,cols:+el.dataset.cols,rows:+el.dataset.rows,
+            cell:cl,seed:+el.dataset.seed,twinkle:false,animate:false});
+        });
+      });
+      document.querySelectorAll('.wb-leaves').forEach(function(el,i){
+        if(el.dataset.built) return; el.dataset.built='1';
+        var form=el.dataset.form;
+        var cell=parseFloat(el.parentElement.querySelector('.wb-limb').dataset.cell);
+        el.__i=i*2; el.__stride=1+(i%2);
+        var NF=wbFrames();
+        for(var fr=0;fr<NF;fr++)(function(fr){
+          /* Only frame 0 is on screen at load. Frames 1-3 exist for the wind
+             cycle and are the heaviest canvases on the page, so they are built
+             after the first paint rather than during it. The cycler below skips
+             any frame that has not been built yet. */
+          (fr===0 ? queue.push.bind(queue) : later)(function(){
+            var cv=document.createElement('canvas');
+            if(fr===0) cv.className='on';
+            el.appendChild(cv);
+            if(getComputedStyle(el.parentElement).display==='none') return;
+            var cl2=wbCell(el,210); if(!cl2) return;
+            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:210,rows:176,
+              cell:cl2,seed:3,twinkle:false,animate:false});
+          });
+        })(fr);
+      });
+      pump();
+    }
+    /* CSS keeps the canvas fitting its box at any width, so a resize can never
+       clip or overflow. But a canvas rasterised for a 232px box and then scaled
+       up to 620px is soft, and one rasterised at 620px scaled down to 232px is
+       wasted memory. So past a threshold the branch is rebuilt at the new size.
+       Debounced, and only on a real change - iOS fires resize on scroll when the
+       address bar collapses, which would otherwise rebuild constantly. */
+    var wbT=null, wbLastW=innerWidth;
+    addEventListener('resize', function(){
+      if(innerWidth===wbLastW) return;          /* height-only change: ignore */
+      wbLastW=innerWidth;
+      clearTimeout(wbT);
+      wbT=setTimeout(function(){
+        document.querySelectorAll('.wallbranch').forEach(function(host){
+          if(getComputedStyle(host).display==='none') return;
+          var now=host.getBoundingClientRect().width, was=+host.dataset.builtW||0;
+          if(!was || !now) return;
+          var k=now/was;
+          if(k<1.32 && k>0.76) return;          /* scaling still looks fine */
+          host.querySelectorAll('.wb-limb, .wb-cash, .wb-leaves').forEach(function(l){
+            l.innerHTML=''; delete l.dataset.built;
+          });
+        });
+        branches();
+      }, 320);
+    }, {passive:true});
+
+    var btick=0;
+    setInterval(function(){
+      if(document.hidden) return;
+      btick++;
+      document.querySelectorAll('.wb-leaves').forEach(function(el){
+        var cs=el.children; if(!cs.length) return;
+        var n=Math.floor((btick*(el.__stride||1)+(el.__i||0))/5) % cs.length;
+        for(var k=0;k<cs.length;k++) cs[k].classList.toggle('on', k===n);
+      });
+    }, 320);
+
+    /* ---------- the flock ---------- */
+    var CAST=[{perch:['bd-wren',56,62],wing:'a',cell:0.78},
+              {perch:['bd-robin',58,66],wing:'b',cell:0.74},
+              {perch:['bd-crow',72,58],wing:'c',cell:0.70}];
+    var BEATS=['bob','look','preen','flick','fluff','stretch'], PHASES=12, birds=[];
+    var EMOTES=['spin','bow','flutter','tilt','puff','sing','startle','nod','wobble','jump'];
+
+    function obstacles(){
+      var out=[], PAD=16, TPAD=13;
+      /* Every line of text on the page, found by walking TEXT NODES rather than
+         by naming selectors. The old version listed six selectors, so any heading
+         that was not on the list was fair game and birds landed on it. A text
+         node's own client rects are the exact line boxes, so this covers copy
+         that does not exist yet. */
+      var tw=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), tn;
+      while((tn=tw.nextNode())){
+        if(!tn.nodeValue || !tn.nodeValue.trim()) continue;
+        var pe=tn.parentElement; if(!pe) continue;
+        if(pe.closest('.flock,.drift,.wallbranch,script,style')) continue;
+        var cs=getComputedStyle(pe);
+        if(cs.display==='none'||cs.visibility==='hidden'||parseFloat(cs.opacity)===0) continue;
+        var rng=document.createRange(); rng.selectNodeContents(tn);
+        var list=rng.getClientRects();
+        for(var i=0;i<list.length;i++){
+          var x=list[i];
+          if(x.width<6||x.height<4) continue;
+          if(x.bottom<-260||x.top>innerHeight+260) continue;
+          out.push({l:x.left-TPAD,t:x.top+scrollY-TPAD,r:x.right+TPAD,b:x.bottom+scrollY+TPAD});
+        }
+      }
+      /* NB: never list a full-bleed container (.flock, .drift, .wallbranch) — an
+         inset:0 layer makes every position illegal and all birds fall back to
+         their seed coordinates in a neat row. */
+      /* everything a visitor interacts with, plus the Cal embed and any iframe —
+         a bird sitting on the booking calendar looks broken and, worse, sits over
+         a control someone is trying to click */
+      ('.vsl,.cats-wrap,.cta-row,.pill,.nav-wrap,.dock,.vsl-step,.pf,.seam,'+
+       '.plan-book,.plan-book-frame,.plan-book-head,.plan-book-lead,iframe,'+
+       '.pfd-cal,.foot').split(',').forEach(function(q){
+        document.querySelectorAll(q).forEach(function(el){
+          var x=el.getBoundingClientRect(); if(x.bottom<-260||x.top>innerHeight+260) return;
+          out.push({l:x.left-PAD,t:x.top+scrollY-PAD,r:x.right+PAD,b:x.bottom+scrollY+PAD});
+        });
+      });
+      return out;
+    }
+    function clear(c,list){ for(var i=0;i<list.length;i++){ var b=list[i];
+      if(c.l<b.r&&c.r>b.l&&c.t<b.b&&c.b>b.t) return false; } return true; }
+    function findPerch(w,h,avoid,near){
+      var blocked=obstacles(), top=scrollY+80, bot=scrollY+innerHeight-h-70;
+      if(bot<top) bot=top+40;
+      for(var t=0;t<220;t++){
+        var x,y;
+        if(near&&t<70){ x=near.x+(Math.random()-0.5)*190; y=near.y+(Math.random()-0.5)*90; }
+        else { x=22+Math.random()*(innerWidth-w-44); y=top+Math.random()*(bot-top); }
+        if(x<16||x>innerWidth-w-16) continue;
+        if(avoid&&Math.hypot(x-avoid.x,y-avoid.y)<170) continue;
+        if(clear({l:x,t:y,r:x+w,b:y+h},blocked)) return {x:x,y:y};
+      }
+      return null;
+    }
+    function place(b){ b.el.style.transform='translate('+b.at.x+'px,'+b.at.y+'px) scaleX('+b.facing+')'; }
+    function show(b,which){
+      for(var i=0;i<b.wings.length;i++) b.wings[i].classList.toggle('on', i===which);
+      if(which===-1) setPose(b, b.poseIdx||0);
+      else for(var j=0;j<b.poses.length;j++) b.poses[j].classList.remove('on');
+    }
+    function setPose(b,n){
+      b.poseIdx=n;
+      for(var i=0;i<b.poses.length;i++) b.poses[i].classList.toggle('on', i===n);
+    }
+    /* a behaviour is: hold the pose for a beat, then return to rest. The HOLD is
+       what makes it read as a bird — it is the stillness between moves, not the
+       move, that sells it. */
+    var POSE_OF={bob:4,look:2,preen:3,flick:0,fluff:5,stretch:6,
+                 lunge:1,recoil:5,offer:4};
+    function act(b,beat,ms){
+      var pn=POSE_OF[beat];
+      if(pn!=null) setPose(b,pn);
+      b.el.dataset.beat=beat;
+      return new Promise(function(r){
+        setTimeout(function(){ b.el.dataset.beat=''; setPose(b,0); r(); }, ms);
+      });
+    }
+    function flapStart(b,dur){
+      var i=0, beat=Math.max(38, Math.min(72, 96-dur*0.012));
+      b.flapT=setInterval(function(){ show(b, i%PHASES); i++; }, beat);
+    }
+    function flapStop(b){ if(b.flapT){ clearInterval(b.flapT); b.flapT=null; } show(b,-1); }
+    function flyTo(b,dest){
+      if(!dest||b.flying) return;
+      b.flying=true; b.el.dataset.beat=''; b.el.dataset.emote='';
+      var dx=dest.x-b.at.x, dy=dest.y-b.at.y;
+      b.facing = dx>=0 ? -1 : 1;
+      var dist=Math.hypot(dx,dy), dur=620+dist*0.95, lift=Math.min(190,70+dist*0.30);
+      if(b.anim){ b.anim.cancel(); b.anim=null; }
+      flapStart(b,dur);
+      b.anim=b.el.animate([
+        {transform:'translate('+b.at.x+'px,'+b.at.y+'px) scaleX('+b.facing+') rotate(0deg)'},
+        {transform:'translate('+((b.at.x+dest.x)/2)+'px,'+(Math.min(b.at.y,dest.y)-lift)+'px) scaleX('+b.facing+') rotate('+(dx>=0?-8:8)+'deg)',offset:0.5},
+        {transform:'translate('+dest.x+'px,'+dest.y+'px) scaleX('+b.facing+') rotate(0deg)'}
+      ],{duration:dur,easing:'cubic-bezier(.30,.06,.26,1)',fill:'forwards'});
+      b.anim.onfinish=function(){
+        flapStop(b); b.at=dest; b.flying=false; place(b);
+        if(b.anim){ b.anim.cancel(); b.anim=null; }
+        meet(b);
+      };
+      b.anim.oncancel=function(){ flapStop(b); b.flying=false; };
+    }
+    /* an exchange, played as turns. One acts, the other answers, with a beat of
+       stillness between — which is what makes it read as two birds reacting to
+       each other rather than two sprites vibrating in unison. */
+
+    function meet(b){
+      birds.forEach(function(o){
+        if(o===b||o.flying||b.flying||b.busy||o.busy) return;
+        if(Math.hypot(o.at.x-b.at.x,o.at.y-b.at.y)>170) return;
+        b.busy=o.busy=true;
+        /* they turn and face each other first — nothing happens until they do */
+        b.facing=(o.at.x>b.at.x)?-1:1; place(b);
+        o.facing=(b.at.x>o.at.x)?-1:1; place(o);
+        var scrap=Math.random()<0.55;
+        var seq = scrap
+          ? [[b,'lunge',900],[o,'recoil',900],[o,'lunge',900],[b,'recoil',900],
+             [b,'fluff',1500],[o,'flick',1100]]
+          : [[b,'offer',1500],[o,'look',1600],[o,'offer',1500],[b,'bob',1600],
+             [b,'preen',2200],[o,'preen',2200]];
+        (function run(i){
+          if(i>=seq.length || document.hidden){ b.busy=o.busy=false; return; }
+          act(seq[i][0], seq[i][1], seq[i][2]).then(function(){
+            setTimeout(function(){ run(i+1); }, 260);   /* the pause between turns */
+          });
+        })(0);
+      });
+    }
+    function beatLoop(b){
+      setTimeout(function(){
+        if(!b.el.isConnected) return;
+        if(!document.hidden && !b.flying && !b.busy && !b.el.dataset.beat && !b.el.dataset.emote){
+          var pick=BEATS[(Math.random()*BEATS.length)|0];
+          act(b, pick, 1500+Math.random()*1600);
+        }
+        beatLoop(b);
+      }, 6000+Math.random()*6000+b.idx*1900);
+    }
+    function flightLoop(b){
+      setTimeout(function(){
+        if(!b.el.isConnected) return;
+        if(!document.hidden && !b.flying && !b.busy){
+          var target=null;
+          if(Math.random()<0.34){
+            var o=birds[(b.idx+1)%birds.length];
+            if(o&&o!==b&&!o.flying) target=findPerch(b.w,b.h,null,o.at);
+          }
+          flyTo(b, target || findPerch(b.w,b.h,b.at,null));
+        }
+        flightLoop(b);
+      }, 16000+Math.random()*12000+b.idx*5000);
+    }
+
+    var flockBuilt=false;
+    function flock(){
+      var host=document.querySelector('.flock');
+      if(!host||innerWidth<900||flockBuilt) return;
+      flockBuilt=true;
+      host.style.height=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)+'px';
+      CAST.forEach(function(spec,idx){
+        var el=document.createElement('div'); el.className='flyer';
+        var inner=document.createElement('span'); inner.className='inner'; el.appendChild(inner);
+        var w=spec.perch[1]*spec.cell, h=spec.perch[2]*spec.cell;
+        inner.style.width=w+'px'; inner.style.height=h+'px';
+        function pose(kind,cols,rows,on){
+          var wrap=document.createElement('span'); wrap.className='pose'+(on?' on':'');
+          var c=document.createElement('canvas'); wrap.appendChild(c); inner.appendChild(wrap);
+          queue.push(function(){
+            AHStitch.mount(c,{kind:kind,cols:cols,rows:rows,cell:spec.cell,seed:7+idx*13,twinkle:false,animate:false});
+          });
+          return wrap;
+        }
+        /* seven DRAWN perched poses, not one sprite being rotated. Behaviour is a
+           sprite swap: a preen actually buries the head, an alert actually
+           extends the neck. Transforms alone can only ever tilt. */
+        var poses=[]; for(var q=0;q<7;q++) poses.push(pose('bp-'+spec.wing+'-'+q,64,64,q===0));
+        var perched=poses[0];
+        var wings=[]; for(var p=0;p<PHASES;p++) wings.push(pose('fw-'+spec.wing+'-'+p,76,54,false));
+        host.appendChild(el);
+        var b={el:el,inner:inner,perched:perched,poses:poses,wings:wings,w:w,h:h,facing:1,anim:null,flapT:null,flying:false,idx:idx};
+        b.at=findPerch(w,h,null,null)||{x:60+idx*160,y:scrollY+150};
+        place(b); birds.push(b);
+        var lastEmote=-1;
+        el.addEventListener('pointerdown',function(ev){
+          ev.preventDefault();
+          if(b.flying) return;
+          var pick; do{ pick=(Math.random()*EMOTES.length)|0; } while(pick===lastEmote);
+          lastEmote=pick;
+          el.dataset.beat=''; el.dataset.emote=''; void el.offsetWidth;
+          el.dataset.emote=EMOTES[pick];
+          if(/flutter|startle|jump/.test(EMOTES[pick])){ flapStart(b,300); setTimeout(function(){ flapStop(b); },900); }
+          setTimeout(function(){ if(el.dataset.emote===EMOTES[pick]) el.dataset.emote=''; },1300);
+        },{passive:false});
+        beatLoop(b); flightLoop(b);
+      });
+      pump();
+      var st;
+      window.addEventListener('scroll',function(){
+        clearTimeout(st);
+        st=setTimeout(function(){
+          if(document.hidden) return;
+          var top=scrollY, bot=top+innerHeight;
+          birds.forEach(function(b,i){
+            if(b.flying) return;
+            if(b.at.y+b.h<top+40 || b.at.y>bot-60)
+              setTimeout(function(){ flyTo(b, findPerch(b.w,b.h,b.at,null)); }, i*420);
+          });
+        },520);
+      },{passive:true});
+    }
+
+    /* ---------- drift + blooms ---------- */
+    var DRIFT_POOL=4, DRIFT_SHAPES=['dl-0','dl-1','dl-2','dl-3','dl-4'];
+    var leaves=[], blooms=[], driftBuilt=false;
+    function fall(L,delay){
+      if(!L.el.isConnected) return;
+      var w=innerWidth,h=innerHeight;
+      /* Spawn in the outer margin on one side or the other. A leaf that falls
+         through the middle of the page crosses the headline and the copy, which
+         is exactly the distraction to avoid; the branches are at the corners
+         anyway, so the sides are also where a leaf would really come from. */
+      var band=Math.min(0.26*w, 330);
+      var x0=(Math.random()<0.5) ? Math.random()*band : w-band+Math.random()*band;
+      var drift=(Math.random()-0.5)*150, dur=15000+Math.random()*8000;
+      var spin=(Math.random()<0.5?-1:1)*(160+Math.random()*220), sway=34+Math.random()*46;
+      var peak=0.30+Math.random()*0.10;             /* never fully opaque */
+      if(L.anim){ L.anim.cancel(); L.anim=null; }
+      L.anim=L.el.animate([
+        {transform:'translate('+x0+'px,-60px) rotate(0deg)',opacity:0},
+        {transform:'translate('+(x0+sway)+'px,'+(h*0.22)+'px) rotate('+(spin*0.25)+'deg)',opacity:peak,offset:0.22},
+        {transform:'translate('+(x0-sway*0.6+drift*0.5)+'px,'+(h*0.55)+'px) rotate('+(spin*0.6)+'deg)',opacity:peak,offset:0.58},
+        {transform:'translate('+(x0+drift)+'px,'+(h+70)+'px) rotate('+spin+'deg)',opacity:0}
+      ],{duration:dur,delay:delay||0,easing:'cubic-bezier(.42,.05,.55,.98)',fill:'forwards'});
+      L.anim.onfinish=function(){ sched(L); };
+    }
+    function sched(L){
+      clearTimeout(L.t);
+      /* long gaps on purpose: with four leaves and this spacing the page shows
+         one or two at a time, which is weather, not confetti */
+      L.t=setTimeout(function(){ if(document.hidden){ sched(L); return; } fall(L,0); }, 5000+Math.random()*11000);
+    }
+    var SPOTS=[{s:'.wallbranch.left',x:0.32,y:0.58},{s:'.wallbranch.left',x:0.54,y:0.47},
+               {s:'.wallbranch.left',x:0.70,y:0.66},{s:'.wallbranch.right',x:0.30,y:0.52},
+               {s:'.wallbranch.right',x:0.50,y:0.66},{s:'.wallbranch.right',x:0.68,y:0.48}];
+    var FLOWERS=['fb-daisy','fb-aster','fb-rose','fb-bell','fb-pom'], lastBloom=-1;
+    function driftBloom(){
+      if(driftBuilt||innerWidth<1040) return;
+      driftBuilt=true;
+
+      /* A few loose leaves coming off the branches. The leaves that matter are
+         still the ones ON the tree; this is a handful more, low and slow. */
+      var dw=document.createElement('div'); dw.className='drift';
+      document.body.appendChild(dw);
+      for(var di=0; di<DRIFT_POOL; di++){
+        (function(idx){
+          var el=document.createElement('div'); el.className='leaf';
+          var c=document.createElement('canvas'); el.appendChild(c); dw.appendChild(el);
+          var L={el:el, anim:null, t:0};
+          later(function(){
+            AHStitch.mount(c,{kind:DRIFT_SHAPES[idx%DRIFT_SHAPES.length],
+              cols:22, rows:22, cell:1.10, seed:31+idx*7, twinkle:false, animate:false});
+          });
+          leaves.push(L); sched(L);
+        })(di);
+      }
+      SPOTS.forEach(function(sp,i){
+        var h2=document.querySelector(sp.s); if(!h2) return;
+        var el=document.createElement('div'); el.className='wb-bloom';
+        el.style.left=(sp.x*100).toFixed(1)+'%'; el.style.top=(sp.y*100).toFixed(1)+'%';
+        var c=document.createElement('canvas'); el.appendChild(c); h2.appendChild(el);
+        queue.push(function(){ AHStitch.mount(c,{kind:FLOWERS[i%FLOWERS.length],cols:30,rows:30,cell:0.92,seed:5+i,twinkle:false,animate:false}); });
+        blooms.push(el);
+      });
+      pump();
+      setInterval(function(){
+        if(document.hidden||!blooms.length) return;
+        var pick; do{ pick=(Math.random()*blooms.length)|0; } while(blooms.length>1&&pick===lastBloom);
+        lastBloom=pick;
+        var el=blooms[pick]; if(el.dataset.state==='in') return;
+        el.dataset.state='in';
+        setTimeout(function(){
+          if(el.dataset.state==='in') el.dataset.state='out';
+          setTimeout(function(){ if(el.dataset.state==='out') el.dataset.state=''; },700);
+        }, 4200+Math.random()*1800);
+      }, 5000);
+    }
+
+    document.addEventListener('visibilitychange',function(){
+      if(document.hidden) return;
+      birds.forEach(function(b){
+        b.el.getAnimations().forEach(function(a){ a.cancel(); });
+        flapStop(b); b.flying=false; b.el.dataset.beat=''; b.el.dataset.emote=''; place(b);
+      });
+      leaves.forEach(function(L){ if(L.anim && L.anim.playState!=='running') sched(L); });
+    });
+
+    function build(){
+      if(!window.AHStitch) return;
+      seams(); branches();
+      if(!REDUCE){ flock(); driftBloom(); }   /* driftBloom now only builds the blooms */
+    }
+    /* retry: a first paint can land before the viewport has a usable width */
+    function boot(n){
+      build();
+      if((!flockBuilt||!driftBuilt) && (n||0)<24) setTimeout(function(){ boot((n||0)+1); },400);
+    }
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ boot(0); });
+    else window.addEventListener('load',function(){ boot(0); });
+    var rt; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ seams(); build(); },320); });
+    window.__ah=function(){ return {birds:birds.length,leaves:leaves.length,blooms:blooms.length}; };
+  })();
+
 </script>
 </body></html>
