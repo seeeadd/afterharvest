@@ -1982,7 +1982,10 @@ hr {
   .flyer[data-emote="jump"]    .inner { animation: em-jump 820ms cubic-bezier(.3,1.3,.4,1); }
 
   /* ---------- DRIFT + BLOOM ---------- */
-  .drift { position: fixed; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; }
+  /* Falling leaves, kept deliberately quiet: behind the content rather than over
+     it, and confined to the outer margins where the branches actually are, so
+     nothing ever tracks across a line the reader is on. */
+  .drift { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
   .drift .leaf { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
   .drift .leaf canvas { display: block; }
   .wb-bloom { position: absolute; z-index: 3; pointer-events: none;
@@ -4288,24 +4291,34 @@ hr {
     }
 
     /* ---------- drift + blooms ---------- */
-    var POOL=8, leaves=[], blooms=[], driftBuilt=false;
+    var DRIFT_POOL=4, DRIFT_SHAPES=['dl-0','dl-1','dl-2','dl-3','dl-4'];
+    var leaves=[], blooms=[], driftBuilt=false;
     function fall(L,delay){
       if(!L.el.isConnected) return;
       var w=innerWidth,h=innerHeight;
-      var x0=Math.random()*w, drift=(Math.random()-0.5)*260, dur=9000+Math.random()*7000;
-      var spin=(Math.random()<0.5?-1:1)*(220+Math.random()*320), sway=60+Math.random()*90;
+      /* Spawn in the outer margin on one side or the other. A leaf that falls
+         through the middle of the page crosses the headline and the copy, which
+         is exactly the distraction to avoid; the branches are at the corners
+         anyway, so the sides are also where a leaf would really come from. */
+      var band=Math.min(0.26*w, 330);
+      var x0=(Math.random()<0.5) ? Math.random()*band : w-band+Math.random()*band;
+      var drift=(Math.random()-0.5)*150, dur=15000+Math.random()*8000;
+      var spin=(Math.random()<0.5?-1:1)*(160+Math.random()*220), sway=34+Math.random()*46;
+      var peak=0.30+Math.random()*0.10;             /* never fully opaque */
       if(L.anim){ L.anim.cancel(); L.anim=null; }
       L.anim=L.el.animate([
         {transform:'translate('+x0+'px,-60px) rotate(0deg)',opacity:0},
-        {transform:'translate('+(x0+sway)+'px,'+(h*0.22)+'px) rotate('+(spin*0.25)+'deg)',opacity:0.85,offset:0.22},
-        {transform:'translate('+(x0-sway*0.6+drift*0.5)+'px,'+(h*0.55)+'px) rotate('+(spin*0.6)+'deg)',opacity:0.9,offset:0.55},
+        {transform:'translate('+(x0+sway)+'px,'+(h*0.22)+'px) rotate('+(spin*0.25)+'deg)',opacity:peak,offset:0.22},
+        {transform:'translate('+(x0-sway*0.6+drift*0.5)+'px,'+(h*0.55)+'px) rotate('+(spin*0.6)+'deg)',opacity:peak,offset:0.58},
         {transform:'translate('+(x0+drift)+'px,'+(h+70)+'px) rotate('+spin+'deg)',opacity:0}
       ],{duration:dur,delay:delay||0,easing:'cubic-bezier(.42,.05,.55,.98)',fill:'forwards'});
       L.anim.onfinish=function(){ sched(L); };
     }
     function sched(L){
       clearTimeout(L.t);
-      L.t=setTimeout(function(){ if(document.hidden){ sched(L); return; } fall(L,0); }, 400+Math.random()*5200);
+      /* long gaps on purpose: with four leaves and this spacing the page shows
+         one or two at a time, which is weather, not confetti */
+      L.t=setTimeout(function(){ if(document.hidden){ sched(L); return; } fall(L,0); }, 5000+Math.random()*11000);
     }
     var SPOTS=[{s:'.wallbranch.left',x:0.32,y:0.58},{s:'.wallbranch.left',x:0.54,y:0.47},
                {s:'.wallbranch.left',x:0.70,y:0.66},{s:'.wallbranch.right',x:0.30,y:0.52},
@@ -4314,8 +4327,23 @@ hr {
     function driftBloom(){
       if(driftBuilt||innerWidth<1040) return;
       driftBuilt=true;
-      /* the falling-leaf layer is gone on purpose: leaves belong on the branch,
-         not raining down the page. The bloom popper below stays. */
+
+      /* A few loose leaves coming off the branches. The leaves that matter are
+         still the ones ON the tree; this is a handful more, low and slow. */
+      var dw=document.createElement('div'); dw.className='drift';
+      document.body.appendChild(dw);
+      for(var di=0; di<DRIFT_POOL; di++){
+        (function(idx){
+          var el=document.createElement('div'); el.className='leaf';
+          var c=document.createElement('canvas'); el.appendChild(c); dw.appendChild(el);
+          var L={el:el, anim:null, t:0};
+          queue.push(function(){
+            AHStitch.mount(c,{kind:DRIFT_SHAPES[idx%DRIFT_SHAPES.length],
+              cols:22, rows:22, cell:0.80, seed:31+idx*7, twinkle:false, animate:false});
+          });
+          leaves.push(L); sched(L);
+        })(di);
+      }
       SPOTS.forEach(function(sp,i){
         var h2=document.querySelector(sp.s); if(!h2) return;
         var el=document.createElement('div'); el.className='wb-bloom';
