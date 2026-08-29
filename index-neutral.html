@@ -1900,8 +1900,27 @@ hr {
   @keyframes wb-wind { 0%,100%{transform:rotate(-0.7deg) translateX(-2px)}
                         50%{transform:rotate(0.9deg) translateX(3px)} }
   @media (prefers-reduced-motion: reduce){ .wb-leaves { animation: none; } }
-  @media (max-width: 1240px){ .wallbranch.left { display: none; } }
-  @media (max-width: 1040px){ .wallbranch { display: none; } }
+  /* The branch SCALES rather than disappearing. It was display:none under
+     1040px, so the whole money-tree idea was desktop-only - and the canvases
+     were still being built and painted behind that display:none, which is the
+     worst of both: the full render cost on a phone, and nothing to show for it.
+     Sizes step down so it keeps peeking from the corners without crowding the
+     headline; the JS builds it at a matching resolution. */
+  @media (max-width: 1240px){
+    .wallbranch { width: 520px; height: 452px; top: -110px; }
+    .wallbranch.left { left: -110px; } .wallbranch.right { right: -110px; } }
+  @media (max-width: 1040px){
+    .wallbranch { width: 420px; height: 366px; top: -90px; }
+    .wallbranch.left { left: -92px; } .wallbranch.right { right: -92px; } }
+  @media (max-width: 760px){
+    .wallbranch { width: 300px; height: 262px; top: -66px; opacity: 0.82; }
+    .wallbranch.left { left: -74px; } .wallbranch.right { right: -74px; }
+    /* static on phones: cycling four full-size frames is a battery cost for a
+       decoration nobody is watching */
+    .wallbranch .wb-leaves { animation: none; } }
+  @media (max-width: 430px){
+    .wallbranch { width: 232px; height: 202px; top: -52px; opacity: 0.72; }
+    .wallbranch.left { left: -62px; } .wallbranch.right { right: -62px; } }
 
   /* ---------- THE SEAM ---------- */
   .seam { position: relative; z-index: 1; width: 100%; overflow: hidden; line-height: 0; opacity: 0.62; }
@@ -2094,7 +2113,7 @@ hr {
     .nav .pill .pill-ico { width: 12px; height: 12px; }
     /* every decorative layer is off on a phone: they cost paint and there is no
        margin to put them in */
-    .wallbranch, .flock, .weeptree, .navtree { display: none !important; }
+    .flock, .weeptree, .navtree { display: none !important; }
     .seam { opacity: 0.5; }
   }
   @media (max-width: 430px){
@@ -4140,13 +4159,24 @@ hr {
 
     /* ---------- wall branches ---------- */
     var FRB=4;
+    /* The canvas is sized from cols x cell, NOT from the CSS box, so a branch
+       displayed at 232px was still rasterising 1134px of stitches and throwing
+       most of it away. Scale the cell to the box the branch is actually drawn
+       in. Phones also get one wind frame instead of four. */
+    function wbScale(){
+      var w=innerWidth;
+      return w<=430? 0.375 : (w<=760? 0.485 : (w<=1040? 0.677 : (w<=1240? 0.839 : 1)));
+    }
+    function wbFrames(){ return innerWidth<=760 ? 1 : FRB; }
     function branches(){
+      var SC=wbScale();
       document.querySelectorAll('.wb-limb, .wb-cash').forEach(function(el){
         if(el.dataset.built) return; el.dataset.built='1';
         queue.push(function(){
+          if(getComputedStyle(el.parentElement).display==='none') return;
           var c=document.createElement('canvas'); el.appendChild(c);
           AHStitch.mount(c,{kind:el.dataset.kind,cols:+el.dataset.cols,rows:+el.dataset.rows,
-            cell:parseFloat(el.dataset.cell),seed:+el.dataset.seed,twinkle:false,animate:false});
+            cell:parseFloat(el.dataset.cell)*SC,seed:+el.dataset.seed,twinkle:false,animate:false});
         });
       });
       document.querySelectorAll('.wb-leaves').forEach(function(el,i){
@@ -4154,7 +4184,8 @@ hr {
         var form=el.dataset.form;
         var cell=parseFloat(el.parentElement.querySelector('.wb-limb').dataset.cell);
         el.__i=i*2; el.__stride=1+(i%2);
-        for(var fr=0;fr<FRB;fr++)(function(fr){
+        var NF=wbFrames();
+        for(var fr=0;fr<NF;fr++)(function(fr){
           /* Only frame 0 is on screen at load. Frames 1-3 exist for the wind
              cycle and are the heaviest canvases on the page, so they are built
              after the first paint rather than during it. The cycler below skips
@@ -4163,7 +4194,9 @@ hr {
             var cv=document.createElement('canvas');
             if(fr===0) cv.className='on';
             el.appendChild(cv);
-            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:210,rows:176,cell:cell,seed:3,twinkle:false,animate:false});
+            if(getComputedStyle(el.parentElement).display==='none') return;
+            AHStitch.mount(cv,{kind:'wb-leaf-'+form+'-'+fr,cols:210,rows:176,
+              cell:cell*SC,seed:3,twinkle:false,animate:false});
           });
         })(fr);
       });
