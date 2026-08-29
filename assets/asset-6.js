@@ -329,9 +329,14 @@
     for(var r=0;r<rows;r++)for(var c=0;c<cols;c++){
       var tone=G[r][c]; if(!tone) continue;
       var edge=Math.min(1, Math.min(Math.min(c,cols-1-c)/(cols*0.5), Math.min(r,rows-1-r)/(rows*0.5))*1.5);
-      var keep = dense ? (0.955+0.045*edge) : (0.5+0.5*edge), spark=false;
+      /* dense: false = frayed border (the sampler look), true = mostly solid,
+         'solid' = no fray at all. Anything drawn as a FIGURE rather than a motif
+         has to be solid: the fray is keyed to the tile border, so a bird whose
+         tail reaches the edge of its tile gets that tail eaten. */
+      var keep = dense==='solid' ? 1 : (dense ? (0.955+0.045*edge) : (0.5+0.5*edge)), spark=false;
       if(rnd()>keep){ if(!dense && rnd()<0.1) spark=true; else continue; }
-      if(edge<0.26 && rnd()<(dense?0.05:0.5)) spark=true;
+      if(dense==='solid'){ if(edge>0.30 && rnd()<0.010) spark=true; }
+      else if(edge<0.26 && rnd()<(dense?0.05:0.5)) spark=true;
       cells.push({c:c, r:r, tone:tone, spark:spark});
     }
     return { cells:cells, cols:cols, rows:rows };
@@ -1468,101 +1473,366 @@
   }
 
   /* ================= PERCHED POSES ==========================================
-     Seven drawn poses per plumage. This exists because no amount of transform on
-     a single sprite reads as behaviour: rotating a rigid bird is a rigid bird,
-     tilted. A preen has to actually bury the head in the flank; an alert has to
-     actually extend the neck. So the body, head, wing and tail are placed from
-     pose parameters and redrawn, and the page swaps sprites instead of skewing one.
+     Rebuilt as a SILHOUETTE, not a stack of solids. The previous version drew an
+     ellipse for the body and a circle for the head, which is a snowman: there is
+     always a seam where the two solids meet, and no amount of shading hides it.
+     Here the crown, nape, back, rump, tail, belly, breast and throat are control
+     points on ONE closed contour. It is splined, scanline-filled to a mask, and
+     shaded from a distance transform, so the bird has a continuous outline and a
+     rim that darkens the way a feathered edge actually does.
+
+     Poses deform the landmarks rather than swapping sprites: the head group
+     rotates about the neck joint, the tail group about the rump, and the body
+     inflates about its centroid. That is why a preen buries the bill in the
+     flank instead of tilting the whole bird.
 
      bp-<plumage>-<pose>   plumage a|b|c, pose 0..6
-       0 rest     head forward, neutral
-       1 alert    neck extended, head high and back
-       2 look     head turned back over the shoulder
-       3 preen    head buried down into the flank
-       4 peck     head down to the perch
-       5 fluff    feathers out, head pulled in, rounder
-       6 stretch  one wing extended and held open  */
+       0 rest  1 alert  2 look-back  3 preen  4 peck  5 fluff  6 stretch        */
   function perchPose(G, kind, W, H, rnd){
     function mu(t){ return mix(t, P.umber, 0.10); }
-    function dk(t){ return darken(t, 0.22); }
     var kp=kind.split('-'), sp=kp[1], pose=parseInt(kp[2],10)||0;
-    var PLS={
-      a:{lit:mix(mu(P.robin),P.creamLt,0.42),body:mu(P.robin),dark:mu(P.robinDk),bill:mu(P.awn),foot:mu(P.awn),accent:mix(mu(P.robin),P.creamLt,0.62)},
-      b:{lit:mix(mu(P.breast),P.creamLt,0.34),body:mu(P.breast),dark:mu(P.breastDk),bill:P.umberDk,foot:mu(P.awn),accent:mu(P.olive)},
-      c:{lit:mu(P.crowLt),body:mu(P.crow),dark:mu(P.crowDk),bill:P.crowDk,foot:P.umberDk,accent:mu(P.crowSheen)}
+
+    /* ---- ANATOMY. Landmarks run clockwise from the forehead, around the crown
+       and back, out along the tail, and home under the belly and breast. Facing
+       left. Units are fractions of the tile. g=group: 0 body, 1 head, 2 tail. --- */
+    var SPEC={
+      /* WREN — a fist with a tail pointing at the sky. Barely any neck, the
+         crown runs straight into the mantle, and the tail cocks past vertical. */
+      a:{ scale:0.74, neck:[0.30,0.40], rump:[0.66,0.47], eye:[0.175,0.355],
+          billLen:0.15, billW:0.052, billDrop:0.10, billCurve:0.22,
+          legLen:0.13, legX:[-0.055,0.045], tailFeath:4,
+          wing:{x:0.44,y:0.50,rx:0.20,ry:0.115,rot:0.16,prim:4,primLen:0.20,primAng:0.30},
+          brow:true, bars:true, sheen:false, breast:false, capDark:false,
+          lit:mix(mu(P.robin),P.creamLt,0.50), body:mu(P.robin), dark:mu(P.robinDk),
+          bill:mu(P.awn), billDk:P.awnDk, foot:mu(P.awn),
+          accent:mix(mu(P.robin),P.creamLt,0.80),
+          pts:[[0.115,0.325,1],[0.185,0.268,1],[0.275,0.253,1],[0.360,0.290,3],
+               [0.455,0.352,0],[0.570,0.400,0],[0.665,0.442,0],
+               [0.700,0.415,2],[0.752,0.220,2],[0.828,0.048,2],[0.900,0.092,2],[0.836,0.286,2],[0.778,0.474,2],
+               [0.720,0.610,0],[0.615,0.712,0],[0.470,0.762,0],[0.330,0.745,0],
+               [0.205,0.660,0],[0.138,0.545,3],[0.098,0.430,3]] },
+      /* ROBIN — upright and plump. A real neck notch behind the head, a deep
+         round breast carried high, and a modest tail angled down and back. */
+      b:{ scale:0.86, neck:[0.315,0.360], rump:[0.700,0.480], eye:[0.165,0.310],
+          billLen:0.115, billW:0.060, billDrop:0.02, billCurve:0.06,
+          legLen:0.17, legX:[-0.050,0.050], tailFeath:5,
+          wing:{x:0.455,y:0.470,rx:0.215,ry:0.130,rot:0.20,prim:5,primLen:0.235,primAng:0.26},
+          brow:false, bars:false, sheen:false, breast:true, capDark:true,
+          lit:mix(mu(P.olive),P.creamLt,0.38), body:mu(P.olive), dark:darken(mu(P.olive),0.30),
+          bill:P.awnDk, billDk:P.umberDk, foot:mu(P.awn), accent:mu(P.breast),
+          pts:[[0.098,0.292,1],[0.160,0.212,1],[0.258,0.178,1],[0.350,0.212,1],
+               [0.398,0.300,3],[0.428,0.372,0],[0.560,0.408,0],[0.700,0.470,0],
+               [0.836,0.516,2],[0.958,0.566,2],[0.988,0.622,2],[0.940,0.652,2],[0.812,0.628,2],
+               [0.710,0.640,0],[0.610,0.742,0],[0.470,0.822,0],[0.315,0.820,0],
+               [0.183,0.720,0],[0.108,0.560,3],[0.072,0.395,3]] },
+      /* CROW — long, low and level. Flat crown, heavy dagger bill with a visible
+         gonys, a long wedge tail, and legs set well back under a deep body. */
+      c:{ scale:0.95, neck:[0.330,0.345], rump:[0.735,0.430], eye:[0.205,0.318],
+          billLen:0.220,billW:0.070, billDrop:0.05, billCurve:0.09,
+          legLen:0.185, legX:[-0.045,0.055], tailFeath:6,
+          wing:{x:0.480,y:0.430,rx:0.255,ry:0.115,rot:0.11,prim:6,primLen:0.300,primAng:0.18},
+          brow:false, bars:false, sheen:true, breast:false, capDark:false,
+          lit:mu(P.crowLt), body:mu(P.crow), dark:mu(P.crowDk),
+          bill:P.crowDk, billDk:'#0F0D0B', foot:P.umberDk, accent:mu(P.crowSheen),
+          pts:[[0.128,0.288,1],[0.198,0.246,1],[0.300,0.238,1],[0.392,0.262,3],
+               [0.452,0.315,0],[0.585,0.358,0],[0.735,0.415,0],
+               [0.868,0.440,2],[0.984,0.470,2],[1.000,0.536,2],[0.962,0.582,2],[0.862,0.568,2],
+               [0.755,0.585,0],[0.640,0.665,0],[0.490,0.712,0],[0.335,0.700,0],
+               [0.212,0.618,0],[0.146,0.492,3],[0.108,0.372,3]] }
     };
-    var PL=PLS[sp]||PLS.a, cr=P.creamLt;
+    var A=SPEC[sp]||SPEC.a, cr=P.creamLt;
 
-    /* pose parameters: [headDX, headDY, headTilt, puff, neck, wingOut, tailUp] */
+    /* Pose deltas: headRot, headDX, headDY, puff, tailRot, wingOut, crouch, flip.
+       Screen y runs down, and rot() ADDS to the angle, so a POSITIVE headRot
+       raises the bill and a negative one drives it down. Getting that backwards
+       is what made the preen point at the sky.
+       "Look" is a hard upward cock of the head, not a turn over the shoulder:
+       reversing the head in profile either tears the neck joint open or buries
+       the bill in the bird's own shoulder, and a cocked head is what these birds
+       actually do all day anyway. */
     var POSE=[
-      [ 0.00,  0.00,  0.00, 1.00, 1.00, 0.00, 0.00],  /* rest    */
-      [-0.02, -0.09, -0.16, 0.94, 1.34, 0.00, 0.06],  /* alert   */
-      [ 0.13, -0.02,  0.95, 1.00, 0.92, 0.00, 0.02],  /* look    */
-      [ 0.10,  0.13,  1.75, 1.04, 0.62, 0.10, 0.04],  /* preen   */
-      [-0.06,  0.17,  0.70, 0.98, 0.88, 0.00,-0.05],  /* peck    */
-      [-0.01, -0.02,  0.00, 1.22, 0.72, 0.05, 0.10],  /* fluff   */
-      [ 0.00, -0.02, -0.06, 1.00, 1.06, 1.00, 0.14]   /* stretch */
+      [ 0.00, 0.000, 0.000, 1.00,  0.00, 0.00, 0.00, 0],  /* rest    */
+      [ 0.26,-0.030,-0.080, 0.94,  0.16, 0.00,-0.03, 0],  /* alert   */
+      [ 0.66, 0.030,-0.055, 1.00,  0.06, 0.00, 0.00, 0],  /* look    */
+      [-1.95, 0.050, 0.120, 1.06, -0.10, 0.16, 0.02, 0],  /* preen   */
+      [-0.88,-0.020, 0.150, 0.98, -0.16, 0.00, 0.05, 0],  /* peck    */
+      [ 0.05,-0.005,-0.020, 1.22,  0.20, 0.06, 0.04, 0],  /* fluff   */
+      [ 0.10, 0.000,-0.025, 1.01,  0.26, 1.00,-0.02, 0]   /* stretch */
     ][Math.max(0,Math.min(6,pose))];
-    var hdx=POSE[0], hdy=POSE[1], tilt=POSE[2], puff=POSE[3], neck=POSE[4], wingOut=POSE[5], tailUp=POSE[6];
+    var hRot=POSE[0], hDX=POSE[1], hDY=POSE[2], puff=POSE[3],
+        tRot=POSE[4], wingOut=POSE[5], crouch=POSE[6];
 
-    function mass(x,y,rx,ry,rot,lit,body,shade){
-      var ct=Math.cos(rot||0), st=Math.sin(rot||0), m=Math.ceil(Math.max(rx,ry))+2;
-      for(var j=-m;j<=m;j++) for(var i=-m;i<=m;i++){
-        var u=(i*ct+j*st)/rx, v=(j*ct-i*st)/ry, d=u*u+v*v;
-        if(d>1) continue;
-        var l=(-u*0.62-v*0.78);
-        put(G,x+i,y+j, d>0.86? shade : (l>0.46? lit : (l>-0.05? body : shade)));
+    /* ---- place the bird in the tile ---- */
+    var S=Math.min(W,H)*A.scale, ox=W*0.5-S*0.50, oy=H*0.50-S*0.46+H*crouch;
+    function TX(p){ return ox+p[0]*S; }
+    function TY(p){ return oy+p[1]*S; }
+
+    var neckP=[ox+A.neck[0]*S, oy+A.neck[1]*S],
+        rumpP=[ox+A.rump[0]*S, oy+A.rump[1]*S];
+    var bodyC=[ox+0.46*S, oy+0.50*S];
+
+    function rot(x,y,px,py,a){
+      var c=Math.cos(a), s=Math.sin(a), dx=x-px, dy=y-py;
+      return [px+dx*c-dy*s, py+dx*s+dy*c];
+    }
+    /* Every head feature goes through this one transform. The bill used to carry
+       its own hand-derived angle, which is how it ended up pointing away from the
+       head it was attached to. */
+    function headPt(nx,ny){
+      var r=rot(ox+nx*S, oy+ny*S, neckP[0], neckP[1], hRot);
+      return [r[0]+hDX*S, r[1]+hDY*S];
+    }
+
+    /* deform the landmarks by group */
+    var pts=A.pts.map(function(p){
+      var x=TX(p), y=TY(p), g=p[2];
+      if(g===1||g===3){        /* head + neck rotate together about the neck joint */
+        var hp=headPt(p[0],p[1]);
+        x=hp[0]; y=hp[1];
+      } else if(g===2){                            /* tail rotates about the rump */
+        var t=rot(x,y,rumpP[0],rumpP[1],-tRot);
+        x=t[0]; y=t[1];
+      } else {                                     /* body inflates about centroid */
+        x=bodyC[0]+(x-bodyC[0])*puff;
+        y=bodyC[1]+(y-bodyC[1])*puff;
+      }
+      return [x,y];
+    });
+    /* the head follows the body when it puffs, or it detaches */
+    if(puff!==1){
+      var hc=rot(neckP[0],neckP[1],bodyC[0],bodyC[1],0);
+      var shiftX=(hc[0]-bodyC[0])*(puff-1), shiftY=(hc[1]-bodyC[1])*(puff-1);
+      A.pts.forEach(function(p,i){ if(p[2]===1||p[2]===2||p[2]===3){ pts[i][0]+=shiftX; pts[i][1]+=shiftY; } });
+      neckP=[neckP[0]+shiftX, neckP[1]+shiftY];
+    }
+
+    /* ---- Catmull-Rom through the landmarks: an organic closed contour ---- */
+    function spline(P0, samples){
+      /* cardinal spline at a tension below Catmull-Rom's 0.5 — at full tension
+         the curve overshoots the sharp corner at a tail tip and ties a small
+         loop, which then punches holes through the fill */
+      var out=[], n=P0.length, TEN=0.34;
+      for(var i=0;i<n;i++){
+        var p0=P0[(i-1+n)%n], p1=P0[i], p2=P0[(i+1)%n], p3=P0[(i+2)%n];
+        var m1x=TEN*(p2[0]-p0[0]), m1y=TEN*(p2[1]-p0[1]),
+            m2x=TEN*(p3[0]-p1[0]), m2y=TEN*(p3[1]-p1[1]);
+        for(var k=0;k<samples;k++){
+          var t=k/samples, t2=t*t, t3=t2*t;
+          var h00=2*t3-3*t2+1, h10=t3-2*t2+t, h01=-2*t3+3*t2, h11=t3-t2;
+          out.push([ h00*p1[0]+h10*m1x+h01*p2[0]+h11*m2x,
+                     h00*p1[1]+h10*m1y+h01*p2[1]+h11*m2y ]);
+        }
+      }
+      return out;
+    }
+    var poly=spline(pts, 12);
+
+    /* ---- scanline fill to a mask, then a chamfer distance transform so the
+       edge can be darkened. A feathered bird has no hard outline, it has a rim
+       that falls off, and this is what produces that. ---- */
+    var mask=new Uint8Array(W*H), dist=new Float32Array(W*H);
+    var yMin=H, yMax=0;
+    for(var pi=0;pi<poly.length;pi++){
+      if(poly[pi][1]<yMin) yMin=poly[pi][1];
+      if(poly[pi][1]>yMax) yMax=poly[pi][1];
+    }
+    yMin=Math.max(0,Math.floor(yMin)); yMax=Math.min(H-1,Math.ceil(yMax));
+    for(var y=yMin;y<=yMax;y++){
+      var xs=[];
+      for(var e=0;e<poly.length;e++){
+        var a1=poly[e], b1=poly[(e+1)%poly.length];
+        if(a1[1]<=y&&b1[1]>y)      xs.push([a1[0]+(y-a1[1])/(b1[1]-a1[1])*(b1[0]-a1[0]), 1]);
+        else if(b1[1]<=y&&a1[1]>y) xs.push([a1[0]+(y-a1[1])/(b1[1]-a1[1])*(b1[0]-a1[0]),-1]);
+      }
+      xs.sort(function(u,v){return u[0]-v[0];});
+      var wind=0;                       /* nonzero winding: survives self-overlap */
+      for(var s2=0;s2+1<xs.length;s2++){
+        wind+=xs[s2][1];
+        if(wind===0) continue;
+        var x0=Math.max(0,Math.ceil(xs[s2][0])), x1=Math.min(W-1,Math.floor(xs[s2+1][0]));
+        for(var x=x0;x<=x1;x++) mask[y*W+x]=1;
       }
     }
-    var cx=W*0.52, by=H*0.58;
-
-    /* legs and perch first, so the body sits on them */
-    var px0=W*0.18, px1=W*0.86, perchY=H*0.90;
-    sbar(G,px0,perchY,px1,perchY,2.0,mu(P.bark));
-    sbar(G,cx-W*0.05,by+H*0.15,cx-W*0.06,perchY-1,1.5,PL.foot);
-    sbar(G,cx+W*0.04,by+H*0.15,cx+W*0.05,perchY-1,1.5,PL.foot);
-    [[-0.06],[0.05]].forEach(function(o){
-      var fx=cx+W*o[0];
-      sbar(G,fx,perchY-1,fx-3,perchY+2,1.1,PL.foot);
-      sbar(G,fx,perchY-1,fx+3.4,perchY+1.6,1.1,PL.foot);
-    });
-
-    /* body — puff scales it, which is the whole of the fluff pose */
-    mass(cx, by, W*0.25*puff, H*0.19*puff, 0.06, PL.lit, PL.body, PL.dark);
-
-    /* the extended wing, drawn before the head so the head overlaps it */
-    if(wingOut>0.5){
-      sspike(G, cx+W*0.06, by-H*0.02, cx+W*0.46, by-H*0.16, 9.0, 2.0, PL.body);
-      sspike(G, cx+W*0.06, by-H*0.04, cx+W*0.42, by-H*0.15, 4.0, 1.2, PL.lit);
-      for(var q=0;q<4;q++)
-        sbar(G, cx+W*0.20, by-H*0.06+q*1.6, cx+W*0.48, by-H*0.20+q*2.6, 1.3, q%2?PL.dark:PL.body);
-    } else {
-      /* folded wing on the flank */
-      var wy=by+H*0.01;
-      for(var f=0;f<5;f++)
-        sarc(G, cx+W*0.06, wy, H*0.11+f*1.2, 0.30+wingOut, 1.15+wingOut, 1.5, f%2?PL.dark:PL.body);
+    var BIG=1e6;
+    for(var i2=0;i2<W*H;i2++) dist[i2]=mask[i2]?BIG:0;
+    for(var yy=0;yy<H;yy++) for(var xx=0;xx<W;xx++){
+      var o=yy*W+xx; if(!mask[o]) continue;
+      var m1=dist[o];
+      if(xx>0) m1=Math.min(m1,dist[o-1]+1);
+      if(yy>0) m1=Math.min(m1,dist[o-W]+1);
+      if(xx>0&&yy>0) m1=Math.min(m1,dist[o-W-1]+1.414);
+      if(xx<W-1&&yy>0) m1=Math.min(m1,dist[o-W+1]+1.414);
+      dist[o]=m1;
+    }
+    for(var yb=H-1;yb>=0;yb--) for(var xb=W-1;xb>=0;xb--){
+      var ob=yb*W+xb; if(!mask[ob]) continue;
+      var m2=dist[ob];
+      if(xb<W-1) m2=Math.min(m2,dist[ob+1]+1);
+      if(yb<H-1) m2=Math.min(m2,dist[ob+W]+1);
+      if(xb<W-1&&yb<H-1) m2=Math.min(m2,dist[ob+W+1]+1.414);
+      if(xb>0&&yb<H-1) m2=Math.min(m2,dist[ob+W-1]+1.414);
+      dist[ob]=m2;
     }
 
-    /* neck + head, placed by the pose */
-    var hx=cx-W*0.19+W*hdx, hy=by-H*0.13*neck+H*hdy;
-    sbar(G, cx-W*0.06, by-H*0.06, hx+W*0.05, hy+H*0.05, W*0.14*puff, PL.body, PL.dark);
-    mass(hx, hy, W*0.115*puff, H*0.088*puff, tilt, PL.lit, PL.body, PL.dark);
+    /* head centre — the shading pass needs it for the cap */
+    var hd0=headPt(A.eye[0], A.eye[1]);
+    var hcx=hd0[0], hcy=hd0[1];
 
-    /* bill, eye — both ride the head tilt */
-    var ba=3.05+tilt;
-    sspike(G, hx-W*0.09*Math.cos(tilt), hy-H*0.01+W*0.09*Math.sin(tilt),
-              hx-W*0.09*Math.cos(tilt)+Math.cos(ba)*W*0.11,
-              hy-H*0.01+W*0.09*Math.sin(tilt)+Math.sin(ba)*W*0.11, 2.0, 0.7, PL.bill);
-    var ex=hx-W*0.035*Math.cos(tilt)+W*0.01*Math.sin(tilt);
-    var ey=hy-H*0.03*Math.cos(tilt)-W*0.035*Math.sin(tilt);
-    mass(ex,ey,1.5,1.5,0,P.umberDk,P.umberDk,P.umberDk);
-    put(G,ex-0.6,ey-0.6,cr);
-    if(sp!=='c'){ for(var t=0;t<4;t++) put(G,hx-W*0.02+t*1.2, hy+H*0.05, PL.accent); }
+    /* ---- shade: directional light from upper-left plus the rim falloff ---- */
+    var rimD=Math.max(2.0, S*0.055);
+    for(var sy=0;sy<H;sy++) for(var sx=0;sx<W;sx++){
+      var so=sy*W+sx; if(!mask[so]) continue;
+      var u=(sx-bodyC[0])/(S*0.30), v=(sy-bodyC[1])/(S*0.26);
+      var l=(-u*0.55-v*0.72);
+      var d=dist[so], t3;
+      if(d<rimD*0.55) t3=A.dark;
+      else if(d<rimD) t3=(l>0.30? A.body : A.dark);
+      else t3=(l>0.62? A.lit : (l>-0.10? A.body : A.dark));
 
-    /* tail */
-    for(var tf=-1;tf<=1;tf++)
-      sbar(G, cx+W*0.19, by+H*0.05,
-              cx+W*0.40+tf*W*0.02, by+H*0.05+tf*H*0.09 - H*tailUp*1.4, 2.0, tf?PL.dark:PL.body);
+      /* Plumage as soft REGIONS blended into the shading, not ovals stamped on
+         top. A hard-edged disc of colour reads as a hood or a sticker; fading
+         across the outer fifth of the radius, and letting the rim keep winning,
+         reads as a bird that is that colour there. */
+      if(A.breast){
+        var bd=Math.hypot((sx-(bodyC[0]-S*0.225))/(S*0.205),(sy-(bodyC[1]+S*0.105))/(S*0.240));
+        if(bd<1.06){
+          var ac=(d<rimD*0.55)? darken(A.accent,0.34)
+               : (l>0.52? mix(A.accent,cr,0.30) : (l>-0.05? A.accent : darken(A.accent,0.20)));
+          t3 = bd>0.84 ? mix(t3, ac, (1.06-bd)/0.22) : ac;
+        }
+      }
+      if(A.capDark){
+        var cd=Math.hypot((sx-hcx)/(S*0.150),(sy-(hcy-S*0.030))/(S*0.135));
+        if(cd<1.04) t3 = cd>0.80 ? mix(t3, A.dark, (1.04-cd)/0.24) : A.dark;
+      }
+      if(A.sheen && d>rimD*0.70){
+        var sd=Math.hypot((sx-(bodyC[0]+S*0.045))/(S*0.280),(sy-(bodyC[1]-S*0.115))/(S*0.135));
+        if(sd<1.0 && l>0.10) t3 = mix(t3, A.accent, 0.52*(1-sd));
+      }
+      put(G,sx,sy,t3);
+    }
+    function inMask(x,y){ x=Math.round(x); y=Math.round(y);
+      return x>=0&&y>=0&&x<W&&y<H&&mask[y*W+x]; }
+    function putIn(x,y,t){ if(inMask(x,y)) put(G,x,y,t); }
+
+    /* ---- tail feather separations, drawn along the tail's own axis ---- */
+    var tAng=Math.atan2(pts[9][1]-rumpP[1], pts[9][0]-rumpP[0]);
+    for(var tf=1;tf<A.tailFeath;tf++){
+      var spread=(tf/A.tailFeath-0.5)*0.42;
+      var aT=tAng+spread;
+      for(var q=0.34;q<1.14;q+=0.022){
+        var qx=rumpP[0]+Math.cos(aT)*S*0.42*q, qy=rumpP[1]+Math.sin(aT)*S*0.42*q;
+        putIn(qx,qy, tf%2? A.dark : darken(A.body,0.12));
+      }
+    }
+
+    /* ---- the folded wing: a lens lying on the flank with primaries that run
+       back past the rump. This is the shape that most says "bird" after the
+       silhouette itself, and the old version only hinted at it. ---- */
+    var Wg=A.wing, wcx=ox+Wg.x*S, wcy=oy+Wg.y*S;
+    if(puff!==1){ wcx=bodyC[0]+(wcx-bodyC[0])*puff; wcy=bodyC[1]+(wcy-bodyC[1])*puff; }
+    var wRot=Wg.rot - wingOut*0.62;
+    var wRx=S*Wg.rx*(1+wingOut*0.42), wRy=S*Wg.ry*(1+wingOut*0.30);
+    var cw=Math.cos(wRot), sw=Math.sin(wRot);
+    for(var wj=-Math.ceil(wRy)-2;wj<=Math.ceil(wRy)+2;wj++)
+      for(var wi=-Math.ceil(wRx)-2;wi<=Math.ceil(wRx)+2;wi++){
+        var wu=(wi*cw+wj*sw)/wRx, wv=(wj*cw-wi*sw)/wRy;
+        var wd=wu*wu+wv*wv; if(wd>1) continue;
+        var wt=(wd>0.80)? A.dark : ((wv<-0.30)? A.lit : A.body);
+        if(A.bars && ((wi+wj*2)%7===0)) wt=A.dark;                 /* barred wing */
+        if(A.sheen && wv<-0.42 && wu>-0.30 && wu<0.45) wt=A.accent; /* gloss band */
+        putIn(wcx+wi, wcy+wj, wt);
+      }
+    /* primaries */
+    for(var pr=0;pr<Wg.prim;pr++){
+      var pa=wRot+Wg.primAng*(pr/(Wg.prim-1)-0.15)+wingOut*0.30;
+      var plen=S*Wg.primLen*(1-pr*0.055)*(1+wingOut*0.55);
+      var px0=wcx+Math.cos(wRot)*wRx*0.42, py0=wcy+Math.sin(wRot)*wRy*0.30+pr*(S*0.017);
+      /* folded, the primaries are separation lines inside the silhouette. Spread,
+         they are the wing itself, so they need width and a filled web between
+         them or the stretch pose reads as three loose threads. */
+      var half = wingOut>0 ? Math.max(1.2, S*0.021*(1-pr*0.06)) : 0.5;
+      for(var pq=0;pq<plen;pq+=0.5){
+        var pxx=px0+Math.cos(pa)*pq, pyy=py0+Math.sin(pa)*pq;
+        var fade=1-(pq/plen)*0.35;
+        for(var pw=-half;pw<=half;pw+=0.5){
+          var qx2=pxx-Math.sin(pa)*pw, qy2=pyy+Math.cos(pa)*pw;
+          if(wingOut>0){
+            put(G,qx2,qy2, (Math.abs(pw)>half*0.62)? A.dark
+                          : (fade>0.82? mix(A.body,A.lit,0.30) : darken(A.body,0.14)));
+          } else if(inMask(qx2,qy2)) put(G,qx2,qy2, pr%2? A.dark : darken(A.body,0.18));
+        }
+      }
+    }
+    /* wing coverts: a few short strokes so the shoulder is not a blank field */
+    for(var cvr=0;cvr<3;cvr++)
+      for(var cvq=0;cvq<S*0.11;cvq+=0.6)
+        putIn(wcx-wRx*0.45+cvq*Math.cos(wRot+0.5), wcy-wRy*0.30+cvr*(S*0.045)+cvq*Math.sin(wRot+0.5),
+              darken(A.body,0.10));
+
+    /* ---- brow stripe: the wren's supercilium, the one mark that identifies it ---- */
+    var hx=hcx, hy=hcy;
+    if(A.brow){
+      var bw0=headPt(A.eye[0]-0.085, A.eye[1]-0.048), bw1=headPt(A.eye[0]+0.105, A.eye[1]-0.068);
+      var bwA=Math.atan2(bw1[1]-bw0[1], bw1[0]-bw0[0]), bwL=Math.hypot(bw1[0]-bw0[0],bw1[1]-bw0[1]);
+      for(var bq=0;bq<bwL;bq+=0.5){
+        putIn(bw0[0]+Math.cos(bwA)*bq, bw0[1]+Math.sin(bwA)*bq, A.accent);
+        putIn(bw0[0]+Math.cos(bwA)*bq+Math.sin(bwA)*1.2,
+              bw0[1]+Math.sin(bwA)*bq-Math.cos(bwA)*1.2, mix(A.accent,A.dark,0.35));
+      }
+    }
+
+    /* ---- bill: a wedge with a real gape line, hung off the head landmarks so
+       it swings with the pose. Needle on the wren, dagger on the crow. ---- */
+    var gape=headPt(A.eye[0]-0.055, A.eye[1]+0.028);
+    var btip=headPt(A.eye[0]-0.055-A.billLen, A.eye[1]+0.028+A.billDrop*0.55);
+    var gx=gape[0], gy=gape[1];
+    var bAng=Math.atan2(btip[1]-gy, btip[0]-gx);
+    var bLen=Math.hypot(btip[0]-gx, btip[1]-gy), bHalf=S*A.billW*0.5;
+    var cbA=Math.cos(bAng), sbA=Math.sin(bAng);
+    for(var q2=0;q2<=bLen;q2+=0.42){
+      var f2=q2/bLen, taper=(1-f2*0.80);   /* linear: a wedge, not a tube with a point */
+      var curve=Math.sin(f2*3.14159)*A.billCurve*S*0.10;
+      var bx=gx+cbA*q2 - sbA*curve, byy=gy+sbA*q2 + cbA*curve;
+      var hh=bHalf*taper;
+      for(var w2=-hh;w2<=hh;w2+=0.5){
+        var t4=(w2<-hh*0.25)? A.bill : (w2>hh*0.30? A.billDk : mix(A.bill,A.billDk,0.30));
+        put(G, bx - sbA*w2, byy + cbA*w2, t4);
+      }
+      if(f2>0.10) put(G, bx, byy, A.billDk);                 /* the gape line */
+    }
+    if(A.sheen){                                              /* nasal bristles */
+      for(var nb=0;nb<5;nb++)
+        for(var nq=0;nq<S*0.055;nq+=0.5)
+          put(G, gx+cbA*nq*1.1, gy+sbA*nq+nb*0.9-1.8, A.billDk);
+    }
+
+    /* ---- eye: a dark bead with a lit catch, ringed so it does not vanish ---- */
+    var eR=Math.max(1.5, S*0.026);
+    var ring=A.sheen? mix(A.lit,cr,0.72) : mix(A.lit,cr,0.50);   /* dark birds need a lighter orbital */
+    for(var ej=-Math.ceil(eR)-2;ej<=Math.ceil(eR)+2;ej++)
+      for(var ei=-Math.ceil(eR)-2;ei<=Math.ceil(eR)+2;ei++){
+        var ed=(ei*ei+ej*ej)/(eR*eR);
+        if(ed>1.62) continue;
+        put(G, hx+ei, hy+ej, ed>1.18? ring : (ed>0.94? P.umberDk : '#141210'));
+      }
+    put(G, hx-Math.max(1,eR*0.34), hy-Math.max(1,eR*0.34), cr);   /* catchlight */
+
+    /* ---- legs: a feathered thigh, a scaled tarsus and three forward toes.
+       No perch bar: these birds sit on real page elements, and drawing a stand
+       under them made every one look like a museum mount. ---- */
+    var footY=oy+S*(0.78+A.legLen);
+    [0,1].forEach(function(li){
+      var lx=bodyC[0]+S*A.legX[li];
+      var thighY=oy+S*0.70;
+      sbar(G, lx, thighY, lx+S*0.012, footY-S*0.02, Math.max(1.6,S*0.026), A.foot);
+      for(var sc=0;sc<4;sc++)                                   /* tarsus scales */
+        put(G, lx+S*0.006, thighY+S*0.03+sc*(S*0.030), darken(A.foot,0.30));
+      var fx=lx+S*0.012;
+      sbar(G, fx, footY-S*0.02, fx-S*0.055, footY+S*0.010, Math.max(1.2,S*0.017), A.foot);
+      sbar(G, fx, footY-S*0.02, fx-S*0.020, footY+S*0.022, Math.max(1.2,S*0.017), A.foot);
+      sbar(G, fx, footY-S*0.02, fx+S*0.048, footY+S*0.014, Math.max(1.2,S*0.017), darken(A.foot,0.18));
+    });
   }
 
   /* ================= WINGS — twelve phases ==================================
@@ -1933,7 +2203,8 @@
       case 'seam-chevron': seamRow(G, kind, W, H, rnd); break;
       default: wheatSheaf(G,cx,cy,H*0.78,rnd);
     }
-    return collect(G, cols, rows, rnd, /^(ui-|launch)/.test(kind));
+    return collect(G, cols, rows, rnd,
+      /^(bp-|bd-|fl-)/.test(kind) ? 'solid' : /^(ui-|launch)/.test(kind));
   }
 
   /* horizontal GARLAND — undulating vine, flowers clustered toward both ends
