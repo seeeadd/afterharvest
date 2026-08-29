@@ -1909,16 +1909,35 @@
     var PAL=[mu(P.blA),mu(P.blB),mu(P.blC),mu(P.blD),mu(P.blE),mu(P.blF),
              mu(P.blH),mu(P.blI),mu(P.blJ),mu(P.blK),mu(P.blL),mu(P.leafA)];
 
-    function leaf(x,y,sz,ang,tone){
+    /* A leaf is ASYMMETRIC along its length: rounded at the base where it meets
+       the stalk, pointed at the tip. The old one was an ellipse tapered equally
+       at both ends with a highlight stripe down the middle, which at nine pixels
+       is a banana. Half-width is now a beta curve peaking about 45% along, so
+       the base is full and the tip comes to a point, and there is a midrib.
+       Three profiles for variety: ovate, lanceolate, obovate. */
+    var LSHAPE=[[0.42,0.52],[0.62,0.38],[0.34,0.72]];
+    function leaf(x,y,sz,ang,tone,shp){
       if(x < sz+2 || x > W-sz-2 || y < sz+3 || y > H-sz-3) return;
-      var ca=Math.cos(ang),sa=Math.sin(ang);
-      for(var j=-sz-1;j<=sz+1;j++) for(var i=-sz-1;i<=sz+1;i++){
-        var u=(i*ca+j*sa)/sz, v=(j*ca-i*sa)/(sz*0.46);
-        if(u*u+v*v>1) continue;
-        if(Math.abs(v)>1-Math.abs(u)*0.58) continue;
-        put(G,x+i,y+j, ((-u-v)>0.3)? mix(tone,P.creamLt,0.3) : tone);
+      var ca=Math.cos(ang), sa=Math.sin(ang);
+      var S2=LSHAPE[(shp||0)%3], A2=S2[0], B2=S2[1];
+      var peak=Math.pow(A2/(A2+B2),A2)*Math.pow(B2/(A2+B2),B2);
+      var LEN=sz*1.85, WID=sz*0.44/peak;
+      var lit=mix(tone,P.creamLt,0.26), shd=darken(tone,0.17), rib=darken(tone,0.34);
+      for(var q=0;q<=LEN;q+=0.5){
+        var t=q/LEN;
+        var hw=WID*Math.pow(t,A2)*Math.pow(1-t,B2);
+        if(hw<0.3) continue;
+        var bx=x+ca*(q-LEN*0.5), by=y+sa*(q-LEN*0.5);
+        for(var w=-hw;w<=hw;w+=0.5){
+          var side=w*(sa*0.60-ca*0.80);          /* light from the upper left */
+          put(G, bx-sa*w, by+ca*w,
+              (Math.abs(w)>hw-0.7)? shd : (side>0? lit : tone));
+        }
       }
-      put(G,x-ca*sz*0.9,y-sa*sz*0.9,tkC);
+      for(var r2=LEN*0.06;r2<=LEN*0.94;r2+=0.5)  /* the midrib */
+        put(G, x+ca*(r2-LEN*0.5), y+sa*(r2-LEN*0.5), rib);
+      var sx=x-ca*LEN*0.56, sy=y-sa*LEN*0.56;    /* the stalk */
+      put(G,sx,sy,tkC); put(G,sx-ca*0.9,sy-sa*0.9,tkC);
     }
 
     var kp=kind.split('-');
@@ -1937,7 +1956,7 @@
     /* leaf area scales with the square of this, so it drives ink far harder than
        the leaf COUNT does — halving the count only took 12% off, dropping the size
        is what actually thins the canopy */
-    var LS=Math.max(2.2, Math.min(W,H)*0.020);
+    var LS=Math.max(2.4, Math.min(W,H)*0.0175);
 
     function branch(x,y,ang,len,wid,depth){
       var ex=x+Math.cos(ang)*len, ey=y+Math.sin(ang)*len;
@@ -1963,11 +1982,11 @@
           /* the displacement has to be big enough to SEE between frames. At 1.5px
              the leaves technically moved and read as perfectly still. */
           leaf(lx+Math.cos(la)*off+sway*4.2, ly+Math.sin(la)*off+Math.cos(ph0+leafIdx*0.7)*3.0,
-               LS*(0.80+R()*0.55), la+sway*0.62, PAL[(R()*PAL.length)|0]);
+               LS*(0.80+R()*0.55), la+sway*0.62, PAL[(R()*PAL.length)|0], (R()*3)|0);
         }
         leaf(x2+Math.cos(ang)*2.4+Math.sin(ph0+leafIdx)*3.6,
              y2+Math.sin(ang)*2.4+Math.cos(ph0+leafIdx*1.2)*2.6, LS*(0.85+R()*0.45),
-             ang+Math.sin(ph0+leafIdx)*0.55, PAL[(R()*PAL.length)|0]);
+             ang+Math.sin(ph0+leafIdx)*0.55, PAL[(R()*PAL.length)|0], (R()*3)|0);
         leafIdx++;
       }
       if(depth<=0) return;
@@ -2225,7 +2244,7 @@
         var rad=LS*(0.9+LR()*1.5);
         var swy=Math.sin(ph0+q*0.83);
         leaf(mx2+Math.cos(am)*rad+swy*3.6, my2+Math.sin(am)*rad+Math.cos(ph0+q*0.6)*2.6,
-             LS*(0.75+LR()*0.5), am+swy*0.5, PAL[(LR()*PAL.length)|0]);
+             LS*(0.75+LR()*0.5), am+swy*0.5, PAL[(LR()*PAL.length)|0], (LR()*3)|0);
       }
     }
   }
