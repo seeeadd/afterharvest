@@ -2259,19 +2259,19 @@ hr {
           <div class="ch-index" id="vsl-chapter-index" data-open="false">
             <div class="ch-scroll" id="ch-scroll">
             <ul class="ch-list" id="ch-list" data-open="false">
-            <li><button class="ch-item" type="button" data-t="0"><span class="ch-n">01</span><span class="ch-label">The whole offer in 60 seconds</span><span class="ch-time">0:00</span></button></li>
-            <li><button class="ch-item" type="button" data-t="68"><span class="ch-n">02</span><span class="ch-label">Why a 3-day event, not a webinar</span><span class="ch-time">1:08</span></button></li>
+            <li><button class="ch-item" type="button" data-t="0"><span class="ch-n">01</span><span class="ch-label">the whole offer in 60 seconds</span><span class="ch-time">0:00</span></button></li>
+            <li><button class="ch-item" type="button" data-t="68"><span class="ch-n">02</span><span class="ch-label">why a 3-day event, not a webinar</span><span class="ch-time">1:08</span></button></li>
             <li><button class="ch-item" type="button" data-t="116"><span class="ch-n">03</span><span class="ch-label">$0 upfront: where's the catch?</span><span class="ch-time">1:56</span></button></li>
-            <li><button class="ch-item" type="button" data-t="151"><span class="ch-n">04</span><span class="ch-label">Getting your list to actually buy</span><span class="ch-time">2:31</span></button></li>
-            <li><button class="ch-item" type="button" data-t="198"><span class="ch-n">05</span><span class="ch-label">A real client's numbers</span><span class="ch-time">3:18</span></button></li>
-            <li><button class="ch-item" type="button" data-t="243"><span class="ch-n">06</span><span class="ch-label">Who this works for, who it doesn't</span><span class="ch-time">4:03</span></button></li>
-            <li><button class="ch-item" type="button" data-t="284"><span class="ch-n">07</span><span class="ch-label">Why most 3-day events flop</span><span class="ch-time">4:44</span></button></li>
-            <li><button class="ch-item" type="button" data-t="451"><span class="ch-n">08</span><span class="ch-label">Running one every quarter</span><span class="ch-time">7:31</span></button></li>
-            <li><button class="ch-item" type="button" data-t="561"><span class="ch-n">09</span><span class="ch-label">What you do vs what we do</span><span class="ch-time">9:21</span></button></li>
-            <li><button class="ch-item" type="button" data-t="647"><span class="ch-n">10</span><span class="ch-label">Two weeks to decide</span><span class="ch-time">10:47</span></button></li>
-            <li><button class="ch-item" type="button" data-t="673"><span class="ch-n">11</span><span class="ch-label">The fee, and the revenue split</span><span class="ch-time">11:13</span></button></li>
-            <li><button class="ch-item" type="button" data-t="733"><span class="ch-n">12</span><span class="ch-label">The minimum you'll make</span><span class="ch-time">12:13</span></button></li>
-            <li><button class="ch-item" type="button" data-t="808"><span class="ch-n">13</span><span class="ch-label">Get your free (non AI) event plan</span><span class="ch-time">13:28</span></button></li>
+            <li><button class="ch-item" type="button" data-t="152"><span class="ch-n">04</span><span class="ch-label">getting your list to actually buy</span><span class="ch-time">2:32</span></button></li>
+            <li><button class="ch-item" type="button" data-t="198"><span class="ch-n">05</span><span class="ch-label">a real client's numbers</span><span class="ch-time">3:18</span></button></li>
+            <li><button class="ch-item" type="button" data-t="244"><span class="ch-n">06</span><span class="ch-label">who this works for, who it doesn't</span><span class="ch-time">4:04</span></button></li>
+            <li><button class="ch-item" type="button" data-t="284"><span class="ch-n">07</span><span class="ch-label">why most 3-day events flop</span><span class="ch-time">4:44</span></button></li>
+            <li><button class="ch-item" type="button" data-t="452"><span class="ch-n">08</span><span class="ch-label">running one recurring every quarter</span><span class="ch-time">7:32</span></button></li>
+            <li><button class="ch-item" type="button" data-t="561"><span class="ch-n">09</span><span class="ch-label">what you do vs what we do</span><span class="ch-time">9:21</span></button></li>
+            <li><button class="ch-item" type="button" data-t="647"><span class="ch-n">10</span><span class="ch-label">2 weeks to decide</span><span class="ch-time">10:47</span></button></li>
+            <li><button class="ch-item" type="button" data-t="674"><span class="ch-n">11</span><span class="ch-label">the fee, and the revenue split</span><span class="ch-time">11:14</span></button></li>
+            <li><button class="ch-item" type="button" data-t="734"><span class="ch-n">12</span><span class="ch-label">the minimum you'll make</span><span class="ch-time">12:14</span></button></li>
+            <li><button class="ch-item" type="button" data-t="809"><span class="ch-n">13</span><span class="ch-label">get your free (non AI) event plan</span><span class="ch-time">13:29</span></button></li>
         </ul>
             </div>
             <!-- a thread rail rather than a system scrollbar: iOS hides overlay scrollbars
@@ -2791,26 +2791,6 @@ hr {
 
     // Wistia keeps chapters on the media JSON. Read them there so Wistia stays the single
     // source of truth — edit chapters there and this page follows. Deleted ones persist, so filter.
-    /* Wistia's own titles run 30-38 characters and read like a compliance
-       index: "Common Three Day Event Failure Points". They cannot be edited
-       from here, so they are remapped on read. Wistia remains the source of
-       truth for TIMES - seeking stays exact and a re-cut chapter still works -
-       and any title not listed passes through untouched. */
-    var RETITLE = {
-      'After Harvest Overview and Mission'    : 'The whole offer in 60 seconds',
-      'Specialized Three Day Virtual Events'  : 'Why a 3-day event, not a webinar',
-      'Zero Upfront Cost and Guarantees'      : "$0 upfront: where's the catch?",
-      'Monetizing Existing Audience Segments' : 'Getting your list to actually buy',
-      'Client Success and Revenue Case Study' : "A real client's numbers",
-      'Ideal Client Qualification Criteria'   : "Who this works for, who it doesn't",
-      'Common Three Day Event Failure Points' : 'Why most 3-day events flop',
-      'Building a Recurring Revenue Engine'   : 'Running one every quarter',
-      'Client Roles and Workflow Comparison'  : 'What you do vs what we do',
-      'Two Week Walk Away Guarantee'          : 'Two weeks to decide',
-      'Activation Fee and Revenue Share'      : 'The fee, and the revenue split',
-      'Guaranteed Minimum Revenue Floor'      : "The minimum you'll make",
-      'Application and Booking Call to Action': 'Get your free (non AI) event plan'
-    };
     function fetchChapters(mediaId){
       if (!window.fetch) return;
       fetch('https://fast.wistia.com/embed/medias/' + mediaId + '.json')
@@ -2826,7 +2806,7 @@ hr {
             if (String(c.deleted) === 'true') continue;
             var t = parseFloat(c.time);
             if (isNaN(t) || !c.title) continue;
-            live.push({ t: Math.round(t), label: RETITLE[String(c.title)] || String(c.title) });
+            live.push({ t: Math.round(t), label: String(c.title) });
           }
           if (!live.length) return;
           live.sort(function(a,b){ return a.t - b.t; });
