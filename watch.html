@@ -2776,6 +2776,7 @@ hr {
       list.style.gridAutoFlow = 'column';
       list.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))';
       list.style.gridTemplateRows = 'repeat(' + rows + ', auto)';
+      chLastW = w;
       return true;
     }
     /* The chapters nav carries the `hidden` attribute until the player reports
@@ -2789,17 +2790,25 @@ hr {
         setTimeout(attempt, 150);
       })();
     }
-    /* ResizeObserver on the list, not a window resize listener. colFlow writes
-       an INLINE grid-template-columns, which outranks the stylesheet's mobile
-       one-column rule - so if the recompute is ever missed the phone keeps a
-       two-column desktop grid and every label clips. The observer fires on any
-       box change, including one caused by a media query, which a window resize
-       handler alone did not reliably catch. */
-    var chT = null;
-    function chReflow(){ clearTimeout(chT); chT = setTimeout(colFlow, 120); }
-    try { new ResizeObserver(chReflow).observe(list); } catch (e) {
-      addEventListener('resize', chReflow, { passive: true });
-    }
+    /* Recompute whenever the list's width actually changes.
+
+       This is a poll, deliberately. The layout has to react to three different
+       things: the nav losing its `hidden` attribute when the player reports
+       ready, a viewport resize, and the panel opening. A ResizeObserver on the
+       list did not fire for the first of those, and a window resize listener
+       covers only the second - the observable result was that colFlow locked in
+       whatever it measured first, one column at a narrow width, and never
+       revised it once the panel reached full width.
+
+       One clientWidth read twice a second is cheaper than being wrong, and it
+       is immune to which mechanism happened to notice the change. */
+    var chLastW = 0;
+    setInterval(function(){
+      if (document.hidden) return;
+      var w = list.clientWidth;
+      if (w && w !== chLastW) { chLastW = w; colFlow(); }
+    }, 500);
+    addEventListener('resize', function(){ chLastW = 0; }, { passive: true });
 
     function build(chapters){
       stops = chapters;
