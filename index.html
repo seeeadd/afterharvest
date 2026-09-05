@@ -637,12 +637,22 @@ hr {
   .ch-chev { width: 12px; height: 12px; flex: none; transition: transform var(--dur-fast) var(--ease-out); }
   .ch-toggle[aria-expanded="true"] .ch-chev { transform: rotate(180deg); }
 
+  /* The grid was hard-wired to 6 rows x 2 columns. Wistia decides how many
+     chapters there are, and at 13 the flow spilled into a third, undeclared
+     column - so the two declared columns were squeezed to 1fr each while the
+     implicit one took the rest, and every title ellipsised. Columns are now
+     derived from available width with a readable minimum, so any chapter count
+     lays out correctly. */
   .ch-list { list-style: none; margin: 0; padding: 6px 8px 10px;
-    display: grid; grid-auto-flow: column; grid-template-rows: repeat(6, auto);
-    grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 22px; }
+    display: grid; grid-auto-flow: row;
+    /* 238px columns left the label only 115px of a 308px row - the flag,
+       number, progress dash, timestamp and chevron take the rest. Wider columns
+       and fewer of them; the panel already scrolls. */
+    grid-template-columns: repeat(auto-fill, minmax(336px, 1fr));
+    column-gap: 20px; }
   .ch-item { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px;
     padding: 10px 8px 10px 10px; cursor: pointer; text-align: left;
-    font-family: var(--font-mono); font-size: 11.5px; color: rgba(247,243,234,0.72);
+    font-family: var(--font-mono); font-size: 12px; color: rgba(247,243,234,0.78);
     background: transparent; border: 0; border-bottom: 1px solid rgba(247,243,234,0.09);
     border-left: 2px solid transparent; border-radius: 4px;
     transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out),
@@ -659,7 +669,12 @@ hr {
     transition: opacity 380ms var(--ease-out), transform 460ms var(--ease-out); }
   .ch-item[data-passed="true"] .ch-flag canvas { opacity: 1; transform: none; }
   .ch-n { flex: none; color: var(--wheat); font-size: 10px; font-variant-numeric: tabular-nums; }
-  .ch-label { flex: 1; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Chapter titles run to 38 characters. On one nowrap line that is guaranteed
+     truncation whatever the column width, which defeats the point of building a
+     custom index at all. Two lines, then clamp. */
+  .ch-label { flex: 1; letter-spacing: 0; overflow: hidden; white-space: normal;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    line-height: 1.34; }
   /* duration bar — how long this chapter actually runs, which the flat list threw away */
   .ch-len { flex: none; width: 42px; height: 2px; background: rgba(247,243,234,0.16); position: relative; }
   .ch-len i { position: absolute; inset: 0 auto 0 0; background: var(--wheat); opacity: 0.55; }
