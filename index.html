@@ -643,6 +643,10 @@ hr {
      implicit one took the rest, and every title ellipsised. Columns are now
      derived from available width with a readable minimum, so any chapter count
      lays out correctly. */
+  /* Row flow here is the no-script fallback. colFlow() below upgrades this to
+     column flow with a computed row count, so the numbers read top to bottom
+     down each column. It has to be computed: a hardcoded row count is what
+     originally spilled 13 chapters into an undeclared third column. */
   .ch-list { list-style: none; margin: 0; padding: 6px 8px 10px;
     display: grid; grid-auto-flow: row;
     /* 238px columns left the label only 115px of a 308px row - the flag,
@@ -2759,6 +2763,47 @@ hr {
     function pad(i){ return ('0'+i).slice(-2); }
 
     // one array renders both the index rows and the seam knots, so they can never drift
+    /* Column-major order: 01 runs down the left, then continues down the next
+       column. Both the column count and the row count are derived - columns
+       from the width available at a readable minimum, rows from ceil(n/cols) -
+       so any chapter count lays out without stranding items in a stray column. */
+    var CH_MIN_COL = 336;
+    function colFlow(){
+      var n = list.children.length;
+      if (!n) return false;
+      var w = list.clientWidth;
+      if (!w) return false;                            /* no box yet */
+      var gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+      var cols = Math.max(1, Math.min(n, Math.floor((w + gap) / (CH_MIN_COL + gap))));
+      var rows = Math.ceil(n / cols);
+      list.style.gridAutoFlow = 'column';
+      list.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))';
+      list.style.gridTemplateRows = 'repeat(' + rows + ', auto)';
+      return true;
+    }
+    /* The chapters nav carries the `hidden` attribute until the player reports
+       ready, so at build time the list has no box and colFlow cannot measure.
+       Waiting on a ResizeObserver to catch that transition proved unreliable,
+       so this retries on its own until the element has a width. */
+    function colFlowSoon(){
+      var tries = 0;
+      (function attempt(){
+        if (colFlow() || ++tries > 40) return;
+        setTimeout(attempt, 150);
+      })();
+    }
+    /* ResizeObserver on the list, not a window resize listener. colFlow writes
+       an INLINE grid-template-columns, which outranks the stylesheet's mobile
+       one-column rule - so if the recompute is ever missed the phone keeps a
+       two-column desktop grid and every label clips. The observer fires on any
+       box change, including one caused by a media query, which a window resize
+       handler alone did not reliably catch. */
+    var chT = null;
+    function chReflow(){ clearTimeout(chT); chT = setTimeout(colFlow, 120); }
+    try { new ResizeObserver(chReflow).observe(list); } catch (e) {
+      addEventListener('resize', chReflow, { passive: true });
+    }
+
     function build(chapters){
       stops = chapters;
       list.innerHTML = '';
@@ -2790,6 +2835,7 @@ hr {
       items = [].slice.call(document.querySelectorAll('.ch-item'));
       var c = document.querySelector('.ch-count'); if (c) c.textContent = chapters.length;
       layout();
+      colFlowSoon();
     }
 
     // Wistia keeps chapters on the media JSON. Read them there so Wistia stays the single
